@@ -1,0 +1,91 @@
+{% extends "pagina.twig" %}
+
+{% block extended_content %}
+    <section>
+
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
+        <div style="overflow:hidden;height:700px;width:100%;">
+            <div id="gmap_canvas" style="height:700px;width:100%;"></div>
+            <style>
+                #gmap_canvas img{max-width:none!important;background:none!important}
+            </style>
+        </div>
+
+    </section>
+
+    {% setcontent courses = 'courses/latest/10' allowpaging %}
+
+    <section class="section--cards--wide">
+        <div class="container">
+            <div class="grid">
+                
+                {% for course in courses %}   
+
+                {% include 'course_cardwide.twig' with { 'course': course } %} 
+
+                {% endfor %}
+
+                {{ pager() }}
+
+            </div>
+        </div>
+    </section>
+
+    {% setcontent courses = 'courses' %}
+    
+    <script type="text/javascript"> 
+
+        function init_map()
+        {
+            var myOptions = {
+                zoom:9,
+                center:new google.maps.LatLng(52.156634, 5.388123),
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                scrollwheel: false,
+                draggable: false
+            };
+
+            map = new google.maps.Map(document.getElementById("gmap_canvas"), myOptions);
+
+            {% for course in courses %}       
+                {% if course.location %}
+                
+                marker{{ course.id }} = new google.maps.Marker({map: map,position: new google.maps.LatLng({{ course.location.latitude }},{{ course.location.longitude }})});
+                infowindow{{ course.id }} = new google.maps.InfoWindow({content:"<b>{{course.title}}</b>" });
+                google.maps.event.addListener(marker{{ course.id }}, "click", function() {
+                    infowindow{{ course.id }}.open(map,marker{{ course.id }});
+                });
+                 
+                {% endif %}      
+                        
+            {% endfor %}
+        }
+
+        google.maps.event.addDomListener(window, 'load', init_map);
+
+        function thisTouchStart(e)
+        {
+            dragFlag = true;
+            start = e.touches[0].pageY; 
+        }
+
+        function thisTouchEnd()
+        {
+            dragFlag = false;
+        }
+
+        function thisTouchMove(e)
+        {
+            if ( !dragFlag ) return;
+            end = e.touches[0].pageY;
+            window.scrollBy( 0,( start - end ) );
+        }
+
+        document.getElementById("gmap_canvas").addEventListener("touchstart", thisTouchStart, true);
+        document.getElementById("gmap_canvas").addEventListener("touchend", thisTouchEnd, true);
+        document.getElementById("gmap_canvas").addEventListener("touchmove", thisTouchMove, true);
+
+    </script>
+
+{% endblock %}

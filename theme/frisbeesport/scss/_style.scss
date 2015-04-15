@@ -1,0 +1,244 @@
+
+.section-ultimate .arrow-link::before {
+    color: $nfb-blue;
+}
+
+.section-discgolf .arrow-link::before {
+    color: $nfb-green;
+}
+
+
+.section-ultimate .pdf-link::before {
+    color: $nfb-blue;
+}
+
+.section-discgolf .pdf-link::before {
+    color: $nfb-green;
+}
+
+.section-ultimate {
+   
+    
+.navigatie-afdelingen__tab--inactive:hover {
+    color: $nfb-blue; 
+    background-color: $nfb-blue-white;
+}
+
+.navigatie-afdelingen__tab--active {
+    color: $nfb-blue; 
+}
+
+    .top-menu-link:hover {
+        color: $nfb-blue;
+    }
+  
+       
+   
+}
+
+
+.section-discgolf {
+
+    
+    
+  
+
+.navigatie-afdelingen__tab--inactive:hover {
+    color: $nfb-green; 
+    background-color: $nfb-green-white;
+}
+
+.navigatie-afdelingen__tab--active {
+    color: $nfb-green; 
+}
+
+    
+    .top-menu-link:hover {
+    color: $nfb-green;
+}
+    
+   
+     
+
+}
+ 
+.afdeling--background {
+        background-color: $nfb-orange;
+}
+
+.afdeling--ultimate {
+    .afdeling--text {
+        a { 
+            color: $nfb-blue; 
+        }
+        
+        a:visited{
+            color: $nfb-blue;
+        }
+        
+        a:hover,
+        a:focus,
+        a:active { 
+            color: $nfb-blue-light;
+            text-decoration: underline;
+        }
+    }
+
+    .afdeling--link {
+        color: $nfb-blue;
+
+        &:visited{
+            color: $nfb-blue;
+        }
+        
+        &:hover,
+        &:focus,
+        &:active { 
+            color: $nfb-blue-light;
+            text-decoration: underline;
+        }  
+    }
+
+    .afdeling--background {
+        background-color: $nfb-blue;
+    }
+
+    .afdeling--color {
+        color: $nfb-blue;        
+    }
+   
+    .banner {
+        border-top-color: $nfb-blue;
+    }
+    
+    .separator {
+        border-top-color: $nfb-blue;
+    }
+    
+    .title-link {
+        &:hover, 
+        &:focus, 
+        &:active {
+            color: $nfb-blue;
+        }
+    }
+    
+    .afdeling--link--inverse {
+        &:hover, 
+        &:focus, 
+        &:active {
+            color: $nfb-blue;
+        }
+    }
+.btn-landing {
+  
+
+        a {
+            border-color: $nfb-blue;
+        }
+
+        a:hover {
+            background: $nfb-blue;
+        }
+    }
+    
+    .tag {
+        background: $nfb-blue;
+    }
+}
+
+.afdeling--discgolf {
+    .afdeling--text {
+        a, a:visited { 
+            color: $nfb-green; 
+        }
+        
+        a:hover,
+        a:focus,
+        a:active { 
+            color: $nfb-green-light;
+            text-decoration: underline;
+        }
+    }
+
+    .afdeling--link {
+        color: $nfb-green;
+        
+        &:visited{
+            color: $nfb-green;
+        }
+        
+        &:hover,
+        &:focus,
+        &:active { 
+            color: $nfb-green-light;
+            text-decoration: underline;
+        }  
+    }
+
+    .afdeling--background {
+        background-color: $nfb-green;
+    }
+
+    .afdeling--color {
+        color: $nfb-green;        
+    }
+
+    .banner {
+        border-top-color: $nfb-green;
+    }
+    
+    .separator {
+        border-top-color: $nfb-green;
+    }
+    
+    .title-link {
+        &:hover, 
+        &:focus, 
+        &:active {
+            color: $nfb-green;
+        }
+    }
+
+    .afdeling--link--inverse {
+        &:hover, 
+        &:focus, 
+        &:active {
+            color: $nfb-green;
+        }
+    }
+    
+    .btn-landing {
+  
+
+        a {
+            border-color: $nfb-green;
+        }
+
+        a:hover {
+            background: $nfb-green;
+        }
+    }
+    
+    .tag {
+        background: $nfb-green;
+    }
+}
+
+
+.section--inverse  {
+    .arrow-link::before {
+        color: #fff;
+    }
+    .arrow-link {
+        color: #fff;
+    }
+
+    .pdf-link::before {
+        color: #fff;
+    }
+
+    .pdf-link {
+        color: #fff;
+    }
+}

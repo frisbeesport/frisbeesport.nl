@@ -1,0 +1,91 @@
+
+// Footer menu
+// --------------------------------------------------
+
+
+.footer-logo {
+    @include span-columns(12);
+    text-align: center;
+    margin-top: 20px;
+    @include media($large) {
+        text-align: left;
+        @include span-columns(4);
+    }
+}
+
+.footer-logo-image {
+    
+}
+
+.footer-menu {
+    margin-top: 20px;
+    text-align: center;
+//     @include media($medium) {
+//        @include span-columns(6);
+//        text-align: left;
+//     }                                                                                                                                                                                                                                                                     
+    @include media($large) {
+        @include span-columns(2);
+        text-align: left;
+    }
+}
+
+.footer-menu__title {
+    @include font-size(16);
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 0.1rem;
+    margin-top: 0;
+    padding: 0;
+}
+
+.footer-menu__item {
+    @include font-size(16);
+    
+}
+/*
+.s-footer h3 a {
+    @include font-size(16);
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 0.1rem;
+    margin-top: 0;
+    padding: 0;
+}
+
+
+.footer-menu ul li a {
+    @include font-size(16);
+    font-weight: lighter;
+    color: #ffffff;
+}
+
+.footer-menu ul li a:hover {
+    @include font-size(16);
+    font-weight: lighter;
+    color: $nfb-orange-light;
+}
+
+.footer-menu h3 a:hover { 
+    color: $nfb-orange-light;
+}
+*/
+
+// Footer foot
+// --------------------------------------------------
+
+
+
+.section-footer-bottom .title {
+    
+    @include media($large) {
+        @include span-columns(9);
+    }
+}
+
+.section-footer-bottom .copyright {
+    
+    @include media($large) {
+        float: right;
+    } 
+}

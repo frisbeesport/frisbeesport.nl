@@ -1,0 +1,21 @@
+// Partners
+// --------------------------------------------------
+
+.c-partner {
+    text-align: center;
+    
+    @include media($medium) {
+        display: inline-block;
+        float:none;
+        width:25%;
+        margin:0px 20px 30px 20px;
+    }   
+    
+    @include media($large) {
+        display: inline-block;
+        width:20%;
+        margin:0px 20px 30px 20px;
+    }
+    
+    margin:0px 20px 50px 20px;
+}

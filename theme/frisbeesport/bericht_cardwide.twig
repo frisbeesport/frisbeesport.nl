@@ -1,0 +1,6 @@
+{% set afdeling = "" %}
+{% for tag in bericht.taxonomy.afdelingen %}
+    {% set afdeling = tag %}
+{% endfor %}
+
+{% include 'post_cardwide.twig' with { 'post': bericht, 'afdeling': afdeling } %}

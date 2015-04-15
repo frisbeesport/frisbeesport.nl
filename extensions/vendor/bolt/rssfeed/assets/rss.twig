@@ -1,0 +1,72 @@
+{% set title = '' %}
+{% set description = '' %}
+{% set link = paths.rooturl %}
+{% if afdeling == 'nieuws' %}
+    {% setcontent records = 'nieuws' %}
+    {% set title = 'Frisbeesport.nl - Nieuws' %}
+{% elseif afdeling == 'persberichten' %}
+    {% setcontent records = 'persberichten' %}
+    {% set title = 'Frisbeesport.nl - Persberichten' %}
+    {% set link = paths.rooturl ~ 'pagina/organisatie-pers' %}
+{% elseif afdeling == 'ultimate' %}
+    {% setcontent records = 'nieuws' where { afdelingen: 'ultimate' } %}
+    {% set title = 'Frisbeesport.nl - Ultimate' %}
+    {% set link = paths.rooturl ~ 'ultimate' %}
+{% elseif afdeling == 'discgolf' %}
+    {% setcontent records = 'nieuws' where { afdelingen: 'discgolf' } %}
+    {% set title = 'Frisbeesport.nl - Disc Golf' %}
+    {% set link = paths.rooturl ~ 'discgolf' %}
+{% elseif afdeling == 'organisatie' %}
+    {% setcontent records = 'nieuws' where { afdelingen: 'organisatie' } %}
+    {% set title = 'Frisbeesport.nl - Organisatie' %}
+    {% set link = paths.rooturl ~ 'organisatie' %}
+{% elseif afdeling == 'spelers' %}
+    {% setcontent records = 'berichten' %}
+    {% set title = 'Frisbeesport.nl - Berichten en verslagen' %}
+    {% set link = paths.rooturl ~ 'spelers' %}
+{% endif %}
+
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>{{ title }}</title>
+        <atom:link href="{{ paths.currenturl }}" rel="self" type="application/rss+xml"/>
+        <link>{{ link }}</link>
+{% if description is defined %}
+        <description>{{ description }}</description>
+{% endif %}
+        <language>en-us</language>
+        <generator>Bolt</generator>
+
+{% for record in records %}
+            <item>
+                <title>{{ record.title|striptags }}</title>
+                <link>{{ paths.hosturl }}{{ record.link }}</link>
+                <pubDate>
+                    {{ record.datepublish|date("r") }}
+                </pubDate>
+                <guid isPermaLink="false">{{ record.contenttype.singular_slug }}/{{ record.id }}</guid>
+{% if record.taxonomy.categories is defined %}
+{% for category in record.taxonomy.categories %}
+                <category><![CDATA[ {{ category }} ]]></category>
+{% endfor %}
+{% endif %}
+
+                <description>
+                {% if content_length == 0 %}
+                    {{ record.rss_safe('teaser')|raw }}
+                {% else %}
+                    {{ record.rss_safe('teaser', content_length)|raw }}
+                {% endif %}
+                </description>
+{% if record.image is not empty %}
+                <image>{{ paths.hosturl }}{{ thumbnail(record.image, 600, 400) }}</image>
+                <enclosure url="{{ paths.hosturl }}{{ thumbnail(record.image, 600, 400) }}" type="image/jpeg" />
+{% endif %}                
+            </item>
+
+{% endfor %}
+
+    </channel>
+</rss>

@@ -1,0 +1,29 @@
+{% extends "pagina.twig" %}
+
+{% block extended_content %}
+
+<section class="section--cards--small">
+    <div class="container">
+        <div class="grid">
+
+            <div class="section__header">
+                <div class="section__title"><h2>Concepten en opleidingen</h2></div>
+            </div>
+
+            <p>De Nederlandse Frisbee Bond ondersteunt verenigingen bij hun doelen door het aanbieden van opleidingen en concepten.</p>
+
+        </div>
+        
+        <div class="grid">
+
+            {% setcontent concepten = 'concepten' %}
+
+            {% for concept in concepten %}
+                {% include 'concept_card.twig' with { 'concept': concept } %}               
+            {% endfor %}
+            
+        </div>
+    </div>       
+</section>            
+
+{% endblock %}

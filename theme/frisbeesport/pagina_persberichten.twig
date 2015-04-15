@@ -1,0 +1,22 @@
+{% extends "pagina.twig" %}
+
+{% block extended_content %}
+
+    {% setcontent persberichten = 'persberichten/latest/10' allowpaging %}
+
+    <section class="section--cards--wide">
+        <div class="container">
+            <div class="grid">
+
+                {% for persbericht in persberichten %}       
+                  
+                    {% include 'persbericht_cardwide.twig' with { 'persbericht': persbericht } %} 
+                    
+                {% endfor %}
+                
+                {{ pager() }}
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

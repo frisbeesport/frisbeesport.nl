@@ -1,0 +1,40 @@
+{% setcontent topic = "topics/#{topicid}" %}<div class="topic">
+
+	{% if topic.image is not empty %}
+
+	<img class="topic__image" src="{{ topic.image|image(500,300,"c") }}">
+
+	{% endif %}
+
+	<div class="topic__content">
+
+		{% if topic.caption is not empty %}
+			
+		<h3 class="topic__title">{{ topic.caption }}</h3>
+		
+		{% endif %}
+
+
+		{% if topic.description is not empty %}
+
+		<p class="topic__text">{{ topic.description }}</p>
+
+		{% endif %}	
+
+
+		{% if topic.linktitle is not empty %}
+
+			{% if topic.selectpagina != '0' %}
+	            {% setcontent paginalink = "paginas/#{topic.selectpagina}" %}
+	            <a class="topic__link arrow-link" href="{{ paginalink.link }}">{{ topic.linktitle }}</a>
+			{% endif %}					
+
+			{% if topic.url is not empty %}
+				<a class="topic__link arrow-link" href="{{ topic.url }}">{{ topic.linktitle }}</a>
+			{% endif %}					
+			
+		{% endif %}	
+
+	</div>
+
+</div>

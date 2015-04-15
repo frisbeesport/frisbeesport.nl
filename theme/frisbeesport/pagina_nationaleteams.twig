@@ -1,0 +1,18 @@
+{% extends "pagina.twig" %}
+
+{% block extended_content %}
+    {% setcontent nationaleteams = 'nationaleteams' %}
+
+    <section class="section--cards--wide">
+        <div class="container">
+            <div class="grid">
+                
+                {% for team in nationaleteams %}       
+                    {% include 'nationaalteam_cardwide.twig' with { 'team': team } %} 
+                {% endfor %}
+                
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

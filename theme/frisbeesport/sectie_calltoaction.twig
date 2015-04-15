@@ -1,0 +1,47 @@
+<section class="section--call-to-action {% if sectie.achtergrond %}section--background{% endif %} {% if sectie.inverted %}section--inverse afdeling--background{% endif %}" 
+         style="{% if sectie.minheight %} min-height:{{sectie.minheight}}; {% endif %} 
+                {% if sectie.achtergrond %} background-image: url('{{ sectie.achtergrond|image(2000, 800, "c") }}'); {% endif %}">
+
+	<div class="container">
+		<div class="grid">
+
+			{% if sectie.caption is not empty %}
+
+			<div class="section__header">
+				<h2>{{ sectie.caption }}</h2>
+            </div>
+			
+			{% endif %}
+	
+			
+			{% if sectie.body is not empty %}
+			
+			{{ sectie.body }}
+
+			{% endif %}
+
+
+			{% if sectie.body_advanced is not empty %}
+			
+			{{ sectie.body_advanced }}
+
+			{% endif %}
+
+
+			{% if sectie.linktitle is not empty %}
+
+                {% if sectie.selectpagina != '0' %}
+                    {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
+            		<div class="btn-ghost"><a href="{{ paginalink.link }}">{{ sectie.linktitle }}</a> </div>
+				{% endif %}		
+            
+				 
+				{% if sectie.url is not empty %}
+            		<div class="btn-ghost"><a  href="{{ sectie.url }}">{{ sectie.linktitle }}</a></div>
+				{% endif %}					
+				
+			{% endif %}	
+
+		</div>			
+	</div>
+</section>

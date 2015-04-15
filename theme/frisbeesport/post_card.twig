@@ -1,0 +1,29 @@
+<div class="card card--small card--post">           
+
+    {% if post.image %}
+        <a href="{{ post.link }}">
+            <img class="card__image" src="{{ post.image|image(500, 300, "c") }}">
+        </a>
+    {% endif %}
+    
+    <div class="card__content">
+
+        <div class="card__date">{{ post.datecreated  | localdate("%e %B, %Y") }}</div>
+        <div class="clearfix"></div>
+
+        <h3 class="card__title"><a class="title-link" href="{{ post.link }}">{{ post.title }}</a></h2>
+
+    	{% if post.teaser is not empty %}
+        
+        <p class="card__text">
+            {{ post.teaser }}
+        </p>
+		
+		{% endif %}	
+
+        <a class="card__link arrow-link post-link" href="{{ post.link }}">Lees verder...</a>
+
+    </div>
+    
+</div>                                      
+      

@@ -1,0 +1,73 @@
+.btn-ghost {
+    display: block;
+    margin: 0 0 15px 0;
+    padding: 0.5625em 0em; 
+    @include media($medium) {
+        margin: 0 30px 0 0;
+        display: inline-block;
+    }
+}
+
+.btn-ghost:last-child {
+    margin: 0;
+}
+
+.btn-ghost a {
+	outline: none;
+	*zoom: 1;
+	text-align: center;
+	text-decoration: none;
+	font-family: inherit;
+	font-weight: 300;
+	letter-spacing: 1px;
+	vertical-align: middle;
+	border: 3px solid;
+	transition: all 0.6s ease;
+	box-sizing: border-box;
+	text-shadow: 0 1px 0 rgba(0,0,0,0.01);
+    border-radius: 3px;
+    font-size: 1.0625em;
+	padding: 0.5625em 1.5em;
+    color: #ffffff;
+	border-color: #ffffff;
+    cursor: pointer;
+}
+
+.btn-ghost a:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;	
+}
+
+.btn-landing {
+    display: block;
+    padding: 0.5625em 0em; 
+    margin: 0 30px 0 0;
+
+    a {
+        outline: none;
+        *zoom: 1;
+        text-align: center;
+        text-decoration: none;
+        font-family: inherit;
+        font-weight: 300;
+        letter-spacing: 1px;
+        vertical-align: middle;
+        border: 0px solid;
+        transition: all 0.6s ease;
+        box-sizing: border-box;
+        text-shadow: 0 1px 0 rgba(0,0,0,0.01);
+        border-radius: 3px;
+        font-size: 1.0625em;
+        padding: 0.5625em 1.5em;
+        color: black;
+        border-color: $nfb-orange;
+        cursor: pointer;
+        background: white;
+    }
+
+    a:hover {
+        background: $nfb-orange;
+        color: white;
+    }
+}

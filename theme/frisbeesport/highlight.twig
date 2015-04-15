@@ -1,0 +1,76 @@
+<style>
+	.section-showcase {
+		position: relative;
+	}
+
+	.section-showcase--image {
+		width: 48%;
+		background-size: cover;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-repeat: no-repeat;
+		background-position: left center;
+		background-attachment: scroll;
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+	}
+
+	.section-showcase-content-right {
+		margin-left: 50%;
+	}
+</style>
+
+<section class="section-showcase">
+	<div class="container">
+		<div class="grid">
+			<div class="section-showcase-content-right">
+
+			{% if highlight.title  is not empty %}
+			<div class="section--header">
+			
+			<div class="section--title">
+				<h2>{{ highlight.title }}</h2>
+			</div>
+			</div>
+			{% endif %}
+	
+			
+			{% if highlight.body is not empty %}
+			
+			{{ highlight.body }}
+
+			{% endif %}
+
+
+			{% if highlight.body_advanced is not empty %}
+			
+			{{ highlight.body_advanced }}
+
+			{% endif %}
+
+
+			{% if highlight.linktitle is not empty %}
+
+				{% if highlight.linkpagina != '0' %}
+                    {% setcontent paginalink = "paginas/#{highlight.linkpagina}" %}
+					<a class="arrow-link" href="{{ paginalink.link }}">{{ highlight.linktitle }}</a> 
+				{% endif %}							
+
+				{% if highlight.url is not empty %}
+					<a class="arrow-link" href="{{ highlight.url }}">{{ highlight.linktitle }}</a> 
+				{% endif %}					
+				
+			{% endif %}	
+			
+			</div>	
+		</div>			
+	</div>
+
+	{% if highlight.image is not empty %}
+		<div class="section-showcase--image" style="background-image: url('{{ paths.files }}{{ highlight.image }}');"></div>
+	{% endif %}	
+
+</section>

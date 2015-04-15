@@ -1,0 +1,22 @@
+<ul class="menu-top">
+
+    {% if menu[0].title %}
+
+    <li>
+        <a class="top-menu-link" href="{{ menu[0].link }}">Home</a>
+    </li>
+
+    {% endif %}
+
+
+    {% for item in menu | slice(1) %}
+
+        {% if item.top %}
+
+        <li><a class="top-menu-link" href="{{ item.link }}">{{item.label}}</a></li>
+        
+        {% endif %}
+
+    {% endfor %}      
+
+</ul> 

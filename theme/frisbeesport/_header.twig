@@ -1,0 +1,223 @@
+{% if afdeling == 'ultimate' %}
+    {% set logoimage = 'images/logo_ultimate_200.png' %}
+    {% set bannerimage = 'images/hero-ultimate_1500.jpg' %}
+    {% set logourl = 'ultimate' %}
+{% elseif afdeling == 'discgolf' %}
+    {% set logoimage = 'images/logo_discgolf_200.png' %}
+    {% set bannerimage = 'images/hero-discgolf_1500.jpg' %}
+    {% set logourl = 'discgolf' %}
+{% elseif afdeling == 'organisatie' %}
+    {% set logoimage = 'images/logo_organisatie_200.png' %}
+    {% set bannerimage = 'images/hero-organisatie_1500.jpg' %}
+    {% set logourl = 'organisatie' %}
+{% elseif afdeling == 'spelers' %}
+    {% set logoimage = 'images/logo_spelers_200.png' %}
+    {% set bannerimage = 'images/hero-spelers_1500.jpg' %}
+    {% set logourl = 'spelers' %}    
+{% else %}
+    {% set logoimage = 'images/logo_nfb_200.png' %}
+    {% set bannerimage = 'images/hero-ultimate_1500.jpg' %}
+    {% set logourl = '' %}
+{% endif %}
+
+<style>
+    .section--background {
+        text-shadow: 0px 0px 10px #000;
+    }
+ 
+
+.pagination ul {
+    margin-left: auto;
+    margin-right: auto;
+    
+    clear: both;
+    display: inline-block;
+     
+    padding: 0;
+    border: 0px solid #DDD;
+}
+
+.pagination ul li {
+    float: left;
+    list-style-type: none;
+    border-right: 0px solid #DDD;
+    padding: 4px 6px;
+}
+
+.pagination ul li:last-child {
+    border-right: none;
+}
+
+.pagination ul li.active {
+    font-weight: bold;
+    background-color: #CCF;
+}
+
+.pagination ul li a {
+    text-decoration: none;
+}
+
+
+.section--showcase__image--left--wide {
+    width: 67%;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-attachment: scroll;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.section--showcase__image--right--wide {
+    width: 67%;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-attachment: scroll;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+
+.section--showcase__content--left--wide {
+    margin-right: 69%;
+}
+
+.section--showcase__content--right--wide {
+    margin-left: 69%;
+}
+
+</style>
+<div class="navigatie-afdelingen afdeling--background">
+    <div class="navigatie-afdelingen__tabs">
+        <ul>
+            {% if afdeling == 'homepage' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}"><i class="fa fa-home"></i></a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}"><i class="fa fa-home"></i></a></li>
+            {% endif %}
+            
+            {% if afdeling == 'ultimate' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}ultimate">Ultimate</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}ultimate">Ultimate</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'discgolf' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}discgolf">Disc Golf</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}discgolf">Disc Golf</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'organisatie' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}organisatie">Organisatie</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}organisatie">Organisatie</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'spelers' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}spelers">Spelersinfo</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}spelers">Spelersinfo</a></li>
+            {% endif %}          
+        </ul>
+    </div>
+</div>
+
+<div class="navigatie-mobile afdeling--background">
+    <div class="navigatie-mobile__left">
+        <a class="navigatie-mobile__button domenu">menu</a>
+    </div>
+    <!--<div class="navigatie-mobile__right">
+        <a class="navigatie-mobile__button dosearch">search</i></a>
+    </div>-->
+</div>
+
+<div class="header">
+     
+    <div class="header__logo">
+        <a href="{{ paths.root }}{{ logourl }}"  rel="home" title="Frisbeesport.nl {{ afdeling }}">
+            <img src="{{ paths.theme }}{{ logoimage }}"  alt="{{ site.title }} {{ afdeling }} logo" class="animated bounceInDown">                
+        </a>
+    </div> 
+
+    {% if afdeling == 'spelers' %}
+        <ul class="header__social-icons">
+            <li class="header__facebook"><a href="https://www.facebook.com/groups/64115108734" target="_blank" title="Facebook"></a></li>
+            <li class="header__facebook"><a href="https://www.facebook.com/groups/discgolfnederland" target="_blank" title="Facebook"></a></li>
+        </ul>  
+    {% endif %} 
+    {% if afdeling == 'ultimate' %}
+        <ul class="header__social-icons">
+            <li class="header__facebook"><a href="https://www.facebook.com/pages/NFB-Ultimate-Frisbee/217928458228204" target="_blank" title="Facebook"></a></li>
+        </ul>  
+    {% endif %} 
+    {% if afdeling == 'discgolf' %}
+        <ul class="header__social-icons">
+            <li class="header__facebook"><a href="https://www.facebook.com/pages/NFB-Disc-Golf/179546828767517" target="_blank" title="Facebook"></a></li>
+        </ul>  
+    {% endif %} 
+
+    {{ menu(afdeling, '_menu_header.twig') }}
+       
+</div>
+
+
+{% if afdeling == 'homepage' %}
+<div class="banner {% if image %}banner--big{% else %}banner--small{% endif %}" style="background-image: url('{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}'); background-position-y: 0;">
+{% else %}
+<div class="banner {% if image %}banner--big{% else %}banner--small{% endif %}" style="background-image: url('{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}');">
+{% endif %}
+    {% include 'simple-search.twig' %}
+    
+        {% if afdeling == 'homepage' %}
+            
+            {{ menu('homepage_mobile', '_menu_simple.twig') }}
+    
+        {% else %}
+    
+            {{ menu(afdeling, '_menu_simple.twig') }}
+    
+        {% endif %}
+    
+    {% if fotograaf is not empty %}<p style="position: absolute; bottom: 0px; right: 20px; color: #fff">foto door {{ fotograaf }}</p>{% endif %}
+</div>
+
+<div class="header-content afdeling--background">
+    <div class="container">
+        <div class="header-content__text">
+            <h1>{{ title }}</h1>
+                        
+            <p>{{ header }}</p>
+
+            <div>
+                {% if buttons.linktitle1 is not empty  %}
+                    {% setcontent paginalink1 = "paginas/#{buttons.selectpagina1}" %}
+                    <div class="btn-ghost"><a alt="{{ buttons.linktitle1 }}" href="{{ paginalink1.link }}">{{ buttons.linktitle1 }}</a></div>
+                {% endif %}
+                
+                {% if buttons.linktitle2 is not empty  %}
+                    {% setcontent paginalink2 = "paginas/#{buttons.selectpagina2}" %}
+                    <div class="btn-ghost"><a alt="{{ buttons.linktitle2 }}" href="{{ paginalink2.link }}">{{ buttons.linktitle2 }}</a></div>
+                {% endif %}
+                
+                {% if buttons.linktitle3 is not empty %}
+                    {% setcontent paginalink3 = "paginas/#{buttons.selectpagina3}" %}
+                    <div class="btn-ghost"><a alt="{{ buttons.linktitle3 }}" href="{{ paginalink3.link }}">{{ buttons.linktitle3 }}</a></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="menu-screen"></div>

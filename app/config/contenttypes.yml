@@ -1,0 +1,909 @@
+# This file defines the contenttypes on the website. See the documentation for
+# details: http://docs.bolt.cm/content#defining-contenttypes
+
+nieuws:
+    name: Nieuws
+    singular_name: Nieuwsbericht
+    description: Nieuwsberichten zijn berichten gericht op buitenstaanders die de disciplines of organisatie (kies bij taxonomie) bij voorkeur positief en duidelijk voor het voetlicht brengen. 
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            type: text
+            group: content
+            variant: inline
+        selectauteurs:
+            info: Selecteer een auteur (of maak eerst een nieuwe)
+            label: Auteur
+            type: select
+            values: auteurs/title
+            group: content
+            autocomplete: true
+            
+        image:
+            info: De afbeelding die groot bovenaan in de header wordt getoond
+            type: image
+            upload: nieuws
+            group: header
+            required: true
+        fotograaf:
+            info: Als hier de fotograaf wordt ingevuld worden er credits getoond
+            label: Fotograaf afbeelding
+            type: text   
+            group: header          
+
+        teaser:
+            label: Teaser
+            info: De teaser wordt getoond als samenvatting op de website, twitter en facebook. Hou deze kort.
+            type: textarea
+            height: 100px
+            group: content
+        lead:
+            label: Inleiding
+            info: De teaser wordt getoond als samenvatting op de website, twitter en facebook. Hou deze kort.
+            type: textarea
+            height: 150px
+            group: content
+        body:
+            type: markdown
+            height: 600px
+            group: content
+            
+        video:
+            type: video
+            upload: nieuws
+            group: attachments
+        images:
+            type: imagelist
+            group: attachments
+        files:
+            type: filelist
+            group: attachments
+    taxonomy: [ afdelingen, tags ]
+    listing_records: 10
+    sort: -datepublish
+    recordsperpage: 10    
+    icon_many: fa:newspaper-o
+    icon_one: fa:newspaper-o    
+
+persberichten:
+    name: Persberichten
+    singular_name: Persbericht
+    description: Persberichten zijn enkel geschreven voor de pers om letterlijk over te kunnen nemen. Ze moeten dus op elke hoogte afgekapt kunnen worden. 
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            type: text
+            variant: inline
+            group: content
+        selectauteurs:
+            info: Selecteer een auteur (of maak eerst een nieuwe)
+            type: select
+            values: auteurs/title  
+            group: content     
+            
+        teaser:
+            label: Teaser
+            info: De teaser wordt getoond als samenvatting op de website, twitter en facebook. Hou deze kort.
+            type: textarea
+            height: 100px
+            group: content            
+        lead:
+            label: Inleiding
+            info: De inleiding van het persbericht. De eerste paragraaf, maar ook zichtbaar als samenvatting op de website, twitter en facebook
+            type: textarea
+            height: 150px
+        body:
+            type: markdown
+            height: 600px   
+            
+        image:
+            info: De afbeelding die groot bovenaan in de header wordt getoond
+            type: image
+            upload: nieuws
+            group: header
+            required: true
+        fotograaf:
+            info: Als hier de fotograaf wordt ingevuld worden er credits getoond
+            label: Fotograaf afbeelding
+            type: text   
+            group: header
+        
+        video:
+            type: video
+            group: attachments
+        images:
+            type: imagelist
+            group: attachments
+        files:
+            type: filelist
+            group: attachments
+    taxonomy: [ afdelingen, tags ]
+    listing_records: 10
+    sort: -datepublish
+    recordsperpage: 10           
+    icon_many: fa:newspaper-o
+    icon_one: fa:newspaper-o
+
+rss:
+    name: RSS feeds
+    singular_name: rss
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            type: text
+            variant: inline
+            group: content
+        afdeling:
+            type: select
+            values: [ nieuws, persberichten, ultimate, discgolf, organisatie, spelers ]
+            multiple: false
+    default_status: publish
+
+berichten:
+    name: Berichten
+    singular_name: Bericht
+    description: Berichten zijn enkel geschreven voor bestaande spelers en verenigingen. Doorzoekbaar op basis van de tags (taxonomie).
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            type: text
+            variant: inline
+            group: content
+        selectauteurs:
+            info: Selecteer een auteur (of maak eerst een nieuwe)
+            type: select
+            values: auteurs/title
+            group: content  
+            
+        teaser:
+            label: Teaser
+            info: De teaser wordt getoond als samenvatting op de website, twitter en facebook. Hou deze kort.
+            type: textarea
+            height: 100px
+            group: content                  
+        lead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: content
+        body:
+            type: markdown
+            height: 600px    
+            group: content
+            
+        image:
+            info: De afbeelding die groot bovenaan in de header wordt getoond
+            type: image
+            upload: nieuws
+            group: header
+        fotograaf:
+            info: Als hier de fotograaf wordt ingevuld worden er credits getoond
+            label: Fotograaf afbeelding
+            type: text   
+            group: header                 
+      
+        video:
+            type: video
+            group: attachments
+        images:
+            type: imagelist
+            group: attachments
+        files:
+            type: filelist
+            group: attachments
+    taxonomy: [ tags ]
+    listing_records: 10
+    default_status: publish
+    sort: -datepublish
+    recordsperpage: 10    
+    icon_many: fa:newspaper-o
+    icon_one: fa:newspaper-o    
+
+highlights:
+    name: Highlights
+    singular_name: Highlight
+    description: Een highlights is een tijdelijke melding die bovenaan een pagina verschijnt. Bijvoorbeeld informatie over de AndereSpelen actie. 
+    fields: 
+        title:
+            label: Titel
+            type: text
+            required: true
+            group: content
+            variant: inline
+        selectpagina:
+            label: Zichtbaar op pagina
+            type: select
+            values: paginas/slug
+            multiple: true
+            group: content             
+        image:
+            label: Afbeelding
+            type: image
+            upload: highlights           
+            group: content  
+        body:
+            label: Inhoud
+            type: markdown
+            height: 300px
+            group: content
+        body_advanced:
+            label: Geavanceerde inhoud
+            type: html
+            height: 600px
+            allowtwig: true           
+            group: geavanceerd            
+        
+        linktitle:
+            label: Link tekst
+            type: text
+            group: link
+        url:
+            label: Externe link
+            type: text
+            filter: url
+            group: link
+        linkpagina:
+            label: Interne link
+            type: select
+            values: paginas/slug
+            group: link 
+    searchable: false
+    default_status: published
+    icon_many: fa:bullhorn
+    icon_one: fa:bullhorn
+    
+auteurs:
+    name: Auteurs
+    singular_name: Auteur
+    description: Auteurs schrijven nieuwsberichten, persberichten of spelersberichten.
+    fields:
+        title:
+            label: Naam
+            type: text
+            required: true
+            variant: inline
+        description:
+            label: Korte biografie
+            info: Deze tekst wordt getoond bij een bericht geschreven door deze auteur.
+            type: textarea
+            height: 150px
+            required: false            
+        photo:
+            label: Foto
+            type: image
+            upload: auteurs
+    default_status: published
+    icon_many: fa:user
+    icon_one: fa:user
+    searchable: false
+    
+kader:
+    name: Kader
+    singular_name: Kaderlid
+    description: Kaderleden zijn de leden van de werkgroepen (en het bestuur) binnen de NFB.
+    fields:
+        title:
+            label: Naam
+            type: text
+            required: true
+            variant: inline
+        function:
+            label: Functie in werkgroep
+            type: text
+            variant: inline
+        email:
+            type: text
+            pattern: email
+            variant: inline
+        description:
+            label: Omschrijving
+            info: Deze korte omschrijving wordt getoond bij het kaderlid.
+            type: textarea
+            height: 150px
+        photo:
+            label: Foto
+            type: image
+            upload: kader
+    default_status: published
+    icon_many: fa:user
+    icon_one: fa:user
+    searchable: true
+        
+werkgroepen:
+    name: Werkgroepen
+    singular_name: Werkgroep
+    description: Werkgroepen zijn de werkgroepen binnen de NFB, inclusief het dagelijks bestuur. 
+    fields:
+        title:
+            label: Titel
+            type: text
+            required: true
+            variant: inline
+        email:
+            label: Email adres
+            type: text
+            pattern: email
+            variant: inline            
+        description:
+            label: Omschrijving
+            type: textarea
+            height: 150px
+        
+        lid1:
+            label: Lid 1
+            type: select
+            values: kader/title,function
+            group: Leden
+        lid2:
+            label: Lid 2
+            type: select
+            values: kader/title,function
+            group: Leden
+        lid3:
+            label: Lid 3
+            type: select
+            values: kader/title,function
+            group: Leden
+        lid4:
+            label: Lid 4
+            type: select
+            values: kader/title,function
+            group: Leden   
+        lid5:
+            label: Lid 5
+            type: select
+            values: kader/title,function
+            group: Leden
+        lid6:
+            label: Lid 6
+            type: select
+            values: kader/title,function
+            group: Leden
+        lid7:
+            label: Lid 7
+            type: select
+            values: kader/title,function
+            group: Leden
+        lid8:
+            label: Lid 8
+            type: select
+            values: kader/title,function
+            group: Leden               
+    default_status: published
+    icon_many: fa:group
+    icon_one: fa:group
+    searchable: true
+
+courses:
+    name: Courses
+    singular_name: Course
+    description: Courses zijn de vaste Disc Golf courses in Nederland.
+    fields: 
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            type: text
+            type: text
+            required: true
+            group: content
+            variant: inline
+        plaats:
+            label: Plaats
+            type: text
+            required: true 
+            group: content
+            variant: inline
+        description:
+            label: Omschrijving
+            type: markdown
+            height: 150px          
+            group: content       
+        adres:
+            label: Adres
+            type: markdown
+            height: 150px
+            group: content 
+        image:
+            label: Afbeelding
+            type: image
+            upload: courses           
+            group: content
+        location:
+            label: Locatie
+            type: geolocation            
+    icon_many: fa:cube
+    icon_one: fa:cube  
+    searchable: true
+    default_status: published
+    
+nationaleteams:
+    name: Nationale teams
+    singular_name: Nationaal team
+    description: De nationale teams Ultimate.
+    fields:
+        slug:
+            type: slug
+            uses: title
+        title:
+            label: Titel
+            type: text
+            required: true
+            variant: inline
+        omschrijving:
+            label: Omschrijving
+            type: text
+            variant: inline
+        missie:
+            type: textarea
+            height: 150px
+        photo:
+            label: Foto
+            type: image
+            upload: nationaleteams    
+        spelers:
+            label: Spelers
+            type: markdown
+            height: 400px
+        support:
+            label: Ondersteuning (coaches, e.d.)
+            type: markdown
+            height: 400px            
+    default_status: published
+    searchable: true
+    icon_many: fa:cube
+    icon_one: fa:cube
+    
+verenigingen:
+    name: Verenigingen
+    singular_name: Vereniging
+    description: Verenigingen zijn de Disc Golf en Ultimate verenigingen die lid zijn van de NFB. Kies het aanbod van de vereniging bij taxonomy.
+    fields:
+        title:
+            label: Naam
+            type: text
+            group: content
+            required: true
+            variant: inline
+        town:
+            label: Plaats
+            type: text
+            required: true
+            variant: inline
+        contact:
+            label: Contactpersoon
+            type: text
+            variant: inline
+        phone:
+            label: Telefoon
+            type: text
+            variant: inline
+        url:
+            label: Website
+            type: text
+            pattern: url
+            variant: inline
+        email:
+            label: Email
+            type: text
+            pattern: email
+            variant: inline
+        courses:
+            label: Courses
+            type: select
+            values: courses/title
+            multiple: true            
+        logo:
+            label: Logo
+            type: image
+            upload: verenigingen
+        location:
+            label: Locatie
+            type: geolocation
+    taxonomy: [ verenigingsaanbod ]
+    default_status: published
+    searchable: true
+    icon_many: fa:cube
+    icon_one: fa:cube
+    
+documenten:
+    name: Documenten
+    singular_name: Document
+    description: Documenten van de NFB.
+    fields:
+        title:
+            label: Titel
+            type: text
+            required: true
+        file:
+            label: Bestand
+            type: file
+            upload: documenten
+            required: true
+    icon_many: fa:file-pdf-o
+    icon_one: fa:file-pdf-o    
+    taxonomy: [ documentcategorien ]
+    searchable: true
+    default_status: published
+
+
+concepten:
+    name: Concepten
+    singular_name: Concept
+    description: Concepten (trainersopleiding, cityleague, beginnerscursus) aangeboden aan verenigingen door de NFB.
+    fields: 
+        title:
+            label: Titel
+            type: text
+            required: true
+            group: content
+            variant: inline
+        selectpagina:
+            label: Conceptpagina
+            type: select
+            values: paginas/title
+            group: content  
+        image:
+            label: Afbeelding
+            type: image
+            upload: concepten
+            group: content            
+        description:
+            label: Omschrijving
+            type: textarea
+            height: 150px
+            group: content
+    icon_many: fa:file-text-o
+    icon_one: fa:file-text-o
+    searchable: false
+    default_status: published
+    
+ultimateuitslagen:
+    name: UltimateUitslagen
+    singular_name: UltimateUitslag
+    description: Uitslagen van de Ultimate competitie.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            required: true
+            group: content
+            variant: inline
+        date:
+            label: datum
+            type: date
+            required: true
+            variant: inline
+        body:
+            label: Inhoud
+            type: markdown
+            height: 600px
+            group: content
+        bodyplus:
+            label: Geavanceerde inhoud
+            type: html
+            height: 600px
+            allowtwig: true           
+            group: geavanceerd
+    taxonomy: [ competities ]           
+    searchable: true
+    default_status: published
+    icon_many: fa:file-text-o
+    icon_one: fa:file-text-o
+
+paginas: 
+    name: Pagina's
+    singular_name: Pagina
+    description: Pagina's zijn alle vaste pagina's.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        template:
+            type: templateselect
+            filter: 'pagina*.twig'
+            group: content            
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: content
+            
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas
+            group: header
+        fotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: header
+        lead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: header
+        linktitle1:
+            label: Tekst button 1
+            type: text
+            group: header
+            variant: inline
+        selectpagina1:
+            label: Pagina button 1
+            type: select
+            values: paginas/slug
+            group: header   
+        linktitle2:
+            label: Tekst button 2
+            type: text
+            group: header
+            variant: inline
+        selectpagina2:
+            label: Pagina button 2
+            type: select
+            values: paginas/slug
+            group: header
+        linktitle3:
+            label: Tekst button 3
+            type: text
+            group: header
+            variant: inline            
+        selectpagina3:
+            label: Pagina button 3
+            type: select
+            values: paginas/slug
+            group: header   
+     
+        sectie1:
+            label: Sectie 1
+            type: select
+            values: secties/title
+            group: secties               
+        sectie2:
+            label: Sectie 2
+            type: select
+            values: secties/title
+            group: secties               
+        sectie3:
+            label: Sectie 3
+            type: select
+            values: secties/title
+            group: secties 
+        sectie4:
+            label: Sectie 4
+            type: select
+            values: secties/title
+            group: secties 
+        sectie5:
+            label: Sectie 5
+            type: select
+            values: secties/title
+            group: secties                           
+        sectie6:
+            label: Sectie 6
+            type: select
+            values: secties/title
+            group: secties 
+        sectiev1:
+            label: Voetsectie 1
+            type: select
+            values: secties/title
+            group: secties    
+        sectiev2:
+            label: Voetsectie 2
+            type: select
+            values: secties/title
+            group: secties                
+        sectiev3:
+            label: Voetsectie 3
+            type: select
+            values: secties/title
+            group: secties    
+        sectiev4:
+            label: Voetsectie 4
+            type: select
+            values: secties/title
+            group: secties     
+        
+               
+        body_advanced:
+            label: Geavanceerde inhoud
+            type: html
+            height: 900px
+            allowtwig: true           
+            group: geavanceerd             
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+
+secties:
+    name: Secties
+    singular_name: Sectie
+    description: Secties zijn onderdelen van de pagina's. Welke onderdelen van de sectie worden getoond hangt af van het gekozen template.
+    fields: 
+        title:
+            label: Naam ter identificatie
+            type: text
+            required: true
+            group: content
+            variant: inline
+        caption:
+            label: Titel
+            type: text
+            group: content 
+            variant: inline
+        image:
+            label: Afbeelding
+            type: image
+            upload: secties           
+            group: content  
+        body:
+            label: Inhoud
+            type: markdown
+            height: 300px
+            group: content
+        
+        achtergrond:
+            label: Achtergrond
+            type: image
+            upload: secties           
+            group: layout  
+        template:
+            type: templateselect
+            filter: 'sectie_*.twig' 
+            group: layout  
+        minheight:
+            label: Minimale hoogte
+            type: text
+            group: layout 
+            variant: inline
+        inverted:
+            label: Geinverteerd
+            type: checkbox
+            group: layout 
+            variant: inline
+            
+        linktitle:
+            label: Link tekst
+            type: text
+            group: link
+            variant: inline
+        url:
+            label: Externe link
+            type: text
+            filter: url
+            group: link
+            variant: inline
+        selectpagina:
+            label: Interne link
+            type: select
+            values: paginas/slug
+            group: link  
+            
+        topic1:
+            label: Topic 1
+            type: select
+            values: topics/title
+            group: topics   
+        topic2:
+            label: Topic 2
+            type: select
+            values: topics/title
+            group: topics 
+        topic3:
+            label: Topic 3
+            type: select
+            values: topics/title
+            group: topics 
+        topic4:
+            label: Topic 4
+            type: select
+            values: topics/title
+            group: topics       
+        topic5:
+            label: Topic 5
+            type: select
+            values: topics/title
+            group: topics   
+        topic6:
+            label: Topic 6
+            type: select
+            values: topics/title
+            group: topics 
+        topic7:
+            label: Topic 7
+            type: select
+            values: topics/title
+            group: topics 
+        topic8:
+            label: Topic 8
+            type: select
+            values: topics/title
+            group: topics     
+            
+        body_advanced:
+            label: Geavanceerde inhoud
+            type: html
+            height: 600px
+            allowtwig: true           
+            group: geavanceerd    
+    searchable: false
+    default_status: published
+    taxonomy: [ documentcategorien ]
+    icon_many: fa:file-o
+    icon_one: fa:file-o    
+
+topics:
+    name: Topics
+    singular_name: Topic
+    description: Topics zijn onderwerpen die in een sectie met het sectie_topics template worden weergegeven.
+    fields: 
+        title:
+            label: Naam ter identificatie
+            type: text
+            required: true
+            group: content
+            variant: inline
+        caption:
+            label: Titel
+            type: text
+            group: content
+            variant: inline
+        image:
+            label: Afbeelding
+            type: image
+            upload: topics           
+            group: content            
+        description:
+            label: Omschrijving
+            type: textarea
+            height: 150px
+            group: content
+            
+        linktitle:
+            label: Link tekst
+            type: text
+            group: link
+            variant: inline
+        url:
+            label: Externe link
+            type: text
+            filter: url
+            group: link
+            variant: inline
+        selectpagina:
+            label: Interne link
+            type: select
+            values: paginas/slug
+            group: link  
+            
+    searchable: false
+    default_status: published
+    icon_many: fa:file-o
+    icon_one: fa:file-o
