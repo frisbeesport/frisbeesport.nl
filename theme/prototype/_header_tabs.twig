@@ -1,0 +1,39 @@
+{% if afdeling != 'homepage' %}
+
+<div class="navigatie-afdelingen afdeling--background">
+    <div class="navigatie-afdelingen__tabs">
+        <ul>
+            {% if afdeling == 'homepage' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}"><i class="fa fa-home"></i></a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}"><i class="fa fa-home"></i></a></li>
+            {% endif %}
+            
+            {% if afdeling == 'ultimate' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}ultimate">Ultimate</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}ultimate">Ultimate</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'discgolf' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}discgolf">Disc Golf</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}discgolf">Disc Golf</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'organisatie' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}organisatie">Organisatie</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}organisatie">Organisatie</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'spelers' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}spelers">Spelersinfo</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}spelers">Spelersinfo</a></li>
+            {% endif %}          
+        </ul>
+    </div>
+</div>
+
+{% endif %}

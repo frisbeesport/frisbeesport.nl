@@ -158,7 +158,7 @@ class Library
      * @param array  $param
      * @param string $add
      *
-     * @return string
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public static function redirect($path, $param = array(), $add = '')
     {
@@ -184,6 +184,24 @@ class Library
         }
 
         return $app->redirect(self::path($path, $param, $add));
+    }
+
+    /**
+     * Get an array of the query parameters
+     * 
+     * @internal
+     *
+     * @param string $url
+     *
+     * @return array
+     */
+    public static function getQueryParameters($url)
+    {
+        $parsedUrl = parse_url($url);
+        parse_str($parsedUrl['query'], $parameters);
+        $parameters = array_diff($parameters, array(''));
+
+        return $parameters;
     }
 
     /**

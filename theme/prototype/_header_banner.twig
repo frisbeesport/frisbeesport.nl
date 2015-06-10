@@ -1,0 +1,45 @@
+{% if afdeling == 'homepage' %}
+<div class="banner {% if image %}banner--big{% else %}banner--small{% endif %}" style="background-image: url('{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}'); background-position-y: 0;">
+{% else %}
+<div class="banner {% if image %}banner--big{% else %}banner--small{% endif %}" style="background-image: url('{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}');">
+{% endif %}
+
+<div class="banner-content">
+    <div class="container">
+        <div class="banner-content__text">
+            
+            <h1>{{ title }}</h1>
+     
+        </div>
+    </div>
+</div>
+        
+    
+    {% if fotograaf is not empty %}<p style="position: absolute; bottom: 0px; right: 20px; color: #fff">foto door {{ fotograaf }}</p>{% endif %}
+</div>
+
+<div class="header-content afdeling--background">
+    <div class="container">
+        <div class="header-content__text">
+          
+<p>{{ header }}</p>
+
+            <div>
+                {% if buttons.linktitle1 is not empty  %}
+                    {% setcontent paginalink1 = "paginas/#{buttons.selectpagina1}" %}
+                    <div class="btn-ghost"><a alt="{{ buttons.linktitle1 }}" href="{{ paginalink1.link }}">{{ buttons.linktitle1 }}</a></div>
+                {% endif %}
+                
+                {% if buttons.linktitle2 is not empty  %}
+                    {% setcontent paginalink2 = "paginas/#{buttons.selectpagina2}" %}
+                    <div class="btn-ghost"><a alt="{{ buttons.linktitle2 }}" href="{{ paginalink2.link }}">{{ buttons.linktitle2 }}</a></div>
+                {% endif %}
+                
+                {% if buttons.linktitle3 is not empty %}
+                    {% setcontent paginalink3 = "paginas/#{buttons.selectpagina3}" %}
+                    <div class="btn-ghost"><a alt="{{ buttons.linktitle3 }}" href="{{ paginalink3.link }}">{{ buttons.linktitle3 }}</a></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

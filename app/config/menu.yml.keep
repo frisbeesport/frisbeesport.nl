@@ -1,0 +1,122 @@
+# This file defines the menus on the website. See the documentation for
+# details: http://docs.bolt.cm/menus
+
+homepage:
+  - label: Homepage
+    title: Homepage
+    path: /
+  - label: Ultimate
+    title: Ultimate 
+    path: pagina/ultimate    
+  - label: Disc Golf
+    title: Disc Golf
+    path: pagina/discgolf
+  - label: Organisatie
+    title: Organisatie
+    path: paginas/organisatie
+  - label: Pers
+    title: Pers
+    path: pagina/organisatie-pers
+  - label: Contact
+    title: Contact
+    path: pagina/organisatie-contact
+
+
+ultimate:
+  - label: Ultimate
+    title: Ultimate 
+    path: pagina/ultimate
+  - label: Jeugd
+    title: Jeugd Ultimate 
+    path: pagina/ultimate-jeugd
+  - label: Nationale teams
+    path: pagina/ultimate-nationale-teams
+  - label: Competitie
+    path: paginas/ultimate-competitie
+  - label: Speel Ultimate
+    path: pagina/ultimate-spelen
+  - label: Spelersinformatie
+    path: pagina/ultimate-community
+  - label: Nieuws
+    path: pagina/ultimate-nieuws
+  - label: Spirit of the Game
+    path: pagina/ultimate-spirit-of-the-game
+  - label: Speluitleg
+    path: /pagina/ultimate-speluitleg
+  - label: Scholen
+    path: /pagina/ultimate-scholen
+    
+discgolf:
+  - label: Disc Golf
+    title: Disc Golf
+    path: pagina/discgolf
+#  - label: Nationaal team
+#    title: Disc Golf nationaal team
+#    path: pagina/discgolf-nationaal-team
+  - label: Competitie
+    title: Disc Golf Competitie
+    path: pagina/discgolf-competitie
+  - label: Courses
+    title: Disc Golf Courses
+    path: pagina/discgolf-courses
+#  - label: Speel Disc Golf
+#    title: Speel Disc Golf
+#    path: pagina/discgolf-spelen
+  - label: Nieuws
+    path: pagina/discgolf-nieuws    
+#  - label: Speluitleg
+#    path: /pagina/discgolf-speluitleg    
+  - label: Contact
+    title: Contact
+    path: pagina/discgolf-contact
+    
+organisatie:
+  - label: Organisatie
+    title: Organisatie
+    path: paginas/organisatie
+  - label: Nieuws
+    title: Organisatie Nieuws
+    path: pagina/organisatie-nieuws
+  - label: Kader
+    title: Organisatie Kader
+    path: pagina/organisatie-kader
+  - label: Beleid
+    title: Organisatie Beleid
+    path: pagina/organisatie-beleid
+  - label: Pers
+    title: Pers
+    path: pagina/organisatie-pers
+  - label: Contact
+    title: Contact
+    path: pagina/organisatie-contact
+  - label: Verenigingsinformatie
+    title: Verenigingsinformatie
+    path: pagina/organisatie-verenigingen
+  - label: Vacatures
+    title: Vacatures
+    path: /pagina/organisatie-vacatures
+  - label: Bestuursprofiel
+    title: Bestuursprofiel
+    path: /pagina/organisatie-bestuursprofiel
+  - label: Contributies
+    title: Contributues
+    path: /pagina/verenigingen-contributies
+    
+algemeen:
+  - label: Algemeen
+    title: Algemeen
+  - label: Overige sporten
+    title: Overige sporten
+    path: pagina/overige-sporten
+  - label: Records
+    title: Records
+    path: pagina/records
+  - label: Clinics
+    title: Clinics
+    path: /pagina/clinics 
+  - label: Geschiedenis
+    title: Geschiedenis van de frisbeesport
+    path: /pagina/geschiedenis
+  - label: NOC*NSF
+    title: NOC*NSF
+    path: /pagina/nocnsf

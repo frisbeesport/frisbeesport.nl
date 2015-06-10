@@ -1,0 +1,87 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+ 
+
+{% endblock %}
+
+{% block sectie_content %}
+
+    <div class="container">
+        <div class="grid section__content">
+
+            {% if sectie.caption  is not empty %}
+			
+            <div class="section__header">
+                <div class="section__title">
+                    <h2>{{ sectie.caption }}</h2>
+                </div>
+			</div>
+            
+			{% endif %}
+
+            
+
+            {% if sectie.body is not empty %}
+			
+            <div class="afdeling--text">
+			{{ sectie.body }}
+            </div>    
+            
+			{% endif %}
+
+
+			{% if sectie.body_advanced is not empty %}
+			
+            <div class="afdeling--text">
+			{{ sectie.body_advanced }}
+            </div>
+            
+			{% endif %}
+            
+            {% setcontent documenten = 'documenten' %}
+            
+            <ul class="documenten">
+
+	            {% for document in documenten %}
+
+	            	{% set match = true %}
+            	    {% for link, value in sectie.taxonomy.documentcategorien %}
+            			{% if value not in document.taxonomy.documentcategorien %}
+							{% set match = false %} 
+            			{% endif %}
+        			{% endfor %}
+
+					{% if match %}
+                        {% setcontent werkgroep = "werkgroepen/#{document.werkgroep}" %}
+                        {% set werkgroeplink = "organisatie-kader/#werkgroep#{document.werkgroep}" %}
+					
+	                	<li id="document{{ document.id }}" class="document">
+                            <div class="document__title"><a class="pdf-link" href="{{ paths.files }}{{ document.file }}">{{ document.title }}</a></div>
+                            <div class="document__datum">{{ document.date }}</div>
+                            <div class="document__contact"><a href="{{ werkgroeplink }}">{{ werkgroep.title }}</a></div>
+                        </li>
+					{% endif %}
+
+	            {% endfor %}
+
+            </ul>
+
+            {% if sectie.linktitle is not empty %}
+				
+				{% if sectie.selectpagina != '0' %}
+                    {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
+					<a class="btn-ghost" href="{{ paginalink.link }}">{{ sectie.linktitle }}</a> 
+				{% endif %}						
+
+				{% if sectie.url is not empty %}
+					<a class="arrow-link" href="{{ sectie.url }}">{{ sectie.linktitle }}</a> 
+				{% endif %}					
+				
+			{% endif %}	
+            
+        </div>
+    </div>
+
+{% endblock %}

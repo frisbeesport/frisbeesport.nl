@@ -1,0 +1,42 @@
+<div id="course{{ course.id }}" class="widecard card--course">           
+
+    {% if course.image %}
+
+    <div class="widecard-image">    
+        <img class="card__image" src="{{ course.image|image(1000, 600, "c") }}">
+    </div>
+
+    {% endif %}
+    
+
+    <div class="widecard-header">
+                        
+        <h2 class="card__title">{{ course.title }}</h2>
+        
+        {% if course.plaats %}
+    
+        <h3 class="card__subtitle">{{ course.plaats }}</h3>
+        
+        {% endif %}
+        
+    </div>
+
+    <div class="widecard-copy">
+
+        {% if course.description %}
+
+        <p class="card__text">{{ course.description }}</p>
+
+        {% endif %}
+
+        
+        {% if course.adres %}
+
+        <p class="card__details">{{ course.adres }}</p>
+        
+        {% endif %}
+
+    </div>
+</div>                                      
+                                       
+

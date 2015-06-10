@@ -17,9 +17,9 @@
 # - 'anonymous': this role is automatically assigned at all times, even when
 #   no user is logged in at all.
 roles:
-#    gastreporter:
-#        description: Kan alleen nieuwe berichten schrijven.
-#        label: Gastreporter
+    gastreporter:
+        description: Kan alleen nieuwe berichten schrijven.
+        label: Gastreporter
     reporter:
         description: Kan berichten, nieuwsberichten en persberichten bewerken.
         label: Reporter
@@ -55,7 +55,7 @@ global:
     dbupdate_result: [ admin, developer ]
     extensions: [ developer ]
     extensions:config: [ developer ]
-    fileedit: [ developer ]
+    fileedit: [ admin, developer ]
     files:config: [ developer ]
     files:theme: [ developer ]
     files:uploads: [ admin, developer, chief-editor, editor ]
@@ -208,24 +208,25 @@ contenttypes:
     nieuws:
         edit: [ reporter ]
         create: [ reporter ]
-        publish: [ reporter ]
+        publish: [ hoofdredacteur ]
         depublish: [ reporter ]
         delete: [ reporter ]
         view: [ reporter ]  
     persberichten:
         edit: [ reporter ]
         create: [ reporter ]
-        publish: [ reporter ]
+        publish: [ hoofdredacteur ]
         depublish: [ reporter ]
         delete: [ reporter ]
         view: [ reporter ]    
     berichten:
         edit: [ reporter ]
-        create: [ reporter ]
+        create: [ gastreporter, reporter ]
         publish: [ reporter ]
         depublish: [ reporter ]
         delete: [ reporter ]
         view: [ reporter ]
+        change-ownership: [ reporter ]
     paginas:
         edit: [ hoofdredacteur ]
         create: [ hoofdredacteur ]

@@ -1,0 +1,70 @@
+// =========================================================================================
+// Desktop
+// =========================================================================================
+
+.navigatie-afdelingen {
+    display: none;
+
+    @include media($large-screen) { 
+        display: block;
+    }
+        
+    margin: 0;
+    padding: 0;
+    width: 100%;
+
+    height: 28px;
+    background-color: $nfb-theme;    
+}
+
+.navigatie-afdelingen__tabs {
+    float: right;
+    margin-right:20px;
+    height: 28px;
+    
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        
+        li {
+            float: left; 
+        }
+    }
+}
+
+.navigatie-afdelingen__tab {
+    float: left;
+    margin: 3px 0px 0 0;
+    height: 25px;
+    padding-left: 15px;
+    padding-top: 3px;
+    padding-right: 15px;
+    border-radius: 3px 3px 0 0;
+    font-size: 0.75em;
+}
+
+.navigatie-afdelingen__tab--inactive,
+.navigatie-afdelingen__tab--inactive:visited,
+.navigatie-afdelingen__tab--inactive:active {
+    color: white;
+    background-color: transparent;
+}
+
+.navigatie-afdelingen__tab--inactive:hover {
+    color: $nfb-theme; 
+    background-color: $nfb-theme-white;
+}
+
+.navigatie-afdelingen__tab--active {
+    background-color: white;
+    color: $nfb-theme; 
+}
+
+.navigatie-afdelingen__title {
+    float: left;
+    color: white;
+    margin: 10px 0 0 20px;
+}
+       
+

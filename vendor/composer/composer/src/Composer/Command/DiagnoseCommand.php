@@ -51,6 +51,9 @@ EOT
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $composer = $this->getComposer(false);
@@ -98,21 +101,27 @@ EOT
             }
         } else {
             $this->getIO()->write('Checking github.com rate limit: ', false);
-            $rate = $this->getGithubRateLimit('github.com');
-
-            if (10 > $rate['remaining']) {
-                $this->getIO()->write('<warning>WARNING</warning>');
-                $this->getIO()->write(sprintf(
-                    '<comment>Github has a rate limit on their API. '
-                    . 'You currently have <options=bold>%u</options=bold> '
-                    . 'out of <options=bold>%u</options=bold> requests left.' . PHP_EOL
-                    . 'See https://developer.github.com/v3/#rate-limiting and also' . PHP_EOL
-                    . '    https://getcomposer.org/doc/articles/troubleshooting.md#api-rate-limit-and-oauth-tokens</comment>',
-                    $rate['remaining'],
-                    $rate['limit']
-                ));
-            } else {
-                $this->getIO()->write('<info>OK</info>');
+            try {
+                $rate = $this->getGithubRateLimit('github.com');
+                $this->outputResult(true);
+                if (10 > $rate['remaining']) {
+                    $this->getIO()->write('<warning>WARNING</warning>');
+                    $this->getIO()->write(sprintf(
+                        '<comment>Github has a rate limit on their API. '
+                        . 'You currently have <options=bold>%u</options=bold> '
+                        . 'out of <options=bold>%u</options=bold> requests left.' . PHP_EOL
+                        . 'See https://developer.github.com/v3/#rate-limiting and also' . PHP_EOL
+                        . '    https://getcomposer.org/doc/articles/troubleshooting.md#api-rate-limit-and-oauth-tokens</comment>',
+                        $rate['remaining'],
+                        $rate['limit']
+                    ));
+                }
+            } catch (\Exception $e) {
+                if ($e instanceof TransportException && $e->getCode() === 401) {
+                    $this->outputResult('<comment>The oauth token for github.com seems invalid, run "composer config --global --unset github-oauth.github.com" to remove it</comment>');
+                } else {
+                    $this->outputResult($e);
+                }
             }
         }
 
@@ -263,25 +272,23 @@ EOT
         }
     }
 
+    /**
+     * @param string $domain
+     * @param string $token
+     * @return array
+     * @throws TransportException
+     */
     private function getGithubRateLimit($domain, $token = null)
     {
         if ($token) {
             $this->getIO()->setAuthentication($domain, $token, 'x-oauth-basic');
         }
 
-        try {
-            $url = $domain === 'github.com' ? 'https://api.'.$domain.'/rate_limit' : 'https://'.$domain.'/api/rate_limit';
-            $json = $this->rfs->getContents($domain, $url, false, array('retry-auth-failure' => false));
-            $data = json_decode($json, true);
+        $url = $domain === 'github.com' ? 'https://api.'.$domain.'/rate_limit' : 'https://'.$domain.'/api/rate_limit';
+        $json = $this->rfs->getContents($domain, $url, false, array('retry-auth-failure' => false));
+        $data = json_decode($json, true);
 
-            return $data['resources']['core'];
-        } catch (\Exception $e) {
-            if ($e instanceof TransportException && $e->getCode() === 401) {
-                return '<comment>The oauth token for '.$domain.' seems invalid, run "composer config --global --unset github-oauth.'.$domain.'" to remove it</comment>';
-            }
-
-            return $e;
-        }
+        return $data['resources']['core'];
     }
 
     private function checkDiskSpace($config)
@@ -308,6 +315,9 @@ EOT
         return true;
     }
 
+    /**
+     * @param bool|string|\Exception $result
+     */
     private function outputResult($result)
     {
         if (true === $result) {
@@ -359,10 +369,6 @@ EOT
             $errors['hash'] = true;
         }
 
-        if (!extension_loaded('ctype')) {
-            $errors['ctype'] = true;
-        }
-
         if (!ini_get('allow_url_fopen')) {
             $errors['allow_url_fopen'] = true;
         }
@@ -371,11 +377,11 @@ EOT
             $errors['ioncube'] = ioncube_loader_version();
         }
 
-        if (version_compare(PHP_VERSION, '5.3.2', '<')) {
+        if (PHP_VERSION_ID < 50302) {
             $errors['php'] = PHP_VERSION;
         }
 
-        if (!isset($errors['php']) && version_compare(PHP_VERSION, '5.3.4', '<')) {
+        if (!isset($errors['php']) && PHP_VERSION_ID < 50304) {
             $warnings['php'] = PHP_VERSION;
         }
 
@@ -429,11 +435,6 @@ EOT
                     case 'hash':
                         $text = PHP_EOL."The hash extension is missing.".PHP_EOL;
                         $text .= "Install it or recompile php without --disable-hash";
-                        break;
-
-                    case 'ctype':
-                        $text = PHP_EOL."The ctype extension is missing.".PHP_EOL;
-                        $text .= "Install it or recompile php without --disable-ctype";
                         break;
 
                     case 'unicode':

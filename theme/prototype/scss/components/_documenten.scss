@@ -1,0 +1,28 @@
+.document__title {
+    width: 100%;
+
+    @include media($large-screen) {
+        display: inline-block;
+        width:60%;
+    }     
+}
+
+.document__datum {
+    display: none;
+    @include media($large-screen) {
+        display: inline-block;
+        width:18%;
+    } 
+}
+
+.document__contact {
+    display: none;
+    @include media($large-screen) {
+        display: inline-block;
+        width:18%;
+    } 
+}
+
+ul.documenten {
+    padding: 0;
+}

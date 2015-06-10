@@ -21,6 +21,10 @@ nieuws:
             values: auteurs/title
             group: content
             autocomplete: true
+        auteur:
+            type: text
+            variant: inline
+            group: content
             
         image:
             info: De afbeelding die groot bovenaan in de header wordt getoond
@@ -86,6 +90,10 @@ persberichten:
             type: select
             values: auteurs/title  
             group: content     
+        auteur:
+            type: text
+            variant: inline
+            group: content
             
         teaser:
             label: Teaser
@@ -130,24 +138,8 @@ persberichten:
     icon_many: fa:newspaper-o
     icon_one: fa:newspaper-o
 
-rss:
-    name: RSS feeds
-    singular_name: rss
-    fields:
-        slug:
-            type: slug
-            uses: title
-            group: content
-        title:
-            type: text
-            variant: inline
-            group: content
-        afdeling:
-            type: select
-            values: [ nieuws, persberichten, ultimate, discgolf, organisatie, spelers ]
-            multiple: false
-    default_status: publish
 
+    
 berichten:
     name: Berichten
     singular_name: Bericht
@@ -166,6 +158,10 @@ berichten:
             type: select
             values: auteurs/title
             group: content  
+        auteur:
+            type: text
+            variant: inline
+            group: content
             
         teaser:
             label: Teaser
@@ -210,59 +206,6 @@ berichten:
     recordsperpage: 10    
     icon_many: fa:newspaper-o
     icon_one: fa:newspaper-o    
-
-highlights:
-    name: Highlights
-    singular_name: Highlight
-    description: Een highlights is een tijdelijke melding die bovenaan een pagina verschijnt. Bijvoorbeeld informatie over de AndereSpelen actie. 
-    fields: 
-        title:
-            label: Titel
-            type: text
-            required: true
-            group: content
-            variant: inline
-        selectpagina:
-            label: Zichtbaar op pagina
-            type: select
-            values: paginas/slug
-            multiple: true
-            group: content             
-        image:
-            label: Afbeelding
-            type: image
-            upload: highlights           
-            group: content  
-        body:
-            label: Inhoud
-            type: markdown
-            height: 300px
-            group: content
-        body_advanced:
-            label: Geavanceerde inhoud
-            type: html
-            height: 600px
-            allowtwig: true           
-            group: geavanceerd            
-        
-        linktitle:
-            label: Link tekst
-            type: text
-            group: link
-        url:
-            label: Externe link
-            type: text
-            filter: url
-            group: link
-        linkpagina:
-            label: Interne link
-            type: select
-            values: paginas/slug
-            group: link 
-    searchable: false
-    default_status: published
-    icon_many: fa:bullhorn
-    icon_one: fa:bullhorn
     
 auteurs:
     name: Auteurs
@@ -444,11 +387,12 @@ nationaleteams:
             required: true
             variant: inline
         omschrijving:
-            label: Omschrijving
+            label: Ondertitel
             type: text
             variant: inline
         missie:
-            type: textarea
+            label: Omschrijving
+            type: markdown
             height: 150px
         photo:
             label: Foto
@@ -461,7 +405,11 @@ nationaleteams:
         support:
             label: Ondersteuning (coaches, e.d.)
             type: markdown
-            height: 400px            
+            height: 400px
+        jeugd:
+            label: Jeugdteam
+            type: checkbox
+            variant: inline
     default_status: published
     searchable: true
     icon_many: fa:cube
@@ -533,12 +481,53 @@ documenten:
             type: file
             upload: documenten
             required: true
+        date:
+            label: Laatst gewijzigd
+            type: date
+            required: true
+            variant: inline 
+        werkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title
     icon_many: fa:file-pdf-o
     icon_one: fa:file-pdf-o    
     taxonomy: [ documentcategorien ]
     searchable: true
     default_status: published
 
+
+aanbod:
+    name: Aanbod
+    singular_name: Aanbieding
+    description: Concepten (trainersopleiding, cityleague, beginnerscursus) aangeboden aan verenigingen door de NFB.
+    fields: 
+        title:
+            label: Titel
+            type: text
+            required: true
+            group: content
+            variant: inline
+        selectpagina:
+            label: Conceptpagina
+            type: select
+            values: paginas/title
+            group: content  
+        image:
+            label: Afbeelding
+            type: image
+            upload: concepten
+            group: content            
+        description:
+            label: Omschrijving
+            type: textarea
+            height: 150px
+            group: content
+    icon_many: fa:file-text-o
+    icon_one: fa:file-text-o
+    searchable: true
+    default_status: published
+    
 
 concepten:
     name: Concepten
@@ -568,7 +557,7 @@ concepten:
             group: content
     icon_many: fa:file-text-o
     icon_one: fa:file-text-o
-    searchable: false
+    searchable: true
     default_status: published
     
 ultimateuitslagen:
@@ -603,7 +592,7 @@ ultimateuitslagen:
             allowtwig: true           
             group: geavanceerd
     taxonomy: [ competities ]           
-    searchable: true
+    searchable: false
     default_status: published
     icon_many: fa:file-text-o
     icon_one: fa:file-text-o
@@ -677,7 +666,19 @@ paginas:
             type: select
             values: paginas/slug
             group: header   
-     
+
+        parent:
+            info: Selecteer een hoofdpagina
+            type: select
+            values: paginas/title  
+            group: groepering
+            variant: inline
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: groepering
+            variant: inline
+            
         sectie1:
             label: Sectie 1
             type: select
@@ -780,7 +781,7 @@ secties:
             group: layout  
         minheight:
             label: Minimale hoogte
-            type: text
+            type: integer
             group: layout 
             variant: inline
         inverted:
@@ -788,7 +789,22 @@ secties:
             type: checkbox
             group: layout 
             variant: inline
-            
+        parallax:
+            label: Parallax
+            type: checkbox
+            group: layout 
+            variant: inline
+        achtergrondkleur:
+            label: Achtergrondkleur
+            type: text
+            variant: inline           
+            group: layout  
+        overlaykleur:
+            label: Overlaykleur
+            type: text
+            variant: inline           
+            group: layout  
+                    
         linktitle:
             label: Link tekst
             type: text
@@ -853,7 +869,7 @@ secties:
             height: 600px
             allowtwig: true           
             group: geavanceerd    
-    searchable: false
+    searchable: true
     default_status: published
     taxonomy: [ documentcategorien ]
     icon_many: fa:file-o
@@ -902,8 +918,26 @@ topics:
             type: select
             values: paginas/slug
             group: link  
-            
     searchable: false
     default_status: published
     icon_many: fa:file-o
     icon_one: fa:file-o
+
+rss:
+    name: RSS feeds
+    singular_name: rss
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            type: text
+            variant: inline
+            group: content
+        afdeling:
+            type: select
+            values: [ nieuws, persberichten, ultimate, discgolf, organisatie, spelers ]
+            multiple: false
+    default_status: publish
+    searchable: false

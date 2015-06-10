@@ -20,7 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Composer\Command;
-use Composer\Command\Helper\DialogHelper;
 use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\IOInterface;
@@ -66,7 +65,6 @@ class Application extends BaseApplication
             date_default_timezone_set(@date_default_timezone_get());
         }
 
-        ErrorHandler::register();
         parent::__construct('Composer', Composer::VERSION);
     }
 
@@ -90,8 +88,9 @@ class Application extends BaseApplication
     public function doRun(InputInterface $input, OutputInterface $output)
     {
         $this->io = new ConsoleIO($input, $output, $this->getHelperSet());
+        ErrorHandler::register($this->io);
 
-        if (version_compare(PHP_VERSION, '5.3.2', '<')) {
+        if (PHP_VERSION_ID < 50302) {
             $this->getIO()->writeError('<warning>Composer only officially supports PHP 5.3.2 and above, you will most likely encounter problems with your PHP '.PHP_VERSION.', upgrading is strongly recommended.</warning>');
         }
 
@@ -105,7 +104,7 @@ class Application extends BaseApplication
             }
             if ($commandName !== 'self-update' && $commandName !== 'selfupdate') {
                 if (time() > COMPOSER_DEV_WARNING_TIME) {
-                    $this->getIO()->writeError(sprintf('<warning>Warning: This development build of composer is over 30 days old. It is recommended to update it by running "%s self-update" to get the latest version.</warning>', $_SERVER['PHP_SELF']));
+                    $this->getIO()->writeError(sprintf('<warning>Warning: This development build of composer is over 60 days old. It is recommended to update it by running "%s self-update" to get the latest version.</warning>', $_SERVER['PHP_SELF']));
                 }
             }
         }
@@ -320,16 +319,5 @@ class Application extends BaseApplication
         $definition->addOption(new InputOption('--working-dir', '-d', InputOption::VALUE_REQUIRED, 'If specified, use the given directory as working directory.'));
 
         return $definition;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getDefaultHelperSet()
-    {
-        $helperSet = parent::getDefaultHelperSet();
-        $helperSet->set(new DialogHelper());
-
-        return $helperSet;
     }
 }

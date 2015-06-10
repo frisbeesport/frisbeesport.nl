@@ -1,0 +1,142 @@
+{# parameter afdeling: Afdeling (required) #}
+
+{# parameter title: Title of page (required) #}
+{# parameter url: Url to page (required) #}
+
+{# parameter description: Description of page (optional) #}
+{# parameter image: Image to include (optional) #}
+{# parameter tags: Author of page (optional) #}
+
+{% set rss = afdeling %}
+{% if afdeling == 'homepage' %}
+	{% set rss = 'nieuws' %}
+{% endif %}
+
+{% set cssfile = 'main_organisatie.css' %}
+{% if afdeling == 'ultimate' %}
+	{% set cssfile = 'main_ultimate.css' %}
+{% elseif afdeling == 'discgolf' %}
+	{% set cssfile = 'main_discgolf.css' %}
+{% endif %}
+
+{% set simpletags = ['frisbeesport'] %}
+{% if afdeling == 'ultimate' %}
+	{% set simpletags = simpletags|merge(['ultimate']) %}
+{% elseif afdeling == 'discgolf' %}
+	{% set simpletags = simpletags|merge(['discgolf']) %}
+{% elseif afdeling == 'organisatie' %}
+	{% set simpletags = simpletags|merge(['sportbond']) %}
+{% endif %}
+{% set simpletags = simpletags|merge(['nfb']) %}
+{% if simpletags is not empty %}
+	{% for link,value in tags %}
+		{% set simpletags = simpletags|merge([value]) %}
+	{%endfor %}
+{% endif %}
+
+{% if description is empty %}
+	{% if afdeling == 'ultimate' %}
+		{% set description = 'Ultimate is de meest beoefende teamsport onder de frisbeesporten. Het is een van de snelst groeiende sporten ter wereld. De sport vereist atletisch vermogen, tactisch inzicht, zelfbeheersing en teamspirit.' %}
+	{% elseif afdeling == 'discgolf' %}
+		{% set description = 'Disc Golf is een individuele buitensport die veel precisie en nauwkeurigheid vereist. Je speelt een aantal holes waarbij je in zo min mogelijk worpen de frisbee in de polehole probeert te gooien.' %}
+	{% else %}
+		{% set description = 'De Nederlandse Frisbee Bond is de bond voor de frisbeesporten in Nederland.' %}
+	{% endif %}
+{% endif %}
+
+{% if image is empty %}
+	{% if afdeling == 'ultimate' %}
+		{% set image = paths.theme ~ 'images/hero-ultimate.jpg' %}
+	{% elseif afdeling == 'discgolf' %}
+		{% set image = paths.theme ~ 'images/hero-discgolf.jpg' %}
+	{% else %}
+		{% set image = paths.theme ~ 'images/hero-nfb.jpg' %}
+	{% endif %}
+{% else %}	
+	{% set image = paths.files ~ image %}
+{% endif %}
+
+<head>
+	<meta charset="utf-8">
+	
+	<title>{{ title }}</title>
+	{% if description is not empty %}<meta name="description" content="{{ description | striptags }}">{% endif %}
+	{% if simpletags is not empty %}<meta name="keywords" content="{{ simpletags | join(', ') }}">{% endif %}
+
+	<!-- Twitter Cards -->
+	<meta name="twitter:title" content="{{ title }}">
+	{% if description is not empty %}<meta name="twitter:description" content="{{ description | striptags }}">{% endif %}
+	<meta name="twitter:site" content="@nfb">
+	<meta name="twitter:card" content="summary_large_image">
+	{% if image is not empty %}<meta name="twitter:image" content="{{ paths.hosturl }}{{ image }}">{% endif %}
+
+	<!-- Open Graph -->
+	<meta property="og:locale" content="nl_NL">
+	<meta property="og:type" content="article">
+	<meta property="og:title" content="{{ title }}">
+	{% if description is not empty %}<meta property="og:description" content="{{ description | striptags }}">{% endif %}
+	<meta property="og:url" content="{{ paths.hosturl }}{{ url }}">
+	<meta property="og:site_name" content="Frisbeesport">
+	{% if image is not empty %}<meta property="og:image" content="{{ paths.hosturl }}{{ image }}">{% endif %}
+
+	<link rel="canonical" href="{{ paths.hosturl }}{{ url }}">
+
+	<!-- RSS -->
+	<link href="{{ paths.rooturl }}rss/{{ rss }}/" rel="alternate" type="application/rss+xml" title="Frisbeesport.nl - {{ rss }}" />
+
+ 
+
+	<meta name="HandheldFriendly" content="True">
+	<meta name="MobileOptimized" content="320">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- For all browsers -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Shadows+Into+Light+Two" rel="stylesheet" type="text/css">
+
+
+	<link rel="stylesheet" href="{{ paths.theme }}css/{{ cssfile }}">
+
+	<!-- Webfonts -->
+	<meta http-equiv="cleartype" content="on">
+
+	<!-- HTML5 Shiv and Media Query Support -->
+	<!--[if lt IE 9]>
+	  <script src="{{ paths.theme }}js/vendor/html5shiv.min.js"></script>
+	  <script src="{{ paths.theme }}js/vendor/respond.min.js"></script>
+	<![endif]-->
+
+	<!-- Modernizr -->
+	<script src="{{ paths.theme }}js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+	<!-- Icons -->
+
+	{% set faviconpath = paths.theme ~ 'favicons/nfb/' %}
+	{% if afdeling == 'ultimate' %}
+		{% set faviconpath = paths.theme ~ 'favicons/ultimate/' %}
+	{% elseif afdeling == 'discgolf' %}
+		{% set faviconpath = paths.theme ~ 'favicons/discgolf/' %}
+	{% endif %}
+
+	<link rel="apple-touch-icon" sizes="57x57" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="{{ paths.hosturl }}{{ faviconpath }}apple-touch-icon-180x180.png">
+	<link rel="icon" type="image/png" href="{{ paths.hosturl }}{{ faviconpath }}favicon-32x32.png" sizes="32x32">
+	<link rel="icon" type="image/png" href="{{ paths.hosturl }}{{ faviconpath }}favicon-194x194.png" sizes="194x194">
+	<link rel="icon" type="image/png" href="{{ paths.hosturl }}{{ faviconpath }}favicon-96x96.png" sizes="96x96">
+	<link rel="icon" type="image/png" href="{{ paths.hosturl }}{{ faviconpath }}android-chrome-192x192.png" sizes="192x192">
+	<link rel="icon" type="image/png" href="{{ paths.hosturl }}{{ faviconpath }}favicon-16x16.png" sizes="16x16">
+	<link rel="manifest" href="{{ paths.hosturl }}{{ faviconpath }}manifest.json">
+	<link rel="shortcut icon" href="{{ paths.hosturl }}{{ faviconpath }}favicon.ico">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="{{ paths.hosturl }}{{ faviconpath }}mstile-144x144.png">
+	<meta name="msapplication-config" content="{{ paths.hosturl }}{{ faviconpath }}browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+
+</head>

@@ -13,7 +13,7 @@ payoff: Alles over de frisbeesporten
 # The theme to use. Be sure to copy the {theme_path}/base-2014 folder, and change the
 # name here accordingly. Don't edit the templates in theme/base-2014, because
 # they _will_ get updated in next releases
-theme: frisbeesport
+theme: prototype
 
 # The locale that'll be used by the application. If no locale is set the
 # fallback locale is 'en_GB'. For available options, see: http://docs.bolt.cm/locales
@@ -91,7 +91,7 @@ taxonomy_sort: DESC
 # and your changes do not show up on the website, be sure to check for a
 # config.yml file in your theme's folder. If a template is set there, it will
 # override the setting here.
-search_results_template: listing.twig
+search_results_template: search_results.twig
 search_results_records: 10
 
 # Add jQuery to the rendered HTML, whether or not it's added by an extension.

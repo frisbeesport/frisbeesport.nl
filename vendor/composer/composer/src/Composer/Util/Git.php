@@ -154,7 +154,8 @@ class Git
         }
     }
 
-    private function isAuthenticationFailure ($url, &$match) {
+    private function isAuthenticationFailure($url, &$match)
+    {
         if (!preg_match('{(https?://)([^/]+)(.*)$}i', $url, $match)) {
             return false;
         }
@@ -213,6 +214,9 @@ class Git
 
     private function throwException($message, $url)
     {
+        // git might delete a directory when it fails and php will not know
+        clearstatcache();
+
         if (0 !== $this->process->execute('git --version', $ignoredOutput)) {
             throw new \RuntimeException('Failed to clone '.self::sanitizeUrl($url).', git was not found, check that it is installed and in your PATH env.' . "\n\n" . $this->process->getErrorOutput());
         }

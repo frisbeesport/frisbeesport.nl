@@ -1,0 +1,36 @@
+/************ General Page Elements */
+.row-wrapper {
+  @include row();
+
+  .outer-container {
+    @include outer-container;
+  }  
+
+  &:nth-child(odd) {
+  background: $row-background;
+}
+}
+
+
+
+/************ Teaser Top */
+article.teaser--top {
+  @include span-columns(8);
+  @include shift(2);
+}
+
+article.teaser--top {
+  float: left;
+  display: block;
+  margin-right: 4.56432%;
+  width: 65.14523%; }
+  article.teaser--top:last-child {
+    margin-right: 0; 
+
+& .teaser-image {
+    @include size($teaser-size);
+    @include retina-image('../img/chevron-teaser', $teaser-size);
+}
+    }
+
+

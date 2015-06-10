@@ -2,6 +2,23 @@
 # details: http://docs.bolt.cm/menus
 
 homepage:
+  - label: Ultimate
+    title: Ultimate 
+    path: pagina/ultimate    
+    top: true
+    left: true
+  - label: Disc Golf
+    path: pagina/discgolf
+    top: true
+    left: true
+  - label: Organisatie
+    path: paginas/organisatie
+    top: true
+    right: true
+  - label: Spelersinfo
+    path: paginas/spelers
+    top: true
+    right: true
 
 homepage_mobile:
   - label: Ultimate
@@ -14,7 +31,7 @@ homepage_mobile:
   - label: Organisatie
     path: paginas/organisatie
     top: true
-  - label: Spelers
+  - label: Spelersinfo
     path: paginas/spelers
     top: true
  
@@ -28,20 +45,24 @@ ultimate:
     title: Jeugd Ultimate 
     path: pagina/ultimate-jeugd
     top: true
+    left: true
   - label: Spirit of the Game
     path: pagina/ultimate-spirit-of-the-game
   - label: Nationale teams
     path: pagina/ultimate-nationale-teams
     top: true
+    left: true
   - label: Competitie
     path: paginas/ultimate-competitie
-    top: true    
+    top: true 
+    right: true   
   - label: Verenigingen
-    path: pagina/ultimate-spelen
+    path: pagina/ultimate-verenigingen
     top: true
+    right: true   
   - label: Nieuws
     path: pagina/ultimate-nieuws
-    
+    right: true   
       
 discgolf:
   - label: Disc Golf
@@ -58,7 +79,7 @@ discgolf:
     path: pagina/discgolf-competitie
     top: true    
   - label: Verenigingen
-    path: pagina/discgolf-spelen
+    path: pagina/discgolf-verenigingen
     top: true
   - label: Nieuws
     path: pagina/discgolf-nieuws    
@@ -74,11 +95,11 @@ organisatie:
     top: true
   - label: Documenten
     title: Organisatie Documenten
-    path: pagina/organisatie-beleid
+    path: pagina/organisatie-documenten
     top: true
-  - label: Verenigingsondersteuning
-    title: Verenigingsondersteuning
-    path: pagina/organisatie-verenigingen
+  - label: Opleidingen en concepten
+    title: Opleidingen en concepten
+    path: pagina/organisatie-aanbod
     top: true
   - label: Records
     title: Records

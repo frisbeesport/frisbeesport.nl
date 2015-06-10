@@ -214,7 +214,7 @@ class RemoteFilesystem
             }
 
             if ($decode) {
-                if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+                if (PHP_VERSION_ID >= 50400) {
                     $result = zlib_decode($result);
                 } else {
                     // work around issue with gzuncompress & co that do not work with all gzip checksums
@@ -308,6 +308,11 @@ class RemoteFilesystem
 
             case STREAM_NOTIFY_AUTH_RESULT:
                 if (403 === $messageCode) {
+                    // Bail if the caller is going to handle authentication failures itself.
+                    if (!$this->retryAuthFailure) {
+                        break;
+                    }
+
                     $this->promptAuthAndRetry($messageCode, $message);
                     break;
                 }
@@ -342,7 +347,7 @@ class RemoteFilesystem
     protected function promptAuthAndRetry($httpStatus, $reason = null)
     {
         if ($this->config && in_array($this->originUrl, $this->config->get('github-domains'), true)) {
-            $message = "\n".'Could not fetch '.$this->fileUrl.', enter your GitHub credentials '.($httpStatus === 404 ? 'to access private repos' : 'to go over the API rate limit');
+            $message = "\n".'Could not fetch '.$this->fileUrl.', please create a GitHub OAuth token '.($httpStatus === 404 ? 'to access private repos' : 'to go over the API rate limit');
             $gitHubUtil = new GitHub($this->io, $this->config, null);
             if (!$gitHubUtil->authorizeOAuth($this->originUrl)
                 && (!$this->io->isInteractive() || !$gitHubUtil->authorizeOAuthInteractively($this->originUrl, $message))
@@ -405,6 +410,8 @@ class RemoteFilesystem
         }
 
         $options = array_replace_recursive($this->options, $additionalOptions);
+        $options['http']['protocol_version'] = 1.1;
+        $headers[] = 'Connection: close';
 
         if ($this->io->hasAuthentication($originUrl)) {
             $auth = $this->io->getAuthentication($originUrl);

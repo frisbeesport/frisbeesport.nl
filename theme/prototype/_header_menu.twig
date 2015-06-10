@@ -1,0 +1,56 @@
+<header class="navigation" role="banner">
+    <div class="navigation-wrapper">
+
+    <a href="{{ paths.root }}{{ logourl }}" class="logo" title="Frisbeesport.nl {{ afdeling }}">
+        <img src="{{ paths.theme }}{{ logoimage }}" alt="{{ site.title }} {{ afdeling }} logo">
+    </a>
+
+        <button type="button" id="js-centered-navigation-mobile-menu" class="navigation-menu-button centered-navigation-mobile-menu js-search-trigger sliding-search-panel-button">
+            <i class="fa fa-search"></i>
+        </button>
+      
+        <button type="button" id="js-centered-navigation-mobile-menu" class="navigation-menu-button centered-navigation-mobile-menu js-menu-trigger sliding-panel-button">
+            <i class="fa fa-bars"></i>
+        </button>
+
+        <nav role="navigation">
+            <ul id="js-navigation-menu" class="navigation-menu show">
+
+                {{ menu(afdeling, '_header_menu_top.twig') }}
+            </ul>
+        </nav>
+
+        <div class="navigation-tools" >
+        
+        {% if afdeling == 'ultimate' %}
+        
+            <ul class="header__social-icons">
+                <li class="header__facebook"><a href="https://www.facebook.com/pages/NFB-Ultimate-Frisbee/217928458228204" target="_blank" title="NFB Ultimate op Facebook"></a></li>
+            </ul>  
+            
+        {% endif %} 
+            
+        {% if afdeling == 'discgolf' %}
+            
+            <ul class="header__social-icons">
+                <li class="header__facebook"><a href="https://www.facebook.com/pages/NFB-Disc-Golf/179546828767517" target="_blank" title="NFB Disc Golf op Facebook"></a></li>
+            </ul>  
+            
+        {% endif %} 
+        
+        <div class="search-bar">
+            <form role="search" method="get" action="{{ paths.rooturl }}search"  enctype="text/plain">
+                <input type="search" placeholder="Zoek..." name="search"/>
+                <button type="submit"><i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+            
+        </div>
+    </div>
+</header>
+
+{{ menu(afdeling, '_sliding_panel_menu.twig') }}
+
+{% include '_sliding_panel_search.twig' %}
+

@@ -1,0 +1,24 @@
+{% extends "pagina.twig" %}
+
+{% block extended_content %}
+    {% setcontent competitieuitslagen = 'ultimateuitslagen' where { competities: 'jeugd' } orderby '-date' %}
+
+    <section>
+        <div class="container">
+            <div class="grid section__content">
+                <div class="section__header"><h2> Uitslagen </h2></div>
+                
+
+                <ul>
+                    {% for uitslag in competitieuitslagen %}       
+
+                    <li>{{uitslag.date}} - <a href="{{ uitslag.link }}">{{uitslag.title}}</a></li>
+
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

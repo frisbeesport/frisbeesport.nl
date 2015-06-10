@@ -1,0 +1,42 @@
+
+.werkgroep--lid {
+    text-align: center;
+    overflow: hidden;
+    @include media($large-screen) {
+        display: inline-block;
+        float:none;
+        width:27%;
+        margin:0px 20px 30px 20px;
+        
+    }   
+    
+    vertical-align: top; 
+    margin:0px 20px 50px 20px;
+}
+
+.werkgroep--lid--image {
+    border-radius: 550px; 
+    width: 90%;
+    max-width: 200px;
+}
+
+.werkgroep {
+    text-align: center;
+     
+}
+
+.werkgroep--leden {
+    vertical-align: top; 
+}
+
+.werkgroep--lid--name {
+    margin-bottom: 0;
+}
+
+.werkgroep--lid--omschrijving {
+    font-size: 14px;
+}
+
+.werkgroep--lid--contact {
+    font-size: 14px;
+}

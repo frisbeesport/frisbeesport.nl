@@ -1,0 +1,25 @@
+<!-- Refills sliding menu -->
+
+<nav class="js-menu sliding-panel-content">
+  <ul>
+    
+    {% for item in menu  %}
+      {% if item.top %}
+    
+        <li><a href="{{ paths.rooturl }}{{ item.path }}">{{ item.label }}</a></li>
+    
+      {% endif %}
+    {% endfor %}
+
+    {% if (menu[1].label != 'Disc Golf') %}
+ 
+      <li>
+        <a href="{{ paths.rooturl }}">terug naar Frisbeesport.nl</a>
+      </li>
+                
+    {% endif %}       
+    
+  </ul>
+</nav>
+
+<div class="js-menu-screen sliding-panel-fade-screen"></div>

@@ -157,7 +157,7 @@ The recommended notation for the most common licenses is (alphabetical):
 - MIT
 
 Optional, but it is highly recommended to supply this. More identifiers are
-listed at the [SPDX Open Source License Registry](http://www.spdx.org/licenses/).
+listed at the [SPDX Open Source License Registry](https://www.spdx.org/licenses/).
 
 For closed-source software, you may use `"proprietary"` as the license identifier.
 
@@ -235,11 +235,12 @@ Various information to get support about the project.
 Support information includes the following:
 
 * **email:** Email address for support.
-* **issues:** URL to the Issue Tracker.
-* **forum:** URL to the Forum.
-* **wiki:** URL to the Wiki.
+* **issues:** URL to the issue tracker.
+* **forum:** URL to the forum.
+* **wiki:** URL to the wiki.
 * **irc:** IRC channel for support, as irc://server/channel.
 * **source:** URL to browse or download the sources.
+* **docs:** URL to the documentation.
 
 An example:
 
@@ -703,7 +704,7 @@ Example:
         },
         {
             "type": "pear",
-            "url": "http://pear2.php.net"
+            "url": "https://pear2.php.net"
         },
         {
             "type": "package",
@@ -715,7 +716,7 @@ Example:
                     "type": "zip"
                 },
                 "source": {
-                    "url": "http://smarty-php.googlecode.com/svn/",
+                    "url": "https://smarty-php.googlecode.com/svn/",
                     "type": "svn",
                     "reference": "tags/Smarty_3_1_7/distribution/"
                 }
@@ -761,6 +762,9 @@ The following options are supported:
   against them. For example using
   `{"example.org": {"username": "alice", "password": "foo"}` as the value of this
   option will let composer authenticate against example.org.
+* **platform:** Lets you fake platform packages (PHP and extensions) so that
+  you can emulate a production env or define your target platform in the
+  config. e.g. `{"php": "5.4", "ext-something": "4.0"}`.
 * **vendor-dir:** Defaults to `vendor`. You can install dependencies into a
   different directory if you want to. `$HOME` and `~` will be replaced by your
   home directory's path in vendor-dir and all `*-dir` options below.
@@ -880,7 +884,7 @@ Optional.
 
 ### non-feature-branches
 
-A list of regex patterns of branch names that are non-numeric (e.g. "latest" or something), that will NOT be handled as feature branches. This is an array of string.
+A list of regex patterns of branch names that are non-numeric (e.g. "latest" or something), that will NOT be handled as feature branches. This is an array of strings.
 
 If you have non-numeric branch names, for example like "latest", "current", "latest-stable"
 or something, that do not look like a version number, then composer handles such branches

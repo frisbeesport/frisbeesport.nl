@@ -141,6 +141,11 @@ EOT
             ? ($this->config->get('home') . '/config.json')
             : $input->getOption('file');
 
+        // create global composer.json if this was invoked using `composer global config`
+        if ($configFile === 'composer.json' && !file_exists($configFile) && realpath(getcwd()) === realpath($this->config->get('home'))) {
+            file_put_contents($configFile, "{\n}\n");
+        }
+
         $this->configFile = new JsonFile($configFile);
         $this->configSource = new JsonConfigSource($this->configFile);
 
@@ -408,6 +413,15 @@ EOT
             }
 
             throw new \RuntimeException('You must pass the type and a url. Example: php composer.phar config repositories.foo vcs http://bar.com');
+        }
+
+        // handle platform
+        if (preg_match('/^platform\.(.+)/', $settingKey, $matches)) {
+            if ($input->getOption('unset')) {
+                return $this->configSource->removeConfigSetting($settingKey);
+            }
+
+            return $this->configSource->addConfigSetting($settingKey, $values[0]);
         }
 
         // handle github-oauth

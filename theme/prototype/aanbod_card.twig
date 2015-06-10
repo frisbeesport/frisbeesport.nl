@@ -1,0 +1,28 @@
+{% setcontent aanbod_pagina = "paginas/#{aanbod.selectpagina}" %}<div id="aanbod{{ aanbod.id }}" class="smallcard">           
+
+    <div class="smallcard-image">   
+        
+        {% if aanbod.image %}
+
+        <img class="smallcard__image" src="{{ aanbod.image|image(500,300,"c") }}">
+
+        {% endif %}
+
+    </div>
+
+    <div class="smallcard-header">
+        <div class="smallcard__date"> </div>
+        
+        <h3 class="smallcard__title">{{ aanbod.title }}</h3>
+        
+    </div>
+
+    <div class="smallcard-copy">
+
+        <p>{{ aanbod.description }}</p>
+        
+        <a class=" card__link arrow-link" href="{{ aanbod_pagina.link }}">Meer informatie...</a>
+
+    </div>
+
+</div>

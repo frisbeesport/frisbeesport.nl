@@ -112,7 +112,7 @@ class ClassMapGenerator
      */
     private static function findClasses($path)
     {
-        $extraTypes = version_compare(PHP_VERSION, '5.4', '<') ? '' : '|trait';
+        $extraTypes = PHP_VERSION_ID < 50400 ? '' : '|trait';
         if (defined('HHVM_VERSION') && version_compare(HHVM_VERSION, '3.3', '>=')) {
             $extraTypes .= '|enum';
         }
@@ -173,7 +173,7 @@ class ClassMapGenerator
                 if ($name[0] === ':') {
                     // This is an XHP class, https://github.com/facebook/xhp
                     $name = 'xhp'.substr(str_replace(array('-', ':'), array('_', '__'), $name), 1);
-                } else if ($matches['type'][$i] === 'enum') {
+                } elseif ($matches['type'][$i] === 'enum') {
                     // In Hack, something like:
                     //   enum Foo: int { HERP = '123'; }
                     // The regex above captures the colon, which isn't part of
