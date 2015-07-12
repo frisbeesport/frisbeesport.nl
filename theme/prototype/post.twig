@@ -75,20 +75,23 @@
         <p class="post__lead">{{ post.lead }}</p>
 
         {{ post.body }}
+            {% if post.video %}
+                <div class="video--page">
+                    {{ post.video.html }}
+                </div>
+            {% endif %}
       </div>
     </div>
   </article>
-<!--
+
   {% if post.contenttype.name == 'Nieuws' %}
     {% if afdeling == 'ultimate' %}
-      {% include 'sectie.twig' with { 'sectieid': 15 } %}
+      {% include 'sectie.twig' with { 'sectieid': 30 } %}
     {% elseif afdeling == 'discgolf' %}
-      {% include 'sectie.twig' with { 'sectieid': 16 } %}
-    {% elseif afdeling == 'organisatie' %}
-      {% include 'sectie.twig' with { 'sectieid': 17 } %}      
+      {% include 'sectie.twig' with { 'sectieid': 31 } %}
     {% endif %}
   {% endif %}
--->
+
   {% if post.contenttype.name == 'Nieuws' %}
   <section class="section--cards--small section--nieuws ">
     <div class="container">

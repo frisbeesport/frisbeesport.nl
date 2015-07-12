@@ -2739,6 +2739,10 @@ body {
     .grid {
       margin: 0 1.618em; } }
 
+.img--lazy {
+  opacity: 0;
+  transition: opacity .3s ease-in; }
+
 .section__content {
   padding-bottom: 2em; }
   .section__content .section__header {
@@ -3568,9 +3572,17 @@ a.pdf-link:hover::before {
     font-weight: bold;
     line-height: 1.5em;
     padding: 0.5em 0.75em; }
+    .smallcard .smallcard-header .smallcard__extrainfo {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.5em; }
     .smallcard .smallcard-header .smallcard__date {
       color: #666;
       font-weight: 300; }
+    .smallcard .smallcard-header .smallcard__tag {
+      float: right;
+      color: #ccc; }
+    .smallcard .smallcard-header .smallcard__title {
+      margin-top: 0.5em; }
   .smallcard .smallcard-copy {
     font-size: 0.9em;
     line-height: 1.5em;
@@ -3607,8 +3619,14 @@ a.pdf-link:hover::before {
   .smallcard.ultimate .smallcard-header {
     background-color: #1296D4;
     color: #fff; }
+    .smallcard.ultimate .smallcard-header .smallcard__tag {
+      color: #fff; }
     .smallcard.ultimate .smallcard-header .smallcard__date {
       color: #fff; }
+    .smallcard.ultimate .smallcard-header .smallcard__extrainfo {
+      border-bottom: 1px solid #fff;
+      padding-bottom: 0.5em;
+      border-color: #7FC9FF; }
     .smallcard.ultimate .smallcard-header h3 {
       color: #fff; }
   .smallcard.ultimate .smallcard-copy {
@@ -3625,8 +3643,14 @@ a.pdf-link:hover::before {
   .smallcard.discgolf .smallcard-header {
     background-color: #00A850;
     color: #fff; }
+    .smallcard.discgolf .smallcard-header .smallcard__tag {
+      color: #fff; }
     .smallcard.discgolf .smallcard-header .smallcard__date {
       color: #fff; }
+    .smallcard.discgolf .smallcard-header .smallcard__extrainfo {
+      border-bottom: 1px solid #fff;
+      padding-bottom: 0.5em;
+      border-color: #7FFF8E; }
     .smallcard.discgolf .smallcard-header h3 {
       color: #fff; }
   .smallcard.discgolf .smallcard-copy {
@@ -3645,6 +3669,12 @@ a.pdf-link:hover::before {
     color: #fff; }
     .smallcard.organisatie .smallcard-header .smallcard__date {
       color: #fff; }
+    .smallcard.organisatie .smallcard-header .smallcard__tag {
+      color: #fff; }
+    .smallcard.organisatie .smallcard-header .smallcard__extrainfo {
+      border-bottom: 1px solid #fff;
+      padding-bottom: 0.5em;
+      border-color: #f39d61; }
     .smallcard.organisatie .smallcard-header h3 {
       color: #fff; }
   .smallcard.organisatie .smallcard-copy {
@@ -4351,5 +4381,35 @@ ul.documenten {
       width: 48.82117%; }
       .forwards--rechterkolom:last-child {
         margin-right: 0; } }
+
+.forwards .forward--current {
+  font-weight: 400; }
+
+@media screen and (min-width: 53.75em) {
+  .forwards {
+    float: left;
+    display: block;
+    margin-right: 2.35765%;
+    width: 31.76157%; }
+    .forwards:last-child {
+      margin-right: 0; } }
+
+@media screen and (min-width: 53.75em) {
+  .pagina {
+    float: left;
+    display: block;
+    margin-right: 2.35765%;
+    width: 65.88078%; }
+    .pagina:last-child {
+      margin-right: 0; } }
+
+.forward {
+  border-bottom: 1px solid rgba(18, 150, 212, 0.2);
+  display: block;
+  margin-right: 1.5em;
+  outline: none;
+  padding: 0.75em 0; }
+  .forward:last-child {
+    margin-bottom: 1.5em; }
 
 /*# sourceMappingURL=main_ultimate.css.map */

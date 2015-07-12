@@ -8,7 +8,7 @@ tags:
     postfix: "Add some freeform tags. Start a new tag by typing a comma or space."
     multiple: false
     #listing_template: tag-listing.twig #custom template
-    options: [ ultimate, discgolf, competitie, nationaal, jeugd, studenten ] 
+    options: [ algemeen, jeugd, studenten, nationale-teams, competitie, kader ] 
 
 competities:
     slug: competities

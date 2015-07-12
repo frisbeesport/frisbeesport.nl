@@ -58,9 +58,27 @@
     line-height: 1.5em;
     padding: ($base-spacing / 3) ($base-spacing / 2);
       
+    .smallcard__extrainfo {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.5em;
+    }
+      
     .smallcard__date {
         color: $deemphasize-font-color;
         font-weight: 300;
+    }
+      
+            
+    .smallcard__tag {
+        float: right;
+         color: #ccc;
+        //background-color: #ccc; 
+        //color: #fff;
+        //padding: 0.06em 1em 0.12em 1em;
+    }
+      
+    .smallcard__title {
+        margin-top: 0.5em;
     }
   }
 
@@ -118,11 +136,18 @@
   .smallcard-header {
     background-color: $card-background;
     color: #fff;
-  
+   .smallcard__tag {
+         color: #fff;
+       
+    }
     .smallcard__date {
         color: #fff;
     }
-      
+        .smallcard__extrainfo {
+        border-bottom: 1px solid #fff;
+        padding-bottom: 0.5em;
+            border-color: #7FC9FF;
+    }
     h3 {
       color: #fff;
     }
@@ -148,9 +173,18 @@
   .smallcard-header {
     background-color: $card-background;
     color: #fff;
-
+ .smallcard__tag {
+         color: #fff;
+       
+    }
     .smallcard__date {
         color: #fff;
+    }
+ 
+    .smallcard__extrainfo {
+        border-bottom: 1px solid #fff;
+        padding-bottom: 0.5em;
+        border-color: #7FFF8E;
     }
       
     h3 {
@@ -181,8 +215,16 @@
 
     .smallcard__date {
         color: #fff;
+        
+    } .smallcard__tag {
+         color: #fff;
+       
     }
-      
+      .smallcard__extrainfo {
+        border-bottom: 1px solid #fff;
+        padding-bottom: 0.5em;
+          border-color: #f39d61;
+    }
     h3 {
       color: #fff;
     }

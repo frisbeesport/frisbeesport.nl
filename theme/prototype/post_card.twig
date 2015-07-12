@@ -19,8 +19,11 @@
 
         {% if post.image %}
            
-           <img class="smallcard__image" src="{{ post.image|image(500, 300, "c") }}">
-     
+           <img class="smallcard__image img--lazy" data-src="{{ post.image|image(500, 300, "c") }}">
+        
+            <noscript>
+               <img class="smallcard__image" src="{{ post.image|image(500, 300, "c") }}">
+            </noscript>
         {% else %}     
 
             {% set defaultimage = paths.hosturl ~ paths.theme ~ "/images/post_default_500.jpg" %}
@@ -36,8 +39,13 @@
     {% endif %}
     
     <div class="smallcard-header">
-    
+        <div class="smallcard__extrainfo">
+        {% for tag in post.taxonomy.tags  %}
+            <div class="smallcard__tag smallcard__tag--{{ tag }}">{{ tag }}</div>
+        {% endfor %}
         <div class="smallcard__date">{{ post.datecreated  | localdate("%e %B, %Y") }}</div>
+        </div>
+        
         <h3 class="smallcard__title">{{ post.title }}</h3>
 
     </div>

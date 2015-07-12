@@ -49,60 +49,61 @@
     {% include '_header.twig' with { 'afdeling': afdeling, 'image': pagina.image, 'title': title, 'header': lead, 'buttons': pagina, 'fotograaf': pagina.fotograaf } %}
 
         
-    {% if pagina.parent != 0 and pagina.parent is not empty %}
         
-    <section class="section--forwards">
-        <div class="container">
-            <div class="grid section__content">
+        
+	{% if pagina.body is not empty or pagina.body_advanced is not empty %}  
 
-                <div class="forwards--enkelekolom">
-            <div class="section__header"></div>
-            <ul>
-                
-            {% for child in children %}       
-                {% if child.id == pagina.id %}
-                    <li><a href="{{ child.link }}" class="forward--current">{{ child.title }}</a></li>
-                {% else %}
-                    <li><a href="{{ child.link }}">{{ child.title }}</a></li>
-                {% endif %}
-            {% endfor %}    
-                
-            </ul>
-        </div>
-                </div>
-            </div>
-    </section>        
         
-    {% endif %}
-        
-	{% if pagina.body is not empty %}  
-
     <section class="section--text afdeling--text">
       <div class="container">
 		<div class="grid">
-             {{ pagina.body }}
+            
+            {% if pagina.parent != 0 and pagina.parent is not empty %}
+   
+            <div class="forwards">
+            
+                    
+                {% for child in children %}       
+                
+                {% if child.id == pagina.id %}
+                    <a href="{{ child.link }}" class="forward forward--current">{{ child.title }}</a>
+                {% else %}
+                    <a href="{{ child.link }}" class="forward">{{ child.title }}</a>
+                {% endif %}
+                
+                {% endfor %}  
+                
+            
+            </div>
+            
+            {% endif %}  
+            
+            <div class="pagina">
+             
+            {% if pagina.body is not empty %}  
+
+            {{ pagina.body }}
+            
+            {% endif %}    
+            
+            {% if pagina.body_advanced is not empty %}
+            
+            {{ pagina.body_advanced }}
+            
+            {% endif %}   
+                 
+            </div>
+            
     	</div> 
 	  </div>
     </section>
 
 	{% endif %}    
-   
-   {% if pagina.body_advanced is not empty %}  
-
-    <section class="section--text afdeling--text">
-      <div class="container">
-        <div class="grid">
-             {{ pagina.body_advanced }}
-        </div> 
-      </div>
-    </section>
-
-    {% endif %}    
-
+      
     {% if pagina.sectie1 != '0' %}
         {% include 'sectie.twig' with { 'sectieid': pagina.sectie1 } %}
     {% endif %}
-        
+      
     {% if pagina.sectie2  != '0' %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectie2 } %}

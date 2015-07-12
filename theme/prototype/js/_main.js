@@ -54,3 +54,19 @@ function parallax(){
   });
 
 }
+
+$(document).ready(function(){
+// Target your .container, .wrapper, .post, etc.
+    $(".video--page").fitVids();
+});
+
+    
+$("img--lazy").unveil(200, function() {
+    
+    $(this).load(function() {
+          
+              this.style.opacity = 1;
+          
+    });
+    
+});
