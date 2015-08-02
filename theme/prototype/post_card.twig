@@ -19,11 +19,10 @@
 
         {% if post.image %}
            
-           <img class="smallcard__image img--lazy" data-src="{{ post.image|image(500, 300, "c") }}">
-        
-            <noscript>
+           <img class="smallcard__image lazyload" data-src="{{ post.image|image(500, 300, "c") }}">
+           <noscript>
                <img class="smallcard__image" src="{{ post.image|image(500, 300, "c") }}">
-            </noscript>
+           </noscript>
         {% else %}     
 
             {% set defaultimage = paths.hosturl ~ paths.theme ~ "/images/post_default_500.jpg" %}

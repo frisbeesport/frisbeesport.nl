@@ -32,7 +32,8 @@
       <footer class="entry-meta">
         
         {% if author.photo is not empty %}
-          <img src="{{ author.photo|image(500, 500, "c") }}" class="bio-photo" alt="{{ author.title }} bio photo">
+               <img class="bio-photo" src="{{ author.photo|image(500, 500, "c") }}" alt="{{ author.title }} bio photo">
+           
         {% endif %}
 
         {% if author.title is not empty %}
@@ -75,22 +76,53 @@
         <p class="post__lead">{{ post.lead }}</p>
 
         {{ post.body }}
-            {% if post.video %}
+          
+
+        {% if post.files %}
+        
+        <p>
+        <ul class="documenten">
+    
+            {% for file in post.files %}
+                    <li id="document{{ document.id }}" class="document">
+                            <div class="document__title"><a class="pdf-link" href="{{ paths.files }}{{ file.filename }}">{{ file.title }}</a></div>
+                    </li>
+                {% endfor %}
+            </ul>
+         </p>
+         {% endif %}
+ 
+         {% if post.video %}
+            <p>
                 <div class="video--page">
                     {{ post.video.html }}
                 </div>
+            </p>
+         {% endif %}
+          
+          {% if post.images %}
+                {% for image in post.images %}
+                <div class="image--page">
+                    <a alt="Ultimate video" href="{{ paths.files }}{{ image.filename }}" class="html5lightbox" title="{{ image.title }}">
+                 
+                        
+                        <img class="lazyload picturefill image--wide" data-srcset="{{ image.filename|image(1600, 900, "c") }} 1024w, {{ image.filename|image(1200, 675, "c") }} 640w, {{ image.filename|image(600, 337, "c") }} 320w" alt="{{ image.title }}" />
+                        <noscript>
+                            <img class="image--wide" src="{{ image.filename|image(1600, 900, "c") }}" alt="{{ image.title }}">
+                        </noscript>
+                        <!--<img class="img--lazy image--wide" data-original="{{ image.filename|image(1600, 900, "c") }}" alt="{{ image.title }}">
+                        <noscript>
+                            <img class="img--lazy image--wide" src="{{ image.filename|image(1600, 900, "c") }}" alt="{{ image.title }}">
+                        </noscript>-->
+                    </a>
+                </div>
+                {% endfor %}
             {% endif %}
+            
       </div>
     </div>
   </article>
 
-  {% if post.contenttype.name == 'Nieuws' %}
-    {% if afdeling == 'ultimate' %}
-      {% include 'sectie.twig' with { 'sectieid': 30 } %}
-    {% elseif afdeling == 'discgolf' %}
-      {% include 'sectie.twig' with { 'sectieid': 31 } %}
-    {% endif %}
-  {% endif %}
 
   {% if post.contenttype.name == 'Nieuws' %}
   <section class="section--cards--small section--nieuws ">
@@ -153,6 +185,15 @@
    </section>
   {% endif %}
 
+        
+  {% if post.contenttype.name == 'Nieuws' %}
+    {% if afdeling == 'ultimate' %}
+      {% include 'sectie.twig' with { 'sectieid': 30 } %}
+    {% elseif afdeling == 'discgolf' %}
+      {% include 'sectie.twig' with { 'sectieid': 31 } %}
+    {% endif %}
+  {% endif %}
+        
   {% include '_footer.twig' %}
   {% include '_scripts.twig' %}
   </div>

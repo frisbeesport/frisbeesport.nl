@@ -55,7 +55,10 @@ section--showcase
 </div>
 
 {% if sectie.image is not empty %}
-	<div class="section--showcase__image--left" style="background-image: url('{{ paths.files }}{{ sectie.image }}');"></div>
+	<div class="lazyload section--showcase__image--left" data-bg="{{ paths.files }}{{ sectie.image }}"></div>
+    <noscript>
+        <div class="section--showcase__image--left" style="background-image: url('{{ paths.files }}{{ sectie.image }}')"></div>
+    </noscript>
 {% endif %}	
 
 {% endblock %}

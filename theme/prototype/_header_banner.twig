@@ -1,7 +1,13 @@
 {% if afdeling == 'homepage' %}
-<div class="banner {% if image %}banner--big{% else %}banner--small{% endif %}" style="background-image: url('{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}'); background-position-y: 0;">
+<div class="lazyload banner {% if image %}banner--big{% else %}banner--small{% endif %}" data-bg="{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}" style="background-position-y: 0;">
+<noscript>
+        <div class="banner {% if image %}banner--big{% else %}banner--small{% endif %}" style="background-image: url('{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}'); background-position-y: 0;">
+    </noscript>    
 {% else %}
-<div class="banner {% if image %}banner--big{% else %}banner--small{% endif %}" style="background-image: url('{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}');">
+<div class="lazyload banner {% if image %}banner--big{% else %}banner--small{% endif %}" data-bg="{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}">
+    <noscript>
+        <div class="banner {% if image %}banner--big{% else %}banner--small{% endif %}" style="background-image: url('{% if image %}{{ image|image(2000, 800, "c") }}{% else %}{{ paths.theme }}{{ bannerimage }}{% endif %}')">
+    </noscript> 
 {% endif %}
 
 <div class="banner-content">

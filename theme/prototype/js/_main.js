@@ -1,4 +1,5 @@
 
+var lastScrollTop = 0;
 
 /*! Fix header when scrolling down */
 $(document).ready(function() {
@@ -7,7 +8,9 @@ $(document).ready(function() {
     
     $(window).on("scroll", function() {
         var fromTop = $(window).scrollTop();
-        $("body").toggleClass("down", (fromTop > 120));
+        $("body").toggleClass("down", (fromTop < lastScrollTop && fromTop > 120));
+        
+        lastScrollTop = fromTop;
     });
 
     $('.sliding-panel-button,.sliding-panel-fade-screen,.sliding-panel-close').on('click touchstart',function (e) {
@@ -60,13 +63,12 @@ $(document).ready(function(){
     $(".video--page").fitVids();
 });
 
-    
-$("img--lazy").unveil(200, function() {
-    
-    $(this).load(function() {
-          
-              this.style.opacity = 1;
-          
-    });
-    
+document.addEventListener('lazybeforeunveil', function(e){
+    e.target.style.visibility = 'visible';
+    var bg = e.target.getAttribute('data-bg');
+    if(bg){
+        e.target.style.backgroundImage = 'url(' + bg + ')';
+        e.target.removeAttribute('data-bg');
+    }
 });
+

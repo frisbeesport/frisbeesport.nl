@@ -42,10 +42,12 @@ body {
 	}
 }
 
-.img--lazy {
-    opacity: 0;
+.lazyload {
+    visibility: collapse;
     transition: opacity .3s ease-in;
-} 
+}
+
+
 
 
 

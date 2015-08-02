@@ -344,14 +344,15 @@ header.navigation {
   top: 0;
   left: 0;
   right: 0;
-  transform: translateY(-100%);
+  @include transform(translateY(-100%));
+    
   transition: 0.2s transform cubic-bezier(.3,.73,.3,.74);
 
   opacity: 0.95;
 }
 
 body.down .navigation.clone {
-    transform: translateY(0);
+    @include transform(translateY(0));
+    
     transition: 0.4s transform cubic-bezier(.3,.73,.3,.74);
-
 }

@@ -19,15 +19,17 @@
 	{% set cssfile = 'main_discgolf.css' %}
 {% endif %}
 
-{% set simpletags = ['frisbeesport'] %}
+{% set simpletags = ['frisbeesport', 'frisbee', 'sport'] %}
 {% if afdeling == 'ultimate' %}
-	{% set simpletags = simpletags|merge(['ultimate']) %}
+	{% set simpletags = simpletags|merge(['ultimate', 'ultimate frisbee']) %}
 {% elseif afdeling == 'discgolf' %}
 	{% set simpletags = simpletags|merge(['discgolf']) %}
 {% elseif afdeling == 'organisatie' %}
-	{% set simpletags = simpletags|merge(['sportbond']) %}
+	{% set simpletags = simpletags|merge(['sportbond', 'bond']) %}
+{% elseif afdeling == 'homepage' %}
+	{% set simpletags = simpletags|merge(['ultimate, ultimate frisbee, discgolf, sportbond, bond']) %}
 {% endif %}
-{% set simpletags = simpletags|merge(['nfb']) %}
+{% set simpletags = simpletags|merge(['nfb', 'nederlandse frisbee bond']) %}
 {% if simpletags is not empty %}
 	{% for link,value in tags %}
 		{% set simpletags = simpletags|merge([value]) %}
