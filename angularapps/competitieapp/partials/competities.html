@@ -1,0 +1,78 @@
+<h2>Competitie-uitslagen</h2>
+
+<div class="filterbar" style="margin-bottom:  1em;">
+<div class="button-group" >
+  <label>
+    <input type="radio" name="type-group" value="competitie" checked  ng-model="selectieType" ng-value="'C'">
+    <span class="button-group-item">Competitie</span>
+  </label>
+  <label>
+    <input type="radio" name="type-group" value="beker" ng-model="selectieType" ng-value="'K'">
+    <span class="button-group-item">Beker</span>
+  </label>
+</div>
+<div class="dropdown" style="display: inline-block; margin-left: 1em;"> 
+  <div class="dropdown-container">
+    <p class="dropdown-button" ng-click="dropdownMenu='terrein'">{{ terreinDropdownText }}</p>
+    <ul class="dropdown-menu dropdown-select" ng-class="dropdownMenu == 'terrein' ? 'show-menu' : ''">
+      <li ng-click="selectTerrein('o', 'Indoor/Outdoor');">Indoor/Outdoor</li>
+      <li ng-click="selectTerrein('indoor', 'Indoor');">Indoor</li>
+      <li ng-click="selectTerrein('outdoor', 'Outdoor')">Outdoor</li>
+    </ul> 
+  </div>
+</div><div class="dropdown" style="display:  inline-block; margin-left: 1em;">
+  <div class="dropdown-container">
+    <p class="dropdown-button" ng-click="dropdownMenu='geslacht'">{{ geslachtDropdownText }}</p>
+    <ul class="dropdown-menu dropdown-select" ng-class="dropdownMenu == 'geslacht' ? 'show-menu' : ''">
+      <li ng-click="selectGeslacht('e', 'Open/Dames/Mixed')">Open/Dames/Mixed</li>
+      <li ng-click="selectGeslacht('open', 'Open')">Open</li>
+      <li ng-click="selectGeslacht('dames', 'Dames')">Dames</li>
+      <li ng-click="selectGeslacht('mixed', 'Mixed')">Mixed</li>
+    </ul>
+  </div>
+</div>
+    </div>
+
+ <div ng-if="selectieType == 'C'">
+
+<table class="tables">
+    <thead>
+    <tr >
+        <th>Jaar</th>
+        <th>Indoor/Outdoor</th>
+        <th>Open/Dames/Mixed</th>
+        <th>Kampioen</th>
+        <th>Spirit</th>
+    </tr></thead>
+    <tr class="selectable" ng-repeat="competitie in competities | geslacht:selectieGeslacht | terrein:selectieTerrein " ng-click="showCompetitie(competitie.id)">
+        
+        <td>{{competitie.jaar_begin}}</td>
+        <td>{{competitie.terrein}}</td>
+        <td>{{competitie.geslacht}}</td>
+        <td>{{competitie.kampioen}}</td>
+        <td>{{competitie.spirit}}</td>
+        
+    </tr>
+</table>
+</div>
+
+ <div ng-if="selectieType == 'K'">
+<table class="tables">
+    <thead><tr>
+        <th>Indoor/Outdoor</th>
+        <th>Open/Dames/Mixed</th>
+        <th>Jaar</th>
+        <th>Locatie</th>
+        <th>Kampioen</th>
+        <th>Spirit</th>
+    </tr></thead>
+    <tr class="selectable" ng-repeat="beker in bekers | geslacht:selectieGeslacht | terrein:selectieTerrein" ng-click="showCompetitie(beker.id)">
+        <td>{{beker.terrein}}</td>
+        <td>{{beker.geslacht}}</td>
+        <td>{{beker.jaar_begin}}</td>
+        <td>{{beker.locatie}}</td>
+        <td>{{beker.kampioen}}</td>
+        <td>{{beker.spirit}}</td>
+    </tr>
+</table>
+</div>

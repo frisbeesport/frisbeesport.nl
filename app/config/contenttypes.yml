@@ -736,7 +736,9 @@ paginas:
             type: html
             height: 900px
             allowtwig: true           
-            group: geavanceerd             
+            group: geavanceerd  
+        
+           
     taxonomy: [ afdelingen ]
     recordsperpage: 100
     icon_many: fa:file-o
@@ -868,7 +870,9 @@ secties:
             type: html
             height: 600px
             allowtwig: true           
-            group: geavanceerd    
+            group: geavanceerd   
+        application:
+            type: text    
     searchable: true
     default_status: published
     taxonomy: [ documentcategorien ]

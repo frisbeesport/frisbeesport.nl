@@ -1,0 +1,69 @@
+<h2 id="uitslagentop">{{ competitie }}</h2>
+<div class="filterbar" style="margin-bottom:  1em;"><a class="button" ng-click="naarCompetities()">Terug naar competitieoverzicht</a>
+      
+<div class="dropdown" style="display:  inline-block; margin-left:  1em;"><div class="dropdown-container">
+    <p class="dropdown-button" ng-click="dropdownMenu='divisies'">{{ divisieDropdownText }}</p>
+    <ul class="dropdown-menu dropdown-select" ng-class="dropdownMenu == 'divisies' ? 'show-menu' : ''">
+      <li ng-repeat="divisie in divisies track by $index" ng-click="selectDivisie(divisie); updateSpeeldagen(divisie);">
+          <span ng-if="divisie != ''">Divisie {{ divisie }}</span>
+          <span ng-if="divisie == ''">Alle divisies</span></li>
+    </ul>
+  </div>
+</div>
+<div class="dropdown" style="display:  inline-block; margin-left:  1em;">
+  <div class="dropdown-container">
+    <p class="dropdown-button" ng-click="dropdownMenu='speeldag'">{{ speeldagDropdownText }}</p>
+    <ul class="dropdown-menu dropdown-select" ng-class="dropdownMenu == 'speeldag' ? 'show-menu' : ''">
+      <li ng-repeat="speeldag in speeldagen track by $index" ng-click="selectSpeeldag(speeldag); updateDivisies(speeldag);">
+          <span ng-if="speeldag != ''">Speeldag {{ speeldag }}</span>
+          <span ng-if="speeldag == ''">Eindstand</span>
+    </ul>
+  </div>
+</div>
+    
+</div>
+
+<h3>Stand</h3>
+
+<table class="tables">
+    <thead><tr>
+        <th></th>
+        <th>Team</th>
+        <th>Spiritranking</th>
+        <th>PT</th>
+        <th>W</th>
+        <th>V</th>
+        <th>T</th>
+        <th>S</th>
+    </tr></thead>
+    <tr ng-repeat="klassement in klassementen | speeldag:selectieSpeeldag | divisie:selectieDivisie">
+         
+        <td>{{klassement.ranking_competitie}}</td>
+        <td>{{klassement.team}}</td>
+        <td>{{klassement.ranking_spirit}}</td>
+        <td>{{klassement.score_punten}}</td>
+        <td>{{klassement.score_wedstrijden}}</td>
+        <td>{{klassement.score_voor}}</td>
+        <td>{{klassement.score_tegen}}</td>
+        <td>{{klassement.score_spirit}}</td>
+    </tr>
+</table>
+
+ <div ng-if="wedstrijden.length > 3">
+<h3>Wedstrijden</h3>
+
+<table class="tables">
+    <thead><tr> 
+        <th>Team thuis</th>
+        <th>Team uit</th>
+        <th>Uitslag</th>
+    </tr></thead>
+    <tr ng-repeat="wedstrijd in wedstrijden | speeldag:selectieSpeeldag | divisie:selectieDivisie">
+        <td>{{wedstrijd.team_thuis}}</td>
+        <td>{{wedstrijd.team_uit}}</td>
+        <td>{{wedstrijd.score_thuis}} - {{wedstrijd.score_uit}}</td>
+    </tr>
+</table>
+     </div>
+
+
