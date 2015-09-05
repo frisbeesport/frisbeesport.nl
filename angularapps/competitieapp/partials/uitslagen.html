@@ -29,23 +29,23 @@
     <thead><tr>
         <th></th>
         <th>Team</th>
-        <th>Spiritranking</th>
-        <th>PT</th>
-        <th>W</th>
-        <th>V</th>
-        <th>T</th>
-        <th>S</th>
+        <th ng-if="showSpiritRanking">Spiritranking</th>
+        <th ng-if="showScorePunten">PT</th>
+        <th ng-if="showScoreWedstrijden">W</th>
+        <th ng-if="showScoreVoor">V</th>
+        <th ng-if="showScoreTegen">T</th>
+        <th ng-if="showScoreSpirit">S</th>
     </tr></thead>
-    <tr ng-repeat="klassement in klassementen | speeldag:selectieSpeeldag | divisie:selectieDivisie">
+    <tr ng-repeat="klassement in filteredKlassementen">
          
         <td>{{klassement.ranking_competitie}}</td>
         <td>{{klassement.team}}</td>
-        <td>{{klassement.ranking_spirit}}</td>
-        <td>{{klassement.score_punten}}</td>
-        <td>{{klassement.score_wedstrijden}}</td>
-        <td>{{klassement.score_voor}}</td>
-        <td>{{klassement.score_tegen}}</td>
-        <td>{{klassement.score_spirit}}</td>
+        <td ng-if="showSpiritRanking"><span ng-if="klassement.ranking_spirit != 0">{{klassement.ranking_spirit}}</span></td>
+        <td ng-if="showScorePunten">{{klassement.score_punten}}</td>
+        <td ng-if="showScoreWedstrijden">{{klassement.score_wedstrijden}}</td>
+        <td ng-if="showScoreVoor">{{klassement.score_voor}}</td>
+        <td ng-if="showScoreTegen">{{klassement.score_tegen}}</td>
+        <td ng-if="showScoreSpirit"><span ng-if="klassement.score_spirit != 0">{{klassement.score_spirit}}</span></td>
     </tr>
 </table>
 
@@ -58,7 +58,7 @@
         <th>Team uit</th>
         <th>Uitslag</th>
     </tr></thead>
-    <tr ng-repeat="wedstrijd in wedstrijden | speeldag:selectieSpeeldag | divisie:selectieDivisie">
+    <tr ng-repeat="wedstrijd in filteredWedstrijden">
         <td>{{wedstrijd.team_thuis}}</td>
         <td>{{wedstrijd.team_uit}}</td>
         <td>{{wedstrijd.score_thuis}} - {{wedstrijd.score_uit}}</td>
