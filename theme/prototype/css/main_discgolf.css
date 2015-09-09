@@ -678,13 +678,13 @@ th {
   border: 1px solid #ddd;
   width: 100%; }
   .tables tbody {
-    background-color: #fcfcfc; }
+    background-color: #fff; }
     .tables tbody tr:hover > td, .tables tbody tr:hover > th {
-      background-color: #efefef; }
+      background-color: #a8ffd1; }
     .tables tbody tr:nth-child(even) {
-      background-color: #f7f7f7; }
+      background-color: white; }
       .tables tbody tr:nth-child(even):hover > td {
-        background-color: #eaeaea; }
+        background-color: #a8ffd1; }
   .tables thead:first-of-type tr:first-child > th:first-child {
     border-top-left-radius: 3px; }
   .tables thead:first-of-type tr:first-child > th:last-child {
@@ -694,15 +694,16 @@ th {
   .tables tbody:last-child tr:last-child > td:last-child {
     border-bottom-right-radius: 3px; }
   .tables thead th {
-    background-color: white;
+    background-color: #00A850;
+    color: #fff;
     border-bottom: 0px;
-    border-left: 1px solid #ddd;
+    border-left: 0px;
     padding: 0.75em 1em;
     text-align: left; }
     .tables thead th:first-child {
       border-left: none; }
   .tables tbody {
-    background-color: #fcfcfc; }
+    background-color: #fff; }
     .tables tbody td {
       border-bottom: 0px;
       border-left: 1px solid #ddd;
@@ -3340,7 +3341,7 @@ body {
 
 .navigatie-afdelingen__tab--inactive:hover {
   color: #00A850;
-  background-color: #e1FFe5; }
+  background-color: white; }
 
 .navigatie-afdelingen__tab--active {
   background-color: white;

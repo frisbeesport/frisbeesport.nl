@@ -40,11 +40,11 @@ th {
   $base-font-color: $dark-gray !default;
   $table-border-color: $base-border-color;
   $table-border: 1px solid $table-border-color;
-  $table-background: lighten($table-border-color, 12%);
-  $table-header-background: lighten($table-background, 10%);
-  $table-hover-background: darken($table-background, 5%);
-  $table-stripe-background: darken($table-background, 2%);
-  $table-stripe-background-hover: darken($table-stripe-background, 5%);
+  $table-background: #fff;
+  $table-header-background: $nfb-theme;
+  $table-hover-background: $nfb-theme-very-light;
+  $table-stripe-background: $nfb-theme-white;
+  $table-stripe-background-hover: $nfb-theme-very-light;
   $table-padding: 0.75em 1em;
 
   border-collapse: separate;
@@ -91,8 +91,10 @@ th {
   thead {
     th {
       background-color: $table-header-background;
+      color: #fff;
+
       border-bottom: 0px;
-      border-left: 1px solid $table-border-color;
+      border-left: 0px; 
       padding: $table-padding;
       text-align: left;
 
