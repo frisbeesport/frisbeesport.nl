@@ -1,0 +1,30 @@
+{% extends "pagina.twig" %}
+
+{% block extended_content %}
+    {% setcontent berichten = 'berichten' where { status: 'published', datepublish: '>2015-01-01' } %}
+    {% setcontent ultimatenieuws = 'nieuws' where { afdelingen: 'ultimate', datepublish: '>2015-01-01' } %}
+    {% setcontent discgolfnieuws = 'nieuws' where { afdelingen: 'discgolf', datepublish: '>2015-01-01' } %}
+    {% setcontent organisatienieuws = 'nieuws' where { afdelingen: 'organisatie', datepublish: '>2015-01-01' } %}
+    
+    {% set records = berichten|merge(ultimatenieuws) %}
+    {% set records = records|merge(discgolfnieuws) %}
+    {% set records = records|merge(organisatienieuws) %}
+    {% set records = records|order('-datepublish') %}
+
+    <section class="section--cards--small section--nieuws " style="position: relative;">
+        <div class="container">
+            <div class="section__content">
+                 <div class="section__header">
+                    <div class="section__title section__title--centered"><h2>Berichten en verslagen</h2></div>
+                </div>
+           
+            <div class="smallcards">
+                {% for record in records %}       
+                    {% include 'nieuwsbericht_card.twig' with { 'nieuwsbericht': record, 'afdelingkleur': true } %} 
+                {% endfor %}
+            </div>
+                </div>
+        </div>
+    </section>
+
+{% endblock %}

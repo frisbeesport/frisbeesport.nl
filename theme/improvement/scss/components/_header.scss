@@ -1,0 +1,169 @@
+// =========================================================================================
+// Social icons
+// =========================================================================================
+
+.header__social-icons {
+    padding: 0;
+    margin: 18px 0 0 0;
+    height: 28px;
+    float: right;
+}
+
+.header__social-icons li {
+    list-style: none;
+    margin-right: 5px;
+    float: right;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    line-height: 18px;
+}
+.header__social-icons li a {
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    display: block;
+    height: 28px;
+    width: 28px;
+}
+.header__social-icons li:hover {
+background-position: 0 -38px; }
+
+.header__facebook {
+    background: url("../images/icon_facebook.png") no-repeat;
+}
+
+
+
+
+
+// =========================================================================================
+// Banner
+// =========================================================================================
+
+.banner {
+    position: relative;
+    
+    width:100%; 
+    padding: 0;
+    margin: 0;
+    
+    border-top: none;
+    
+     background-size: cover; 
+    -webkit-background-size: cover; 
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat:no-repeat;
+    background-position: center center;
+    background-attachment: scroll; 
+}
+
+.banner--small {
+    .banner-content {
+        @include media($medium-screen) {
+        padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        @include media($large-screen) {
+            padding-top: 50px;
+        }
+    }
+}
+
+.banner--big {
+    height: 200px;
+    @include media($medium-screen) {
+        height: 300px;
+    }
+    @include media($large-screen) {
+        height:470px;
+    }
+
+    .banner-content {
+        position: absolute;
+        bottom: 0px;
+        margin-bottom: 30px;
+    }
+}
+
+
+.image-credit {
+	margin: 0 auto;
+	max-width: 440px;
+	padding-top: 5px;
+	padding-right: 20px;
+	padding-left: 20px;
+	text-align: right;
+    font-size: 14px;
+	line-height: 1.3;
+	
+	@include clearfix();
+	@include media($medium-screen) {
+		max-width: 760px;
+		padding-right: 60px;
+		padding-left: 60px;
+	}
+	@include media($large-screen) {
+		max-width: 960px;
+	}
+	a {
+	
+	}
+}
+
+// =========================================================================================
+// Header title
+// =========================================================================================
+
+.header-content {
+    width: 100%;
+    background-color: $nfb-theme;
+}
+
+.header-content__text {
+    padding: 20px;
+    color:#fff;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    
+    h1 {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.ghost-buttons {
+    margin: 0;
+    padding: 0;
+}
+
+// =========================================================================================
+// Banner title
+// =========================================================================================
+
+.banner-content {
+    width: 100%;
+    text-shadow: 0px 0px 10px #000;
+}
+
+.banner-content__text {
+    padding: 20px;
+    color:#fff;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    
+    h1 {
+        margin: 0;
+        padding: 0;
+        font-weight: bold;
+    }
+}
+
+.ghost-buttons {
+    margin: 0;
+    padding: 0;
+}

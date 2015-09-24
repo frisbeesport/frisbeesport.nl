@@ -1,0 +1,45 @@
+ <div id="vereniging{{ vereniging.id }}" class="smallcard smallcard--vereniging">
+
+    {% if vereniging.logo %}
+        
+            <div class="smallcard-image">
+                <img class="smallcard--vereniging__image" src="{{ vereniging.logo|image(500,150,"r") }}">
+                    
+            </div>
+    {% endif %}
+ 
+ 
+    <div class="smallcard-header">
+
+        <h3 class="card__title"><a id="{{ vereniging.slug }}" class="title-link" href="{{ vereniging.url }}">{{ vereniging.title }}</a></h3>
+        
+        {% if vereniging.town %}
+            
+        <div class="card__subtitle">{{ vereniging.town }}</div>
+        
+        {% endif %}
+    </div>
+    <div class="smallcard-copy">
+
+        <p class="card__text">
+            {% for link, offer in vereniging.taxonomy.verenigingsaanbod  %}
+                {{ offer }}<br>
+            {% endfor %}
+        </p>   
+        
+
+        <p class="card__details">
+            {% if vereniging.phone is not empty %}
+                <i class="fa fa-mobile"></i> {{ vereniging.phone }}<br>
+            {% endif %}
+            {% if vereniging.email is not empty %}
+                <i class="fa fa-envelope-o"></i> {{ vereniging.email }}<br>
+            {% endif %}
+            {% if vereniging.url is not empty %}
+                <i class="fa fa-external-link"></i> {{ vereniging.url }}<br>
+            {% endif %}
+        </p>
+    
+    </div>
+
+</div>

@@ -1,0 +1,130 @@
+// Text links
+// --------------------------------------------------
+
+//.afdeling--text {
+//        a { 
+//            color: $nfb-theme; 
+//        }
+//        
+//        a:visited{
+//            color: $nfb-theme;
+//        }
+ //       
+ //       a:hover,
+  //      a:focus,
+//        a:active { 
+ //           color: $nfb-theme-light;
+//            text-decoration: underline;
+  //      }
+ //   }
+
+.afdeling--link--inverse {
+    color: #fff; 
+    &:visited {
+        color: #fff;
+    }
+        
+    &:hover, 
+    &:focus, 
+    &:active {
+        color: $nfb-theme;
+        text-decoration: underline;
+    }
+}
+
+// Arrow links
+// --------------------------------------------------
+
+a.arrow-link {
+    font-weight: 400;
+    color: #000;
+
+    &:hover,
+    &:focus,
+    &:active { 
+        color: #000;
+        text-decoration: none;
+    }
+}
+a.arrow-link::before {
+    content: "\f178";
+    font-family: "FontAwesome";
+    margin-right: 15px;
+    color: $nfb-theme;
+    transition: all 0.5s ease;
+}
+
+a.arrow-link:visited {
+    color: inherit;
+}
+
+a.arrow-link:hover::before {
+    margin-right: 7px;
+    margin-left: 8px;
+}
+
+.inverse a.arrow-link::before {
+    color: #fff;
+}
+
+.inverse a.arrow-link {
+    color: #fff;
+}
+
+// Pdf links
+// --------------------------------------------------
+
+
+.inverse a.pdf-link::before {
+    color: #fff;
+}
+
+.inverse a.pdf-link {
+    color: #fff;
+}
+
+a.pdf-link {
+    font-weight: 400;
+    color: #000;
+
+    &:hover,
+    &:focus,
+    &:active { 
+        color: #000;
+        text-decoration: none;
+    }
+}
+a.pdf-link::before {
+    content: "\f1c1";
+    font-family: "FontAwesome";
+    margin-right: 15px;
+    color: $nfb-theme;
+    transition: all 0.5s ease;
+}
+
+a.pdf-link:visited {
+    color: #000;
+}
+
+a.pdf-link:hover::before {
+    margin-right: 7px;
+    margin-left: 8px;
+}
+
+// Title links
+// --------------------------------------------------
+
+//a.title-link {
+    //color: $title-color; 
+//    &:visited {
+       // color: $title-color;
+  //  }
+        
+//    &:hover, 
+ //   &:focus, 
+   // &:active {
+     //   color: $nfb-theme;
+ //       text-decoration: underline;
+  //  }
+//}
+

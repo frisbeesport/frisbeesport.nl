@@ -1,0 +1,79 @@
+<!-- werkgroep_part.twig -->
+
+<div id="werkgroep{{ werkgroep.id }}" id="{{ werkgroep[0] }}" class="widecard widecard--werkgroep">  
+
+    <div class="widecard-header">
+   
+        
+        <h2 class="widecard__title">{{ werkgroep.title }}</h2>
+
+        {% if werkgroep.tagline is not empty %}
+         
+        <div class="card--subtitle">{{ werkgroep.tagline }}</div>
+
+        {% endif %}
+        
+
+    </div>           
+
+    <div class="widecard-copy">
+           
+        {% if werkgroep.description is not empty %}
+        
+        <p class="card__text">
+            {{ werkgroep.description }}
+        </p>
+    
+        {% endif %} 
+        
+        <div class="werkgroep__leden">
+
+            {% if werkgroep.lid1 != '0' %}
+                {% setcontent lid1 = "kader/#{werkgroep.lid1}" %}
+                {% include 'kaderlid_part.twig' with { 'kaderlid': lid1 } %}
+            {% endif %}
+
+            {% if werkgroep.lid2 != '0' %}
+                {% setcontent lid2 = "kader/#{werkgroep.lid2}" %}
+                {% include 'kaderlid_part.twig' with { 'kaderlid': lid2 } %}
+            {% endif %}
+
+            {% if werkgroep.lid3 != '0' %}
+                {% setcontent lid3 = "kader/#{werkgroep.lid3}" %}
+                {% include 'kaderlid_part.twig' with { 'kaderlid': lid3 } %}
+            {% endif %}
+
+            {% if werkgroep.lid4 != '0' %}
+                {% setcontent lid4 = "kader/#{werkgroep.lid4}" %}
+                {% include 'kaderlid_part.twig' with { 'kaderlid': lid4 } %}
+            {% endif %}
+
+            {% if werkgroep.lid5 != '0' %}
+                {% setcontent lid5 = "kader/#{werkgroep.lid5}" %}
+                {% include 'kaderlid_part.twig' with { 'kaderlid': lid5 } %}
+            {% endif %}
+
+            {% if werkgroep.lid6 != '0' %}
+                {% setcontent lid6 = "kader/#{werkgroep.lid6}" %}
+                {% include 'kaderlid_part.twig' with { 'kaderlid': lid6 } %}
+            {% endif %}
+
+            {% if werkgroep.lid7 != '0' %}
+                {% setcontent lid7 = "kader/#{werkgroep.lid7}" %}
+                {% include 'kaderlid_part.twig' with { 'kaderlid': lid7 } %}
+            {% endif %}
+
+            {% if werkgroep.lid8 != '0' %}
+                {% setcontent lid8 = "kader/#{werkgroep.lid8}" %}
+                {% include 'kaderlid_part.twig' with { 'kaderlid': lid8 } %}
+            {% endif %}
+
+         </div>
+         
+        
+
+    </div>
+
+</div>
+    
+<!-- /werkgroep_part.twig -->    

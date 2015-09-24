@@ -1,0 +1,7 @@
+{% set afdeling = "" %}
+{% for tag in nieuwsbericht.taxonomy.afdelingen %}
+	{% set afdeling = tag %}
+{% endfor %}
+
+{% include 'post.twig' with { 'post': nieuwsbericht, 'authorid': nieuwsbericht.selectauteurs, 'afdeling': afdeling } %}    
+    

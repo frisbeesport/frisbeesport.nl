@@ -1,0 +1,239 @@
+// Refill cards
+
+.smallcards {
+  @include display(flex);
+  @include flex-wrap(wrap);
+  @include justify-content(center);
+}
+
+.smallcard {
+  $base-border-color: gainsboro !default;
+  $base-border-radius: 3px !default;
+  $base-background-color: white !default;
+  $base-spacing: 1.5em !default;
+  $action-color: #477DCA !default;
+  $base-link-color: $action-color !default;
+  $dark-gray: #333 !default;
+  $base-font-color: $dark-gray !default;
+  $card-border-color: $base-border-color;
+  $card-border: 0px solid $card-border-color;
+  $card-background: #FFF;//lighten($card-border-color, 10%);
+  $card-header-background: $card-background;
+  $card-hover-background: #FFF;//lighten($card-background, 5%);
+  $card-image-background: #DBD199;
+  $card-image-hover-background: lighten($card-image-background, 5%);
+  $card-margin: 1em;
+
+  @include flex-basis(250px);
+  @include flex-grow(1);
+  @include transition (all 0.2s ease-in-out);
+  background-color: $card-background;
+  border-radius: $base-border-radius;
+  border: $card-border;
+  box-shadow: 0 2px 4px darken($base-background-color, 20%);
+  //cursor: pointer;
+  margin: 0 $card-margin $base-spacing $card-margin;
+  position: relative;
+  overflow: hidden;
+  
+      
+  .smallcard-image {
+    overflow: hidden;
+    max-height: 150px;
+
+    img {
+      @include transition (all 0.2s ease-in-out);
+      background: $card-image-background;
+      border-top-left-radius: $base-border-radius;
+      border-top-right-radius: $base-border-radius;
+      width: 100%;
+    }
+  } 
+
+  .smallcard-header {
+    @include transition (all 0.2s ease-in-out);
+    background-color: $card-header-background;
+    border-bottom: none;
+    font-weight: bold;
+    line-height: 1.5em;
+    padding: ($base-spacing / 3) ($base-spacing / 2);
+      
+    .smallcard__extrainfo {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.5em;
+    }
+      
+    .smallcard__date {
+        color: $deemphasize-font-color;
+        font-weight: 300;
+    }
+      
+            
+    .smallcard__tag {
+        float: right;
+         color: #ccc;
+        //background-color: #ccc; 
+        //color: #fff;
+        //padding: 0.06em 1em 0.12em 1em;
+    }
+      
+    .smallcard__title {
+        margin-top: 0.5em;
+    }
+  }
+
+  .smallcard-copy {
+    font-size: 0.9em;
+    line-height: 1.5em;
+    padding: ($base-spacing / 2) ($base-spacing / 2);
+    padding-top: 0;
+
+    p {
+      margin: 0 0 ($base-spacing / 2);
+    }
+  }
+  
+  &:focus,
+  &:hover {
+    box-shadow: 0 5px 10px darken($base-background-color, 50%);
+  
+    
+  }
+
+  
+} 
+
+.smallcard.smallcard--vereniging {
+  text-align: center;  
+    .smallcard-image {
+    overflow: hidden;
+    max-height: 150px;
+
+    img {
+    max-height: 120px;
+
+      @include transition (all 0.2s ease-in-out);
+      background: #fff;
+      border-top-left-radius: $base-border-radius;
+      border-top-right-radius: $base-border-radius;
+      padding: 15px;
+      width: auto;
+    }
+  } 
+}
+
+.smallcard.ultimate {
+  $card-background: #1296D4;
+  background-color: $card-background;
+  
+  .smallcard-image {
+    img {
+      @include transition (all 0.2s ease-in-out);
+      background: $card-background;
+    }
+  } 
+
+  .smallcard-header {
+    background-color: $card-background;
+    color: #fff;
+   .smallcard__tag {
+         color: #fff;
+       
+    }
+    .smallcard__date {
+        color: #fff;
+    }
+        .smallcard__extrainfo {
+        border-bottom: 1px solid #fff;
+        padding-bottom: 0.5em;
+            border-color: #7FC9FF;
+    }
+    h3 {
+      color: #fff;
+    }
+  }
+
+  .smallcard-copy {
+    background-color: $card-background;
+    color: #fff;
+  }
+}
+
+.smallcard.discgolf {
+  $card-background: #00A850;
+  background-color: $card-background;
+  
+  .smallcard-image {
+    img {
+      @include transition (all 0.2s ease-in-out);
+      background: $card-background;
+    }
+  } 
+
+  .smallcard-header {
+    background-color: $card-background;
+    color: #fff;
+ .smallcard__tag {
+         color: #fff;
+       
+    }
+    .smallcard__date {
+        color: #fff;
+    }
+ 
+    .smallcard__extrainfo {
+        border-bottom: 1px solid #fff;
+        padding-bottom: 0.5em;
+        border-color: #7FFF8E;
+    }
+      
+    h3 {
+      color: #fff;
+    }
+  }
+
+  .smallcard-copy {
+    background-color: $card-background;
+    color: #fff;
+  }
+}
+
+.smallcard.organisatie {
+  $card-background: #ee7900;
+  background-color: $card-background;
+  
+  .smallcard-image {
+    img {
+      @include transition (all 0.2s ease-in-out);
+      background: $card-background;
+    }
+  } 
+
+  .smallcard-header {
+    background-color: $card-background;
+    color: #fff;
+
+    .smallcard__date {
+        color: #fff;
+        
+    } .smallcard__tag {
+         color: #fff;
+       
+    }
+      .smallcard__extrainfo {
+        border-bottom: 1px solid #fff;
+        padding-bottom: 0.5em;
+          border-color: #f39d61;
+    }
+    h3 {
+      color: #fff;
+    }
+  }
+
+  .smallcard-copy {
+    background-color: $card-background;
+    color: #fff;
+  }
+
+
+}

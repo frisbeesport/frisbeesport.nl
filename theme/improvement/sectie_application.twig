@@ -1,0 +1,38 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+
+{% endblock %}
+
+{% block sectie_content %}
+
+   <div class="container">
+        <div class="grid section__content">
+
+			{% if sectie.caption  is not empty %}
+			
+            <div class="section__header">
+                <h2 class="section__title">{{ sectie.caption }}</h2>
+			</div>
+            
+			{% endif %}
+
+			{% if sectie.application is not empty %}
+                <!--<script src="{{ paths.root }}angularapps/{{sectie.application}}/node_modules/angular/angular.js"></script>
+	            <script src="{{ paths.root }}angularapps/{{sectie.application}}/node_modules/angular-route/angular-route.js"></script>	         
+	            <script src="{{ paths.root }}angularapps/{{sectie.application}}/node_modules/angular-resource/angular-resource.js"></script>
+                <script src="{{ paths.root }}angularapps/{{sectie.application}}/js/controllers.js"></script>
+	            <script src="{{ paths.root }}angularapps/{{sectie.application}}/js/app.js"></script>
+                <script src="{{ paths.root }}angularapps/{{sectie.application}}/js/services.js"></script>
+                <script src="{{ paths.root }}angularapps/{{sectie.application}}/js/filters.js"></script>-->
+                <script src="{{ paths.root }}angularapps/{{sectie.application | lower}}/app.min.js"></script>
+                <div ng-app="{{sectie.application}}">
+                    <div ng-view></div>
+                </div>
+
+            {% endif %}   
+            
+        </div>
+    </div>
+
+{% endblock %}

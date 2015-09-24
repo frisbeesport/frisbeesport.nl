@@ -1,0 +1,20 @@
+{% extends "pagina.twig" %}
+
+{% block extended_content %}
+
+    <section class="section--cards--wide">
+        <div class="container">
+            <div class="grid section__content">
+                <div class="section__header"></div>
+                
+                {% setcontent werkgroepen = 'werkgroepen' %}
+
+                {% for werkgroep in werkgroepen | reverse %}       
+                    {% include 'werkgroep_cardwide.twig' with { 'werkgroep': werkgroep } %} 
+                {% endfor %}
+                
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

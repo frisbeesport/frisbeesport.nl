@@ -1,0 +1,134 @@
+// Refills sliding menu
+
+.sliding-search-panel-content {  
+  $action-color: #477DCA !default;
+  $dark-gray: #333 !default;
+  $sliding-panel-border-color: $dark-gray;
+  $sliding-panel-background: lighten($sliding-panel-border-color, 5%);
+  $sliding-panel-color: #fff;
+  $sliding-panel-border: 1px solid $sliding-panel-border-color;
+  $sliding-panel-background-hover: $action-color;
+  $sliding-panel-color-hover: #fff;
+  $sliding-panel-background-focus: lighten($sliding-panel-background, 5%);
+
+  @include position(fixed, 0px 0px 0px auto);
+
+  width: 100%;
+  height: 4em;
+
+  @include transform(translateY(-4em));
+  @include transition(all 0.25s linear);
+  background: $sliding-panel-background;
+  z-index: 999999;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  li a {
+    border-bottom: $sliding-panel-border;
+    color: $sliding-panel-color;
+    display: block;
+    font-weight: bold;
+    padding: 1em;
+    text-decoration: none;
+
+    &:focus {
+      background-color: $sliding-panel-background-focus;
+    }
+
+    &:hover {
+      background-color: $sliding-panel-background-hover;
+      color: $sliding-panel-color-hover;
+    }
+  }
+
+  &.is-visible {
+    @include transform(translateY(0));
+  }
+
+  .search-bar {
+  $navigation-search-background: sliding-panel-background;
+    
+  $navigation-search-border: #fff;
+
+  $navigation-color: $base-font-color;
+    $search-bar-border-color: $base-border-color;
+    $search-bar-border: 1px solid $search-bar-border-color;
+    $search-bar-background: lighten($search-bar-border-color, 10%);
+
+     padding: 0.85em 0.6em 0.7em 0.6em;
+      
+    form {
+      position: relative;
+
+      input[type=search] {
+        box-sizing: border-box;
+        background: $navigation-search-background;
+        border-radius: $base-border-radius * 2;
+        border: $navigation-search-border;
+        color: $navigation-color;
+        font-size: 0.9em;
+        font-style: italic;
+        margin: 0;
+        padding: 0.5em 0.8em;
+        width: 100%;
+
+         
+      }
+
+      button[type=submit] {
+        background-color: #fff;
+        bottom: 0.3em;
+        left: auto;
+        outline: none;
+        padding: 0 9px;
+        position: absolute;
+        right: 0.3em;
+        top: 0.3em;
+
+        i {
+          color: $base-border-color;
+          padding: 1px;
+        };
+      }
+    }
+  
+  }
+}
+
+.sliding-search-panel-fade-screen {
+  @include position(fixed, 0px 0px 0px 0px);
+  @include transition;
+  background: black;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 999998;
+
+  &.is-visible {
+    opacity: 0.4;
+    visibility: visible;
+  }
+}
+
+.sliding-search-panel-button {
+  padding: 10px 16px;
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+
+  i {
+    color: #fff;
+    height: 1.3em;
+  }
+
+  
+}   

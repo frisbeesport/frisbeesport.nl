@@ -1,0 +1,10 @@
+{% for item in menu %}
+
+    {% if item.top %}
+    
+    <li class="nav-link"><a href="{{ paths.rooturl }}{{ item.path }}">{{item.label}}</a></li>
+    
+    {% endif %}
+
+{% endfor %}      
+ 

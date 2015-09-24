@@ -1,0 +1,20 @@
+{# parameter tags: array of tags #} 
+{# parameter url: url of page #}
+{# parameter title: title of page #}
+{# parameter twitterauthor: twitter account of author #}
+
+{% set simpletags = [afdeling] %}
+
+{% for link,value in tags %}
+	{% set simpletags = simpletags|merge([value]) %}
+{%endfor %}
+
+<div class="sharing sharing-vertical">
+
+	<a href="https://twitter.com/intent/tweet?hashtags={{ simpletags | join(',') | trim(' ') }}&amp;text={{ title | escape | replace(' ','%20') }}&amp;url={{ url }}&amp;via=@nfb" class="twitter" title="Deel op Twitter" itemprop="Twitter"><i class="fa fa-twitter"></i> Tweet</a>
+
+	<a href="https://www.facebook.com/sharer/sharer.php?u={{ url }}" class="facebook" title="Deel op Facebook" itemprop="Facebook"><i class="fa fa-facebook"></i> Deel</a>
+
+	<a href="https://plus.google.com/share?url={{ url }}" class="gplus" title="Deel op Google Plus" itemprop="GooglePlus"><i class="fa fa-google-plus"></i> Post</a>
+
+</div>

@@ -1,0 +1,10 @@
+<ul>
+    <li><h3><a href="{{ paths.rooturl }}{{ menu[0].path }}">{{ menu[0].label }}</a></h3></li>
+
+    {% for item in menu | slice(1) %}
+        
+    <li><a href="{{ paths.rooturl }}{{ item.path }}">{{ item.label }}</a></li>
+
+    {% endfor %}  
+</ul>
+
