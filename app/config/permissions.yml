@@ -17,12 +17,12 @@
 # - 'anonymous': this role is automatically assigned at all times, even when
 #   no user is logged in at all.
 roles:
-    gastreporter:
-        description: Kan alleen nieuwe berichten schrijven.
-        label: Gastreporter
     reporter:
-        description: Kan berichten, nieuwsberichten en persberichten bewerken.
+        description: Kan alleen nieuwe berichten schrijven.
         label: Reporter
+    redacteur:
+        description: Kan berichten, nieuwsberichten en persberichten bewerken.
+        label: Redacteur
     hoofdredacteur:
         description: Kan alle berichten, nieuwsberichten, persberichten en pagina's bewerken. 
         label: Hoofdredacteur
@@ -32,7 +32,25 @@ roles:
     developer:
         description: Developer access. Only required to change system-level settings.
         label: Developer
-
+    documenten:
+        description: Toegang tot documenten.
+        label: Documenten
+    aanbod:
+        description: Toegang tot aanbod (concepten).
+        label: Aanbod        
+    nationaleteams:
+        description: Toegang tot nationale teams.
+        label: Nationale Teams 
+    courses:
+        description: Toegang tot Disc Golf courses.
+        label: Courses         
+    competitie:
+        description: Toegang tot Ultimate competitie uitslagen.
+        label: Competitie
+    paginas:
+        description: Toegang tot paginas.
+        label: Pagina's
+        
 # Now we'll define some permissions. Each permission comes with a list of roles
 # that grant access.
 
@@ -58,7 +76,7 @@ global:
     fileedit: [ admin, developer ]
     files:config: [ developer ]
     files:theme: [ developer ]
-    files:uploads: [ admin, developer, chief-editor, editor ]
+    files:uploads: [ admin, developer, redacteur, hoofdredacteur, reporter ]
     files: [ editor, admin, developer ]
     prefill: [ developer ]
     profile: [ everyone ] # edit own profile
@@ -79,7 +97,9 @@ global:
     # Likewise, 'logout' needs to be granted to 'everyone', otherwise people
     # cannot log out anymore.
     logout: [ everyone ]
-
+    changelog: [ admin, developer, hoofdredacteur ]
+    systemlog: [ admin, developer ]
+    
 # For content type related actions, permissions can be set individually for
 # each content type. For this, we define three groups of permission sets.
 # The 'contenttype-all' permission sets *overrides*; any roles specified here
@@ -150,40 +170,40 @@ contenttype-default:
 
 contenttypes:
     ultimateuitslagen:
-        edit: [ hoofdredacteur ]
-        create: [ hoofdredacteur ]
-        publish: [ hoofdredacteur ]
-        depublish: [ hoofdredacteur ]
-        delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]  
+        edit: [ hoofdredacteur, competitie ]
+        create: [ hoofdredacteur, competitie ]
+        publish: [ hoofdredacteur, competitie ]
+        depublish: [ hoofdredacteur, competitie ]
+        delete: [ hoofdredacteur, competitie ]
+        view: [ hoofdredacteur, competitie ]  
     courses:
-        edit: [ hoofdredacteur ]
-        create: [ hoofdredacteur ]
-        publish: [ hoofdredacteur ]
-        depublish: [ hoofdredacteur ]
-        delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]  
-    concepten:
-        edit: [ hoofdredacteur ]
-        create: [ hoofdredacteur ]
-        publish: [ hoofdredacteur ]
-        depublish: [ hoofdredacteur ]
-        delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]  
+        edit: [ hoofdredacteur, courses ]
+        create: [ hoofdredacteur, courses ]
+        publish: [ hoofdredacteur, courses ]
+        depublish: [ hoofdredacteur, courses ]
+        delete: [ hoofdredacteur, courses ]
+        view: [ hoofdredacteur, courses ]  
+    aanbod:
+        edit: [ hoofdredacteur, aanbod ]
+        create: [ hoofdredacteur, aanbod ]
+        publish: [ hoofdredacteur, aanbod ]
+        depublish: [ hoofdredacteur, aanbod ]
+        delete: [ hoofdredacteur, aanbod ]
+        view: [ hoofdredacteur, aanbod ]  
     nationaleteams:
-        edit: [ hoofdredacteur ]
-        create: [ hoofdredacteur ]
-        publish: [ hoofdredacteur ]
-        depublish: [ hoofdredacteur ]
-        delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]  
+        edit: [ hoofdredacteur, nationaleteams ]
+        create: [ hoofdredacteur, nationaleteams ]
+        publish: [ hoofdredacteur, nationaleteams ]
+        depublish: [ hoofdredacteur, nationaleteams ]
+        delete: [ hoofdredacteur, nationaleteams ]
+        view: [ hoofdredacteur, nationaleteams ]  
     auteurs:
-        edit: [ hoofdredacteur ]
-        create: [ hoofdredacteur ]
-        publish: [ hoofdredacteur ]
-        depublish: [ hoofdredacteur ]
-        delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]  
+        edit: [ redacteur ]
+        create: [ redacteur ]
+        publish: [ redacteur ]
+        depublish: [ redacteur ]
+        delete: [ redacteur ]
+        view: [ redacteur ]  
     werkgroepen:
         edit: [ hoofdredacteur ]
         create: [ hoofdredacteur ]
@@ -206,48 +226,55 @@ contenttypes:
         delete: [ hoofdredacteur ]
         view: [ hoofdredacteur ]  
     nieuws:
-        edit: [ reporter ]
-        create: [ reporter ]
-        publish: [ hoofdredacteur ]
-        depublish: [ reporter ]
-        delete: [ reporter ]
-        view: [ reporter ]  
+        edit: [ redacteur ]
+        create: [ redacteur ]
+        publish: [ redacteur ]
+        depublish: [ redacteur ]
+        delete: [ redacteur ]
+        view: [ redacteur ]  
     persberichten:
-        edit: [ reporter ]
-        create: [ reporter ]
-        publish: [ hoofdredacteur ]
-        depublish: [ reporter ]
-        delete: [ reporter ]
-        view: [ reporter ]    
+        edit: [ redacteur ]
+        create: [ redacteur ]
+        publish: [ redacteur ]
+        depublish: [ redacteur ]
+        delete: [ redacteur ]
+        view: [ redacteur ]    
     berichten:
         edit: [ reporter ]
-        create: [ gastreporter, reporter ]
+        create: [ reporter ]
         publish: [ reporter ]
         depublish: [ reporter ]
         delete: [ reporter ]
         view: [ reporter ]
         change-ownership: [ reporter ]
     paginas:
-        edit: [ hoofdredacteur ]
-        create: [ hoofdredacteur ]
-        publish: [ hoofdredacteur ]
-        depublish: [ hoofdredacteur ]
-        delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]
+        edit: [ hoofdredacteur, paginas ]
+        create: [ hoofdredacteur, paginas ]
+        publish: [ hoofdredacteur, paginas ]
+        depublish: [ hoofdredacteur, paginas ]
+        delete: [ hoofdredacteur, paginas ]
+        view: [ hoofdredacteur, paginas ]
     secties:
         edit: [ hoofdredacteur ]
         create: [ hoofdredacteur ]
         publish: [ hoofdredacteur ]
         depublish: [ hoofdredacteur ]
         delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]        
-    documenten:
+        view: [ hoofdredacteur ]  
+    topics:
         edit: [ hoofdredacteur ]
         create: [ hoofdredacteur ]
         publish: [ hoofdredacteur ]
         depublish: [ hoofdredacteur ]
         delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]
+        view: [ hoofdredacteur ]          
+    documenten:
+        edit: [ hoofdredacteur, documenten ]
+        create: [ hoofdredacteur, documenten ]
+        publish: [ hoofdredacteur, documenten ]
+        depublish: [ hoofdredacteur, documenten ]
+        delete: [ hoofdredacteur, documenten ]
+        view: [ hoofdredacteur, documenten ]
         
 # This is an example of how to define Contenttype specific permissions
 #

@@ -5,10 +5,9 @@ tags:
     slug: tags
     singular_slug: tag
     behaves_like: categories
-    postfix: "Add some freeform tags. Start a new tag by typing a comma or space."
     multiple: false
     #listing_template: tag-listing.twig #custom template
-    options: [ algemeen, jeugd, studenten, nationale-teams, competitie, kader ] 
+    options: [ algemeen, jeugd, studenten, nationale-teams, competitie, verenigingen, bond, internationaal, beach, toernooi, opinie ]  
 
 competities:
     slug: competities
@@ -42,4 +41,4 @@ documentcategorien:
     singular_slug: documentcategorie
     behaves_like: categories
     multiple: true
-    options: [ ultimate, organisatie, discgolf, spelers, beleid, reglementen, verenigingen, kader, competitie, senioren, jeugd, formulieren ]
+    options: [ ultimate, organisatie, discgolf, spelers, beleid, reglementen, verenigingen, kader, competitie, senioren, jeugd, formulieren, pr, trainersopleiding, aanbod ]

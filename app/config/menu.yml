@@ -6,20 +6,19 @@ homepage:
     title: Ultimate 
     path: pagina/ultimate    
     top: true
-    left: true
   - label: Disc Golf
     path: pagina/discgolf
     top: true
-    left: true
   - label: Organisatie
     path: paginas/organisatie
     top: true
-    right: true
   - label: Spelersinfo
     path: paginas/spelers
     top: true
-    right: true
-
+  - label: Pers
+    path: paginas/organisatie-pers
+    top: true
+    
 homepage_mobile:
   - label: Ultimate
     title: Ultimate 
@@ -34,42 +33,46 @@ homepage_mobile:
   - label: Spelersinfo
     path: paginas/spelers
     top: true
- 
+  - label: Pers
+    path: paginas/organisatie-pers
+    top: true
+    
 ultimate:
   - label: Ultimate
     title: Ultimate 
     path: pagina/ultimate
+    top: true
   - label: Speluitleg
-    path: /pagina/ultimate-speluitleg
+    path: pagina/ultimate-speluitleg
   - label: Jeugd
     title: Jeugd Ultimate 
     path: pagina/ultimate-jeugd
     top: true
-    left: true
   - label: Spirit of the Game
     path: pagina/ultimate-spirit-of-the-game
   - label: Nationale teams
     path: pagina/ultimate-nationale-teams
     top: true
-    left: true
   - label: Competitie
     path: paginas/ultimate-competitie
-    top: true 
-    right: true   
+    top: true    
   - label: Verenigingen
     path: pagina/ultimate-verenigingen
     top: true
-    right: true   
+  - label: Contact
+    title: Contact
+    path: pagina/ultimate-contact
+    top: true        
   - label: Nieuws
     path: pagina/ultimate-nieuws
-    right: true   
       
 discgolf:
   - label: Disc Golf
     title: Disc Golf
     path: pagina/discgolf
+    top: true
   - label: Speluitleg
-    path: /pagina/discgolf-speluitleg    
+    path: pagina/discgolf-speluitleg    
   - label: Courses
     title: Disc Golf Courses
     path: pagina/discgolf-courses
@@ -81,6 +84,10 @@ discgolf:
   - label: Verenigingen
     path: pagina/discgolf-verenigingen
     top: true
+  - label: Contact
+    title: Contact
+    path: pagina/discgolf-contact
+    top: true    
   - label: Nieuws
     path: pagina/discgolf-nieuws    
     
@@ -104,7 +111,7 @@ organisatie:
   - label: Records
     title: Records
     path: pagina/records
-    top: true    
+    top: false    
   - label: Pers
     title: Pers
     path: pagina/organisatie-pers
@@ -122,6 +129,7 @@ spelers:
   - label: Spelersinfo
     title: Spelersinfo
     path: pagina/spelers
+    top: true
   - label: Ultimate competitie
     title: Spelershome
     path: pagina/spelers-ultimate-competitie
@@ -134,6 +142,10 @@ spelers:
     title: Spelershome
     path: pagina/spelers-discgolf-competitie
     top: true
+  - label: Vertrouwenspunt
+    title: Vertrouwenspunt
+    path: pagina/spelers-vertrouwenspunt
+    top: true
   - label: Programma's
     title: Programma's
     path: pagina/spelers-programmas
@@ -141,8 +153,8 @@ spelers:
   - label: Overige sporten
     title: Overige sporten
     path: pagina/overige-sporten
-    top: true
+    top: false
   - label: Agenda
     title: Agenda
-    path: /pagina/agenda
+    path: pagina/agenda
     top: true
