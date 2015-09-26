@@ -1,0 +1,160 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+
+{% set afdeling = "" %}
+{% set style = "" %}
+
+{% for tag in record.taxonomy.afdelingen %}
+	{% set afdeling = tag %}
+{% endfor %}
+
+{% if afdeling == "ultimate" %}
+	{% set style = 'ultimate' %}
+{% elseif afdeling == "discgolf" %}
+	{% set style = 'discgolf' %}
+{% else %}
+	{% set style = 'organisatie' %}
+{% endif %}
+ 
+{% set algemeen = '' %}
+{% setcontent algemeenpaginas = record.contenttype.name where { 'grouptype': 'Algemeen' } %}
+{% for child in algemeenpaginas %}       
+    {% set algemeen = child %}            
+{% endfor %}
+{% for tag in algemeen.taxonomy.afdelingen %}
+	{% set afdeling = tag %}
+{% endfor %}
+
+{% setcontent children = record.contenttype.name where { 'grouptype': 'Inhoud' } orderby 'volgnummer' %}
+
+{% include '_head.twig' with { 'title': algemeen.grouptitle, 'description': algemeen.grouplead, 'image': algemeen.groupimage, 'url': record.link } %}
+
+<body class="background afdeling--{{ style }} ">
+<div class="sheet">
+        
+    {% include '_browser-upgrade.twig' %}    
+ 
+    <article>
+    
+    {% include '_header.twig' with { 'afdeling': afdeling, 'image': algemeen.groupimage, 'title': algemeen.grouptitle, 'header': algemeen.grouplead, 'buttons': '', 'fotograaf': algemeen.groupfotograaf } %}
+
+        <section>
+            <div class="container">
+		        <div class="grid">
+            
+                {% if children is not empty %}
+            
+                <div class="sidebar">
+          
+                    <div class="forwards">
+            
+                    
+                    {% for child in children %}       
+                
+                        {% if child.id == record.id %}
+                        <a href="{{ child.link }}" class="forward forward--current">{{ child.menutitle }}</a>
+                        {% else %}
+                        <a href="{{ child.link }}" class="forward">{{ child.menutitle }}</a>
+                        {% endif %}
+                    {% endfor %}  
+                
+                    </div>    
+            
+                    <div class="groupinfo">
+              
+                        <h3>Contact</h3>
+                
+                        {% if algemeen.groupcontacttekst is not empty %}
+                        <p>{{ algemeen.groupcontacttekst  }}</p>
+                        {% endif %}
+            
+
+                        {% if algemeen.groupcontactwerkgroep is not empty %}
+                
+                        {% setcontent werkgroep = 'werkgroepen' where {'id':  algemeen.groupcontactwerkgroep } %}
+                        <p><a href="{{ paths.rooturl }}pagina/organisatie-kader/#werkgroep{{  werkgroep.id }}">{{  werkgroep.title }}</a></p>
+                                     
+                        {% endif %}
+
+
+                        {% if algemeen.groupcontactemail is not empty %}
+                        
+                        <p><a href="mailto:{{ algemeen.groupcontactemail  }}">{{ algemeen.groupcontactemail  }}</a></p>
+                        
+                        {% endif %}
+            
+                        {% if algemeen.groupfiles is not empty %}
+  
+                        <h3>Documenten</h3>
+            
+                        <ul class="documenten">
+
+                            {% for bestand in algemeen.groupfiles %}      
+                            
+                            <li id="document{{ document.id }}" class="document" style="font-style: none">
+                                <a class="pdf-link" href="{{ paths.files }}{{ bestand.filename }}">{{ bestand.title }}</a>
+                            </li>
+                            
+                            {% endfor %} 
+                        
+                        </ul>
+
+                        {% endif %}
+                    </div><!-- groupinfo -->
+                </div><!-- sidebar -->
+
+                {% endif %}  
+            
+                <div class="pagina section--text afdeling--text">
+            
+                    {% if record.title is not empty %}  
+
+                    <h2>{{ record.title }}</h2>
+            
+                    {% endif %}  
+
+ 
+                    {% if record.lead is not empty %}  
+
+                    {{ record.lead }}
+            
+                    {% endif %}  
+
+           
+                    {% if record.image is not empty %}  
+
+                    <img src="{{ record.image|image(800, 450, "c") }}">
+            
+                    {% endif %}  
+
+
+                    {% if record.body is not empty %}  
+
+                    {{ record.body }}
+            
+                    {% endif %}     
+                 
+                </div>
+            
+    	    </div> 
+
+	    </div>
+    </section>
+
+  
+    {% block extended_content %}
+    {% endblock %}
+
+    </article>
+   
+    {% include '_footer.twig' %}
+	{% include '_scripts.twig' %}
+
+    </div>
+
+    {% include '_piwik.twig' %}
+</body>
+</html>

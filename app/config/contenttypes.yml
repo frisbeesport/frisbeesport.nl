@@ -945,3 +945,960 @@ rss:
             multiple: false
     default_status: publish
     searchable: false
+
+
+
+paginas_njts: 
+    name: NJTInfo
+    singular_name: NJTInfo
+    description: Pagina's met informatie voor de jeugd NJTs.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline            
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_njts
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginas_njts
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Bestanden
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_njts
+            group: Inhoud
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+                   
+    record_template: paginagroep.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+    
+
+paginas_beleid: 
+    name: Beleidsthema's
+    singular_name: Beleidsthema
+    description: Pagina's met informatie voor de jeugd NJTs.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_beleid
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen  
+            upload: paginas_beleid
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Emailadres
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_beleid
+            group: Inhoud           
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+            
+    record_template: paginagroep.twig        
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+
+paginas_vacatures: 
+    name: Vacatures
+    singular_name: Vacature
+    description: Pagina's met vacatures.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_vacatures
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen  
+            upload: paginas_vacatures
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Emailadres
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_vacatures
+            group: Inhoud           
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+            
+    record_template: paginagroep.twig        
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+
+paginas_trainerft2: 
+    name: Trainersopleiding
+    singular_name: Trainersopleiding
+    description: Pagina's over de trainersopleiding.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_trainerft2
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen  
+            upload: paginas_trainerft2
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Emailadres
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_trainerft2
+            group: Inhoud           
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+            
+    record_template: paginagroep.twig        
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+
+
+paginas_discgolfcompetitie: 
+    name: Discgolfcompetities
+    singular_name: Discgolfcompetitie
+    description: Pagina's met informatie over de discgolf competitie.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline            
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_discgolfcompetitie
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginas_discgolfcompetitie
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Bestanden
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_discgolfcompetitie
+            group: Inhoud
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+                   
+    record_template: paginagroep.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+    
+
+paginas_ultimatecompetitie: 
+    name: Ultimatecompetities
+    singular_name: Ultimatecompetitie
+    description: Pagina's met informatie over de Ultimate competitie.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline            
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_ultimatecompetitie
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginas_ultimatecompetitie
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Bestanden
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_ultimatecompetitie
+            group: Inhoud
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+                   
+    record_template: paginagroep.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+    
+
+paginas_ultimatejeugdcompetitie: 
+    name: Ultimatejeugdcompetitie
+    singular_name: Ultimatejeugdcompetitie
+    description: Pagina's met informatie over de Ultimate jeugd competitie.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline            
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_ultimatejeugdcompetitie
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginas_ultimatejeugdcompetitie
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Bestanden
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_ultimatejeugdcompetitie
+            group: Inhoud
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+                   
+    record_template: paginagroep.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+
+paginas_cup: 
+    name: CUP
+    singular_name: CUP
+    description: Pagina's met informatie over het competitief ultimate programma.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline            
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_cup
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginas_cup
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Bestanden
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_cup
+            group: Inhoud
+        body:
+            label: Pagina tekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+                   
+    record_template: paginagroep.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+
+paginas_cityleague: 
+    name: Cityleague
+    singular_name: Cityleague
+    description: Pagina's met informatie over de Cityleague.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline            
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_cityleague
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginas_cityleague
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Bestanden
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_cup
+            group: Inhoud
+        body:
+            label: paginas_cityleague
+            type: markdown
+            height: 300px
+            group: Inhoud
+                   
+    record_template: paginagroep.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+
+
+paginas_beginnerscursus: 
+    name: Beginnerscursus
+    singular_name: Beginnerscursus
+    description: Pagina's met informatie over de beginnerscursus.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline            
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_beginnerscursus
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginas_beginnerscursus
+        groupcontacttekst:
+            label: Bestanden
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Bestanden
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_cup
+            group: Inhoud
+        body:
+            label: paginas_beginnerscursus
+            type: markdown
+            height: 300px
+            group: Inhoud
+                   
+    record_template: paginagroep.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true

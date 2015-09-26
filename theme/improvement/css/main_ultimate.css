@@ -4484,14 +4484,17 @@ ul.documenten {
 .forwards .forward--current {
   font-weight: 400; }
 
-@media screen and (min-width: 53.75em) {
-  .forwards {
-    float: left;
-    display: block;
-    margin-right: 2.35765%;
-    width: 31.76157%; }
-    .forwards:last-child {
-      margin-right: 0; } }
+.sidebar {
+  margin-bottom: 2em;
+  margin-top: 2em; }
+  @media screen and (min-width: 53.75em) {
+    .sidebar {
+      float: left;
+      display: block;
+      margin-right: 2.35765%;
+      width: 31.76157%; }
+      .sidebar:last-child {
+        margin-right: 0; } }
 
 @media screen and (min-width: 53.75em) {
   .pagina {

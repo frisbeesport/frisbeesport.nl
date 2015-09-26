@@ -1,36 +1,30 @@
-  .forwards .forward--current
-    {
-        font-weight: 400;
-    }
+.forwards .forward--current {
+    font-weight: 400;
+}
     
-    .forwards {
-          @include media($large-screen) {
-                  @include span-columns(4);
-              }
-      }
-    .pagina {
-          @include media($large-screen) {
-                  @include span-columns(8);
-              }
-      }
+.sidebar {
+    margin-bottom: 2em;
+    margin-top: 2em;
 
-.forward
-{
-    
+    @include media($large-screen) {
+        @include span-columns(4);
+    }
+}
+
+.pagina {
+    @include media($large-screen) {
+        @include span-columns(8);
+    }
+}
+
+.forward {
     border-bottom: 1px solid transparentize($action-color, 0.8);
-    
-        display: block;
-    
-        margin-right: $base-spacing;
-    
-        outline: none;
-    
-        padding: ($base-spacing / 2) 0;
-    
-    
+    display: block;
+    margin-right: $base-spacing;
+    outline: none;
+    padding: ($base-spacing / 2) 0;
     
     &:last-child {
-            
-                  margin-bottom: $base-spacing;
-}
+        margin-bottom: $base-spacing;
+    }
 }
