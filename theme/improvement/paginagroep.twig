@@ -30,6 +30,10 @@
 
 {% setcontent children = record.contenttype.name where { 'grouptype': 'Inhoud' } orderby 'volgnummer' %}
 
+{% if record.id == algemeen.id %}
+{% set record = children|first %}
+{% endif %}
+
 {% include '_head.twig' with { 'title': algemeen.grouptitle, 'description': algemeen.grouplead, 'image': algemeen.groupimage, 'url': record.link } %}
 
 <body class="background afdeling--{{ style }} ">
@@ -44,13 +48,12 @@
         <section>
             <div class="container">
 		        <div class="grid">
-            
-                {% if children is not empty %}
-            
+             
                 <div class="sidebar">
           
+                    {% if children|length > 1 %}
+
                     <div class="forwards">
-            
                     
                     {% for child in children %}       
                 
@@ -63,6 +66,9 @@
                 
                     </div>    
             
+                    {% endif %}  
+            
+                
                     <div class="groupinfo">
               
                         <h3>Contact</h3>
@@ -106,8 +112,6 @@
                     </div><!-- groupinfo -->
                 </div><!-- sidebar -->
 
-                {% endif %}  
-            
                 <div class="pagina section--text afdeling--text">
             
                     {% if record.title is not empty %}  

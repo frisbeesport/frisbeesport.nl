@@ -508,6 +508,12 @@ aanbod:
             required: true
             group: content
             variant: inline
+        url:
+            label: Externe link
+            type: text
+            filter: url
+            group: content
+            variant: inline
         selectpagina:
             label: Conceptpagina
             type: select
@@ -1005,7 +1011,7 @@ paginas_njts:
             group: Algemeen 
             upload: paginas_njts
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1014,7 +1020,7 @@ paginas_njts:
             type: select
             values: werkgroepen/title  
         groupcontactemail:
-            label: Bestanden
+            label: Contactemail
             type: text
             pattern: email
             group: Algemeen      
@@ -1101,7 +1107,7 @@ paginas_beleid:
             group: Algemeen  
             upload: paginas_beleid
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1196,7 +1202,7 @@ paginas_vacatures:
             group: Algemeen  
             upload: paginas_vacatures
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1291,7 +1297,7 @@ paginas_trainerft2:
             group: Algemeen  
             upload: paginas_trainerft2
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1387,7 +1393,7 @@ paginas_discgolfcompetitie:
             group: Algemeen 
             upload: paginas_discgolfcompetitie
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1396,7 +1402,7 @@ paginas_discgolfcompetitie:
             type: select
             values: werkgroepen/title  
         groupcontactemail:
-            label: Bestanden
+            label: Contactemail
             type: text
             pattern: email
             group: Algemeen      
@@ -1483,7 +1489,7 @@ paginas_ultimatecompetitie:
             group: Algemeen 
             upload: paginas_ultimatecompetitie
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1492,7 +1498,7 @@ paginas_ultimatecompetitie:
             type: select
             values: werkgroepen/title  
         groupcontactemail:
-            label: Bestanden
+            label: Contactemail
             type: text
             pattern: email
             group: Algemeen      
@@ -1579,7 +1585,7 @@ paginas_ultimatejeugdcompetitie:
             group: Algemeen 
             upload: paginas_ultimatejeugdcompetitie
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1588,7 +1594,7 @@ paginas_ultimatejeugdcompetitie:
             type: select
             values: werkgroepen/title  
         groupcontactemail:
-            label: Bestanden
+            label: Contactemail
             type: text
             pattern: email
             group: Algemeen      
@@ -1674,7 +1680,7 @@ paginas_cup:
             group: Algemeen 
             upload: paginas_cup
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1683,7 +1689,7 @@ paginas_cup:
             type: select
             values: werkgroepen/title  
         groupcontactemail:
-            label: Bestanden
+            label: Contactemail
             type: text
             pattern: email
             group: Algemeen      
@@ -1769,7 +1775,7 @@ paginas_cityleague:
             group: Algemeen 
             upload: paginas_cityleague
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1778,7 +1784,7 @@ paginas_cityleague:
             type: select
             values: werkgroepen/title  
         groupcontactemail:
-            label: Bestanden
+            label: Contactemail
             type: text
             pattern: email
             group: Algemeen      
@@ -1865,7 +1871,7 @@ paginas_beginnerscursus:
             group: Algemeen 
             upload: paginas_beginnerscursus
         groupcontacttekst:
-            label: Bestanden
+            label: Contacttekst
             type: textarea
             group: Algemeen
             variant: inline
@@ -1874,7 +1880,7 @@ paginas_beginnerscursus:
             type: select
             values: werkgroepen/title  
         groupcontactemail:
-            label: Bestanden
+            label: Contactemail
             type: text
             pattern: email
             group: Algemeen      
