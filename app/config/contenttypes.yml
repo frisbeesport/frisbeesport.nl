@@ -1798,7 +1798,7 @@ paginas_cityleague:
         image:
             label: Afbeelding
             type: image
-            upload: paginas_cup
+            upload: paginas_cityleague
             group: Inhoud
         body:
             label: paginas_cityleague
