@@ -8,7 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'UAParser\\' => array($vendorDir . '/ua-parser/uap-php/src'),
     'Stecman\\Component\\Symfony\\Console\\BashCompletion\\' => array($vendorDir . '/stecman/symfony-console-completion/src'),
-    'Silex\\' => array($vendorDir . '/silex/silex/src/Silex'),
     'Seld\\PharUtils\\' => array($vendorDir . '/seld/phar-utils/src'),
     'Seld\\JsonLint\\' => array($vendorDir . '/seld/jsonlint/src/Seld/JsonLint'),
     'Seld\\CliPrompt\\' => array($vendorDir . '/seld/cli-prompt/src'),
@@ -19,6 +18,7 @@ return array(
     'GuzzleHttp\\Ring\\' => array($vendorDir . '/guzzlehttp/ringphp/src'),
     'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
     'Eloquent\\Pathogen\\' => array($vendorDir . '/bolt/pathogen/src'),
+    'Composer\\Spdx\\' => array($vendorDir . '/composer/spdx-licenses/src'),
     'Cocur\\Slugify\\' => array($vendorDir . '/cocur/slugify/src'),
     'Bolt\\Thumbs\\Tests\\' => array($vendorDir . '/bolt/thumbs/tests'),
     'Bolt\\Thumbs\\' => array($vendorDir . '/bolt/thumbs/src'),

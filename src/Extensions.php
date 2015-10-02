@@ -181,7 +181,7 @@ class Extensions
                ->followLinks()
                ->name('init.php')
                ->depth('== 2')
-       ;
+        ;
 
         foreach ($finder as $file) {
             /** @var \Symfony\Component\Finder\SplFileInfo $file */
@@ -210,7 +210,11 @@ class Extensions
      */
     public function checkLocalAutoloader($force = false)
     {
-        if (!$this->app['filesystem']->has('extensions://local/') || !$force || $this->app['filesystem']->has('extensions://local/.built')) {
+        if (!$this->app['filesystem']->has('extensions://local/')) {
+            return;
+        }
+
+        if (!$force && $this->app['filesystem']->has('app://cache/.local.autoload.built')) {
             return;
         }
 
@@ -218,12 +222,6 @@ class Extensions
             $initjson = new BoltExtendJson($this->app['extend.manager']->getOptions());
             $this->json = $initjson->updateJson($this->app);
         }
-
-        // Get Bolt's extension JSON
-        $composerOptions = $this->app['extend.manager']->getOptions();
-        $composerJsonFile = new JsonFile($composerOptions['composerjson']);
-        $boltJson = $composerJsonFile->read();
-        $boltPsr4 = isset($boltJson['autoload']['psr-4']) ? $boltJson['autoload']['psr-4'] : array();
 
         $finder = new Finder();
         $finder->files()
@@ -233,12 +231,30 @@ class Extensions
             ->depth('== 2')
         ;
 
+        if ($finder->count() > 0) {
+            $this->setLocalExtensionPsr4($finder);
+        }
+    }
+
+    /**
+     * Write the PSR-4 data to the extensions/composer.json file.
+     *
+     * @param Finder $finder
+     */
+    private function setLocalExtensionPsr4(Finder $finder)
+    {
+        // Get Bolt's extension JSON
+        $composerOptions = $this->app['extend.manager']->getOptions();
+        $composerJsonFile = new JsonFile($composerOptions['composerjson']);
+        $boltJson = $composerJsonFile->read();
+        $boltPsr4 = isset($boltJson['autoload']['psr-4']) ? $boltJson['autoload']['psr-4'] : array();
+
         foreach ($finder as $file) {
             try {
                 $extensionJsonFile = new JsonFile($file->getRealpath());
                 $json = $extensionJsonFile->read();
             } catch (\Exception $e) {
-                // Ignore for now
+                $this->logInitFailure('Reading local extension composer.json file failed', $file->getRealpath(), $e, Logger::ERROR);
             }
 
             if (isset($json['autoload']['psr-4'])) {
@@ -248,10 +264,11 @@ class Extensions
             }
         }
 
+        // Modify Bolt's extension JSON and write out changes
         $boltJson['autoload']['psr-4'] = $boltPsr4;
         $composerJsonFile->write($boltJson);
         $this->app['extend.manager']->dumpautoload();
-        $this->app['filesystem']->write('extensions://local/.built', time());
+        $this->app['filesystem']->put('app://cache/.local.autoload.built', time());
     }
 
     /**
@@ -275,6 +292,8 @@ class Extensions
                 }
             }
 
+            // Ensure the namespace is valid for PSR-4
+            $namespace = rtrim($namespace, '\\') . '\\';
             $psr4[$namespace] = $paths;
         }
 
@@ -487,6 +506,17 @@ class Extensions
     public function getAssets()
     {
         return $this->assets;
+    }
+
+    /**
+     * Clear all previously added assets.
+     */
+    public function clearAssets()
+    {
+        $this->assets = array(
+            'css' => array(),
+            'js'  => array()
+        );
     }
 
     private function getNamespace($extension)

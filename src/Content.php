@@ -911,7 +911,10 @@ class Content implements \ArrayAccess
             try {
                 return $this->app['safe_render']->render($snippet, $this->getTemplateContext());
             } catch(\Exception $e) {
-                return $e->getMessage();
+                $message = 'Rendering a record Twig snippet failed.';
+                $this->app['logger.system']->critical($message, array('event' => 'exception', 'exception' => $e));
+
+                return $message;
             }
         }
 
@@ -1531,8 +1534,8 @@ class Content implements \ArrayAccess
         }
 
         foreach ($this->contenttype['fields'] as $config) {
-            if ($config['type'] == 'slug') {
-                foreach ($config['uses'] as $ptrField) {
+            if ($config['type'] == 'slug' && isset($config['uses'])) {
+                foreach ((array) $config['uses'] as $ptrField) {
                     if (isset($fields[$ptrField])) {
                         $fields[$ptrField] = 100;
                     }

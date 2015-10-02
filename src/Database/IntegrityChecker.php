@@ -115,9 +115,7 @@ class IntegrityChecker
         $this->tables = array();
 
         foreach ($sm->listTables() as $table) {
-            if (strpos($table->getName(), $this->getTablenamePrefix()) === 0) {
-                $this->tables[$table->getName()] = $table;
-            }
+            $this->tables[$table->getName()] = $table;
         }
 
         return $this->tables;
@@ -175,7 +173,6 @@ class IntegrityChecker
                     }
 
                     $diff = $this->cleanupTableDiff($diff);
-
                     // The diff may be just deleted columns which we have reset above
                     // Only exec and add output if does really alter anything.
                     // There's a known issue with MySQL, where it will (falsely) notice an updated index,
@@ -185,7 +182,6 @@ class IntegrityChecker
                         $msg = 'Table `' . $table->getName() . '` is not the correct schema: ';
                         $msgParts = array();
 
-                        // No check on foreign keys yet because we don't use them
                         /** @var $col Column */
                         foreach ($diff->addedColumns as $col) {
                             $msgParts[] = 'missing column `' . $col->getName() . '`';
@@ -207,6 +203,26 @@ class IntegrityChecker
                         }
                         foreach ($diff->removedIndexes as $indexName => $val) {
                             $msgParts[] = 'removed index `' . $indexName . '`';
+                        }
+                        foreach ($diff->renamedColumns as $colName => $val) {
+                            $msgParts[] = 'renamed column `' . $colName . '`';
+                        }
+                        foreach ($diff->addedForeignKeys as $index) {
+                            $msgParts[] = 'missing foreign key on `'
+                                . implode(', ', $index->getUnquotedLocalColumns())
+                                . '` related to `'
+                                . $index->getForeignTableName() . '.'
+                                . implode(', ' . $index->getForeignTableName() . '.', $index->getUnquotedForeignColumns()) . '`';
+                        }
+                        foreach ($diff->changedForeignKeys as $index) {
+                            $msgParts[] = 'changed foreign key on `'
+                                . implode(', ', $index->getUnquotedLocalColumns())
+                                . '`, it is now related to `'
+                                . $index->getForeignTableName() . '.'
+                                . implode(', ' . $index->getForeignTableName() . '.', $index->getUnquotedForeignColumns()) . '`';
+                        }
+                        foreach ($diff->removedForeignKeys as $indexName => $index) {
+                            $msgParts[] = 'removed foreign key from `' . implode(', ', $index->getUnquotedLocalColumns()) . '`';
                         }
 
                         if (!empty($msgParts)) {
@@ -274,7 +290,7 @@ class IntegrityChecker
 
                 /** @var $platform AbstractPlatform */
                 $platform = $this->app['db']->getDatabasePlatform();
-                $queries = $platform->getCreateTableSQL($table);
+                $queries = $platform->getCreateTableSQL($table, AbstractPlatform::CREATE_INDEXES | AbstractPlatform::CREATE_FOREIGNKEYS);
                 foreach ($queries as $query) {
                     $this->app['db']->query($query);
                 }
@@ -335,11 +351,19 @@ class IntegrityChecker
     {
         $schema = new Schema();
 
-        return array_merge(
+        $tables = array_merge(
             $this->getBoltTablesSchema($schema),
             $this->getContentTypeTablesSchema($schema),
             $this->getExtensionTablesSchema($schema)
         );
+
+        foreach ($tables as $index => $table) {
+            if (strpos($table->getName(), $this->getTablenamePrefix()) === false) {
+                unset($tables[$index]);
+            }
+        }
+
+        return $tables;
     }
 
     /**
