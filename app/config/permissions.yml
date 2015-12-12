@@ -80,6 +80,9 @@ roles:
     paginas_ultimatejeugdcompetitie:
         description: Toegang tot ultimate jeugdcompetitie pagina's.
         label: Ultimate jeugdcompetitie
+    paginas_veiligsporten:
+        description: Toegang tot veilig sporten pagina's.
+        label: Veilig sporten        
     paginas:
         description: Toegang tot paginas.
         label: Pagina's
@@ -365,6 +368,13 @@ contenttypes:
         depublish: [ hoofdredacteur, paginas_beginnerscursus ]
         delete: [ hoofdredacteur, paginas_beginnerscursus ]
         view: [ hoofdredacteur, paginas_beginnerscursus ]
+    paginas-veiligsporten:
+        edit: [ hoofdredacteur, paginas_veiligsporten ]
+        create: [ hoofdredacteur, paginas_veiligsporten ]
+        publish: [ hoofdredacteur, paginas_veiligsporten ]
+        depublish: [ hoofdredacteur, paginas_veiligsporten ]
+        delete: [ hoofdredacteur, paginas_veiligsporten ]
+        view: [ hoofdredacteur, paginas_veiligsporten ]
 
     secties:
         edit: [ hoofdredacteur ]

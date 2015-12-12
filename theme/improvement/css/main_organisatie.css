@@ -3269,7 +3269,10 @@ body {
   overflow: hidden; }
   .topic .topic-image {
     overflow: hidden;
-    max-height: 150px; }
+    height: 250px;
+    width: 250px;
+    overflow: hidden;
+    border-radius: 500px; }
     .topic .topic-image img {
       -webkit-transition: all 0.2s ease-in-out;
       -moz-transition: all 0.2s ease-in-out;
@@ -3637,23 +3640,31 @@ a.pdf-link:hover::before {
   -moz-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
   background-color: #FFF;
-  border-radius: 3px;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 25px;
   border: 0px solid #ddd;
-  box-shadow: 0 2px 4px #cccccc;
+  cursor: pointer;
   margin: 0 1em 1.5em 1em;
   position: relative;
   overflow: hidden; }
   .smallcard .smallcard-image {
-    overflow: hidden;
-    max-height: 150px; }
+    overflow: hidden; }
     .smallcard .smallcard-image img {
       -webkit-transition: all 0.2s ease-in-out;
       -moz-transition: all 0.2s ease-in-out;
       transition: all 0.2s ease-in-out;
-      background: #DBD199;
-      border-top-left-radius: 3px;
-      border-top-right-radius: 3px;
       width: 100%; }
+  .smallcard .smallcard__date {
+    color: #666;
+    font-weight: 300; }
+  .smallcard .smallcard__tag {
+    float: right;
+    color: #ccc; }
+  .smallcard .smallcard__footer {
+    padding: 0.5em 0.75em;
+    border-top: 1px solid #fff; }
   .smallcard .smallcard-header {
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;
@@ -3664,14 +3675,7 @@ a.pdf-link:hover::before {
     line-height: 1.5em;
     padding: 0.5em 0.75em; }
     .smallcard .smallcard-header .smallcard__extrainfo {
-      border-bottom: 1px solid #ddd;
       padding-bottom: 0.5em; }
-    .smallcard .smallcard-header .smallcard__date {
-      color: #666;
-      font-weight: 300; }
-    .smallcard .smallcard-header .smallcard__tag {
-      float: right;
-      color: #ccc; }
     .smallcard .smallcard-header .smallcard__title {
       margin-top: 0.5em; }
   .smallcard .smallcard-copy {
@@ -3680,9 +3684,10 @@ a.pdf-link:hover::before {
     padding: 0.75em 0.75em;
     padding-top: 0; }
     .smallcard .smallcard-copy p {
-      margin: 0 0 0.75em; }
-  .smallcard:focus, .smallcard:hover {
-    box-shadow: 0 5px 10px gray; }
+      margin: 0 0 0.75em;
+      color: #ddd; }
+    .smallcard .smallcard-copy p:hover {
+      color: #ddd; }
 
 .smallcard.smallcard--vereniging {
   text-align: center; }
@@ -3702,11 +3707,6 @@ a.pdf-link:hover::before {
 
 .smallcard.ultimate {
   background-color: #1296D4; }
-  .smallcard.ultimate .smallcard-image img {
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out;
-    background: #1296D4; }
   .smallcard.ultimate .smallcard-header {
     background-color: #1296D4;
     color: #fff; }
@@ -3714,10 +3714,6 @@ a.pdf-link:hover::before {
       color: #fff; }
     .smallcard.ultimate .smallcard-header .smallcard__date {
       color: #fff; }
-    .smallcard.ultimate .smallcard-header .smallcard__extrainfo {
-      border-bottom: 1px solid #fff;
-      padding-bottom: 0.5em;
-      border-color: #7FC9FF; }
     .smallcard.ultimate .smallcard-header h3 {
       color: #fff; }
   .smallcard.ultimate .smallcard-copy {
@@ -3727,9 +3723,9 @@ a.pdf-link:hover::before {
 .smallcard.discgolf {
   background-color: #00A850; }
   .smallcard.discgolf .smallcard-image img {
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out;
+    -webkit-transition: all 0.4s ease-in-out;
+    -moz-transition: all 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out;
     background: #00A850; }
   .smallcard.discgolf .smallcard-header {
     background-color: #00A850;
@@ -3739,9 +3735,7 @@ a.pdf-link:hover::before {
     .smallcard.discgolf .smallcard-header .smallcard__date {
       color: #fff; }
     .smallcard.discgolf .smallcard-header .smallcard__extrainfo {
-      border-bottom: 1px solid #fff;
-      padding-bottom: 0.5em;
-      border-color: #7FFF8E; }
+      padding-bottom: 0.5em; }
     .smallcard.discgolf .smallcard-header h3 {
       color: #fff; }
   .smallcard.discgolf .smallcard-copy {
@@ -3763,9 +3757,7 @@ a.pdf-link:hover::before {
     .smallcard.organisatie .smallcard-header .smallcard__tag {
       color: #fff; }
     .smallcard.organisatie .smallcard-header .smallcard__extrainfo {
-      border-bottom: 1px solid #fff;
-      padding-bottom: 0.5em;
-      border-color: #f39d61; }
+      padding-bottom: 0.5em; }
     .smallcard.organisatie .smallcard-header h3 {
       color: #fff; }
   .smallcard.organisatie .smallcard-copy {

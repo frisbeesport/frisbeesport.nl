@@ -100,6 +100,10 @@ organisatie:
     title: Organisatie Kader
     path: pagina/organisatie-kader
     top: true
+  - label: Vacatures
+    title: Vacatures
+    path: vacature/vacatures
+    top: false    
   - label: Documenten
     title: Organisatie Documenten
     path: pagina/organisatie-documenten
@@ -108,10 +112,18 @@ organisatie:
     title: Opleidingen en concepten
     path: pagina/organisatie-aanbod
     top: true
+  - label: Veilig sporten
+    title: Veilig sporten
+    path: veilig-sporten/veilig-sporten
+    top: true
   - label: Records
     title: Records
     path: pagina/records
     top: false    
+  - label: Geschiedenis
+    title: Geschiedenis
+    path: pagina/de-geschiedenis-van-de-frisbeesport
+    top: false
   - label: Pers
     title: Pers
     path: pagina/organisatie-pers
@@ -145,9 +157,9 @@ spelers:
     title: Spelershome
     path: pagina/spelers-discgolf-competitie
     top: true
-  - label: Vertrouwenspunt
-    title: Vertrouwenspunt
-    path: pagina/spelers-vertrouwenspunt
+  - label: Veilig sporten
+    title: Veilig sporten
+    path: veilig-sporten/veilig-sporten
     top: true
 #  - label: Programma's
 #    title: Programma's

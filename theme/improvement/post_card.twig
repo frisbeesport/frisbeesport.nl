@@ -11,24 +11,20 @@
 {% set extraclass = "organisatie inverse" %}     
 {% endif %}
 
+<a href="{{ post.link }}">
 <div class="smallcard {{ extraclass }}">   
     {% if post.contenttype.name != "Berichten" %}
     
-    <div class="smallcard-image">   
+    <div class="smallcard__primary">   
+    <div class="smallcard__image">   
         
 
         {% if post.image %}
            
-           <img class="smallcard__image lazyload" data-src="{{ post.image|image(500, 300, "c") }}">
+           <img class="smallcard__image lazyload" data-src="{{ post.image|image(512, 232, "c") }}">
            <noscript>
-               <img class="smallcard__image" src="{{ post.image|image(500, 300, "c") }}">
+               <img class="smallcard__image" src="{{ post.image|image(512, 232, "c") }}">
            </noscript>
-        {% else %}     
-
-            {% set defaultimage = paths.hosturl ~ paths.theme ~ "/images/post_default_500.jpg" %}
-        
-            <img class="card__image" src="{{ defaultimage }}">
-       
         {% endif %}
 
         
@@ -38,12 +34,7 @@
     {% endif %}
     
     <div class="smallcard-header">
-        <div class="smallcard__extrainfo">
-        {% for tag in post.taxonomy.tags  %}
-            <div class="smallcard__tag smallcard__tag--{{ tag }}">{{ tag }}</div>
-        {% endfor %}
-        <div class="smallcard__date">{{ post.datecreated  | localdate("%e %B, %Y") }}</div>
-        </div>
+        
         
         <h3 class="smallcard__title">{{ post.title }}</h3>
 
@@ -57,9 +48,63 @@
         
         {% endif %} 
 
-        <a class="arrow-link post-link" href="{{ post.link }}">Lees verder...</a>
-    
-    </div>
         
-</div>                                      
+        
+    </div>
+      
+        
+    </div>
+     
+    <div class="smallcard__secondary">
+          <div class="smallcard__footer">
+        
+            {% for tag in post.taxonomy.tags  %}
+                <div class="smallcard__tag smallcard__tag--{{ tag }}">{{ tag }}</div>
+            {% endfor %}
+            <div class="smallcard__date">{{ post.datecreated  | localdate("%e %B, %Y") }}</div>
+        </div>
+        <a class="arrow-link post-link" href="{{ post.link }}">Lees verder...</a>
+    </div>
+
+   
+        
+        
+</div>  
+                          
+    </a>
+
+
+  <style>
+         .smallcard__footer {
+             height:  30px;
+             
+         }
+         .smallcard
+         {
+             box-shadow: 0 2px 4px #cccccc;
+         }
+         .smallcard:hover .smallcard__primary {
+             transform: translateY(-30px);
+             transition: transform 0.4s;
     
+        }
+         
+        .smallcard:hover .smallcard__secondary {
+             transform: translateY(0);
+             opacity: 1;
+    
+        }
+         .smallcard__primary {
+         padding-bottom:  30px;
+         }
+        .smallcard__secondary {
+            transform: translateY(50%);
+            height: 60px;
+    width: 100%;
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    opacity: 1;
+    transition: transform 0.4s;
+        }
+    </style>             

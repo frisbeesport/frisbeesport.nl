@@ -10,6 +10,7 @@
     {% set records = records|merge(discgolfnieuws) %}
     {% set records = records|merge(organisatienieuws) %}
     {% set records = records|order('-datepublish') %}
+    {% set records = records[:12] %}
 
     <section class="section--cards--small section--nieuws " style="position: relative;">
         <div class="container">

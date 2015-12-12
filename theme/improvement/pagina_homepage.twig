@@ -1,7 +1,7 @@
 {% extends "pagina.twig" %}
 
 {% block extended_content %}
-    {% setcontent nieuwsberichten = 'nieuws/latest/6' %}
+    {% setcontent nieuwsberichten = 'nieuws/latest/12' %}
 
     <section class="section--cards--small section--nieuws">
         <div class="container">
@@ -14,7 +14,7 @@
 
                 <div class="smallcards">
                     {% for nieuwsbericht in nieuwsberichten %}       
-                        {% include 'nieuwsbericht_card.twig' with { 'nieuwsbericht': nieuwsbericht } %} 
+                        {% include 'nieuwsbericht_card.twig' with { 'nieuwsbericht': nieuwsbericht, 'afdelingkleur': true } %} 
                     {% endfor %}
                 </div>
             </div>

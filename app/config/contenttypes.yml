@@ -1801,7 +1801,7 @@ paginas_cityleague:
             upload: paginas_cityleague
             group: Inhoud
         body:
-            label: paginas_cityleague
+            label: Hoofdtekst
             type: markdown
             height: 300px
             group: Inhoud
@@ -1894,10 +1894,106 @@ paginas_beginnerscursus:
         image:
             label: Afbeelding
             type: image
-            upload: paginas_cup
+            upload: paginas_beginnerscursus
             group: Inhoud
         body:
-            label: paginas_beginnerscursus
+            label: Hoofdtekst
+            type: markdown
+            height: 300px
+            group: Inhoud
+                   
+    record_template: paginagroep.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true
+
+
+paginas_veiligsporten: 
+    name: Veilig Sporten
+    singular_name: Veilig Sporten
+    description: Pagina's met informatie over veilig sporten.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: content
+            variant: inline
+        menutitle:
+            label: Menutitel
+            type: text
+            group: content
+            variant: inline            
+        volgnummer:
+            label: Volgnummer
+            type: integer
+            group: content
+            variant: inline
+        grouptype:
+            type: select
+            values: [ Inhoud, Algemeen ]
+            multiple: false
+            postfix: "Is dit een pagina met algemene gegevens of een pagina met inhoud. Vul alleen het corresponderende tabblad."
+            
+        grouptitle:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        grouplead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        groupimage:
+            label: Afbeelding
+            type: image
+            upload: paginas_veiligsporten
+            group: Algemeen
+        groupfotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        groupfiles:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginas_veiligsporten
+        groupcontacttekst:
+            label: Contacttekst
+            type: textarea
+            group: Algemeen
+            variant: inline
+        groupcontactwerkgroep:
+            label: Werkgroep
+            type: select
+            values: werkgroepen/title  
+        groupcontactemail:
+            label: Contactemail
+            type: text
+            pattern: email
+            group: Algemeen      
+            variant: inline
+            
+        lead:
+            label: Inleiding
+            type: markdown
+            height: 150px
+            group: Inhoud
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_beginnerscursus
+            group: Inhoud
+        body:
+            label: Hoofdtekst
             type: markdown
             height: 300px
             group: Inhoud

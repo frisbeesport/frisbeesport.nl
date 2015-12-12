@@ -8,7 +8,7 @@
 
 .smallcard {
   $base-border-color: gainsboro !default;
-  $base-border-radius: 3px !default;
+  $base-border-radius: 25px;
   $base-background-color: white !default;
   $base-spacing: 1.5em !default;
   $action-color: #477DCA !default;
@@ -24,14 +24,20 @@
   $card-image-hover-background: lighten($card-image-background, 5%);
   $card-margin: 1em;
 
-  @include flex-basis(250px);
+   @include flex-basis(250px);
   @include flex-grow(1);
+ 
   @include transition (all 0.2s ease-in-out);
+
   background-color: $card-background;
-  border-radius: $base-border-radius;
+
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: $base-border-radius;
+
   border: $card-border;
-  box-shadow: 0 2px 4px darken($base-background-color, 20%);
-  //cursor: pointer;
+  cursor: pointer;
   margin: 0 $card-margin $base-spacing $card-margin;
   position: relative;
   overflow: hidden;
@@ -39,31 +45,14 @@
       
   .smallcard-image {
     overflow: hidden;
-    max-height: 150px;
-
+    
     img {
       @include transition (all 0.2s ease-in-out);
-      background: $card-image-background;
-      border-top-left-radius: $base-border-radius;
-      border-top-right-radius: $base-border-radius;
+      
       width: 100%;
     }
   } 
-
-  .smallcard-header {
-    @include transition (all 0.2s ease-in-out);
-    background-color: $card-header-background;
-    border-bottom: none;
-    font-weight: bold;
-    line-height: 1.5em;
-    padding: ($base-spacing / 3) ($base-spacing / 2);
-      
-    .smallcard__extrainfo {
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 0.5em;
-    }
-      
-    .smallcard__date {
+  .smallcard__date {
         color: $deemphasize-font-color;
         font-weight: 300;
     }
@@ -76,6 +65,25 @@
         //color: #fff;
         //padding: 0.06em 1em 0.12em 1em;
     }
+     .smallcard__footer {
+            
+             padding: ($base-spacing / 3) ($base-spacing / 2);
+    
+             border-top:  1px solid #fff;
+         }
+  .smallcard-header {
+    @include transition (all 0.2s ease-in-out);
+    background-color: $card-header-background;
+    border-bottom: none;
+    font-weight: bold;
+    line-height: 1.5em;
+    padding: ($base-spacing / 3) ($base-spacing / 2);
+      
+    .smallcard__extrainfo {
+        padding-bottom: 0.5em;
+    }
+      
+    
       
     .smallcard__title {
         margin-top: 0.5em;
@@ -90,13 +98,16 @@
 
     p {
       margin: 0 0 ($base-spacing / 2);
+      color: #ddd;
+    }
+    p:hover {
+        color: #ddd;
     }
   }
   
   &:focus,
   &:hover {
-    box-shadow: 0 5px 10px darken($base-background-color, 50%);
-  
+     
     
   }
 
@@ -124,15 +135,9 @@
 
 .smallcard.ultimate {
   $card-background: #1296D4;
-  background-color: $card-background;
-  
-  .smallcard-image {
-    img {
-      @include transition (all 0.2s ease-in-out);
-      background: $card-background;
-    }
-  } 
 
+  background-color: $card-background;
+ 
   .smallcard-header {
     background-color: $card-background;
     color: #fff;
@@ -143,11 +148,7 @@
     .smallcard__date {
         color: #fff;
     }
-        .smallcard__extrainfo {
-        border-bottom: 1px solid #fff;
-        padding-bottom: 0.5em;
-            border-color: #7FC9FF;
-    }
+
     h3 {
       color: #fff;
     }
@@ -165,7 +166,7 @@
   
   .smallcard-image {
     img {
-      @include transition (all 0.2s ease-in-out);
+      @include transition (all 0.4s ease-in-out);
       background: $card-background;
     }
   } 
@@ -182,9 +183,8 @@
     }
  
     .smallcard__extrainfo {
-        border-bottom: 1px solid #fff;
-        padding-bottom: 0.5em;
-        border-color: #7FFF8E;
+         padding-bottom: 0.5em;
+         
     }
       
     h3 {
@@ -221,9 +221,8 @@
        
     }
       .smallcard__extrainfo {
-        border-bottom: 1px solid #fff;
-        padding-bottom: 0.5em;
-          border-color: #f39d61;
+         padding-bottom: 0.5em;
+           
     }
     h3 {
       color: #fff;
