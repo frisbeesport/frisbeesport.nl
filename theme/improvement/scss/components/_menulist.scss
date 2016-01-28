@@ -1,0 +1,19 @@
+.menulist__item--current {
+    font-weight: 400;
+}
+
+
+.menulist__item {
+    border-bottom: 1px solid transparentize($action-color, 0.8);
+    display: block;
+    margin-right: $base-spacing;
+    outline: none;
+    padding: ($base-spacing / 2) 0;
+    
+    &:last-child {
+        margin-bottom: $base-spacing;
+    }
+}
+
+
+ 

@@ -58,26 +58,6 @@
       <div class="container">
 		<div class="grid">
             
-            {% if pagina.parent != 0 and pagina.parent is not empty %}
-   
-            <div class="forwards">
-            
-                    
-                {% for child in children %}       
-                
-                {% if child.id == pagina.id %}
-                    <a href="{{ child.link }}" class="forward forward--current">{{ child.title }}</a>
-                {% else %}
-                    <a href="{{ child.link }}" class="forward">{{ child.title }}</a>
-                {% endif %}
-                
-                {% endfor %}  
-                
-            
-            </div>
-            
-            {% endif %}  
-            
             <div class="pagina">
              
             {% if pagina.body is not empty %}  

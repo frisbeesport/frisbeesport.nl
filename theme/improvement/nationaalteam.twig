@@ -1,0 +1,81 @@
+{% extends "layout_sidebar.twig" %}
+
+{% block sidebar_top_content %}
+
+  
+    <div class="menulist">
+                    
+    {% setcontent nationaleteams = 'nationaleteams'  %}
+    {% for child in nationaleteams %}    
+                        
+        {% if child.id == record.id %}
+        <div class="menulist__item menulist__item--current">
+            <img class="menulist__item__image" src="{{ child.photo|image(80, 50, "c") }}">
+            <a href="{{ child.link }}" class="menulist__item__caption">{{ child.title }}</a>
+        </div>
+        {% else %}
+        <div class="menulist__item">
+            <img class="menulist__item__image" src="{{ child.photo|image(80, 50, "c") }}">
+            <a href="{{ child.link }}" class="menulist__item__caption">{{ child.title }}</a>
+        </div>
+        {% endif %}
+
+    {% endfor %}  
+                
+    </div>    
+            
+     
+            
+{% endblock %}
+
+{% block sidebar_bottom_content %}
+
+{% endblock %}
+
+{% block sidebar_pagina_content %}
+
+    <div class="container">
+    <div class="grid section__content">
+    
+        <div class="section__header"> 
+            <h2 class="card__title">{{ record.title }}</h2>
+        </div>
+                 
+        {% if record.photo %}
+
+        <img class="card__image team__image" src="{{ record.photo|image(800, 450, "c") }}">
+
+        {% endif %}    
+          
+        {% if record.omschrijving is not empty  %}
+
+        <div class="team__subtitle">{{ record.omschrijving }}</div>
+
+        {% endif %}
+
+        {% if team.missie is not empty %}    
+        
+        <div class="team__omschrijving">{{ record.missie }}</div>
+
+        {% endif %}
+     
+        {% if record.spelers is not empty %}
+
+        <h3>Spelers</h3>
+
+        <div class="team__spelers">{{ record.spelers }}</div>
+
+        {% endif %}
+
+        {% if record.support is not empty %}
+        
+        <h3>Support</h3>
+
+        <div class="team__support">{{ record.support }}</div>
+        
+        {% endif %}
+       
+    </div>
+    </div>
+
+{% endblock %}

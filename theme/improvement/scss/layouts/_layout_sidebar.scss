@@ -1,6 +1,4 @@
-
-    
-.sidebar {
+.sidebar__top {
     margin-bottom: 2em;
     margin-top: 2em;
 
@@ -9,7 +7,16 @@
     }
 }
 
-.pagina {
+.sidebar__bottom {
+    margin-bottom: 2em;
+    margin-top: 2em;
+
+    @include media($large-screen) {
+        @include span-columns(4);
+    }
+}
+
+.sidebar__pagina {
     @include media($large-screen) {
         @include span-columns(8);
     }

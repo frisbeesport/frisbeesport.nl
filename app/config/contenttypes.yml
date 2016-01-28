@@ -414,6 +414,7 @@ nationaleteams:
     searchable: true
     icon_many: fa:cube
     icon_one: fa:cube
+    record_template: nationaalteam.twig           
     
 verenigingen:
     name: Verenigingen

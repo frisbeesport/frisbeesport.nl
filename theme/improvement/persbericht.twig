@@ -1,1 +1,46 @@
-{% include 'post.twig' with { 'post': persbericht, 'authorid': persbericht.selectauteurs, 'afdeling': 'organisatie' } %}    
+{% extends "layout_sidebar.twig" %}
+
+{% block sidebar_top_content %}
+  
+    <div class="menulist">
+                    
+    {% setcontent berichten = 'persberichten/latest/10'  %}
+    {% for child in berichten %}    
+                        
+        {% if child.id == record.id %}
+        <div class="menulist__item menulist__item--current">
+             <a href="{{ child.link }}" class="menulist__item__caption">{{ child.title }}</a>
+        </div>
+        {% else %}
+        <div class="menulist__item">
+             <a href="{{ child.link }}" class="menulist__item__caption">{{ child.title }}</a>
+        </div>
+        {% endif %}
+
+    {% endfor %}  
+                
+    </div>    
+            
+     
+            
+{% endblock %}
+
+{% block sidebar_bottom_content %}
+
+{% endblock %}
+
+{% block sidebar_pagina_content %}
+
+    <div class="container">
+    <div class="grid section__content">
+    
+        
+
+        
+    </div>
+    </div>
+
+{% endblock %}
+
+{% block prefix_content %}
+{% endblock %}

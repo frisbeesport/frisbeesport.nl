@@ -380,7 +380,7 @@ button, .button {
   cursor: pointer;
   display: inline-block;
   font-family: "Open Sans", sans-serif;
-  font-size: 1em;
+  font-size: 1.1em;
   font-weight: 600;
   line-height: 1;
   padding: 0.75em 1em;
@@ -419,19 +419,19 @@ button, .button {
 fieldset {
   background-color: #f7f7f7;
   border: 1px solid #ddd;
-  margin: 0 0 0.75em;
-  padding: 1.5em; }
+  margin: 0 0 0.8em;
+  padding: 1.6em; }
 
 input,
 label,
 select {
   display: block;
   font-family: "Open Sans", sans-serif;
-  font-size: 1em; }
+  font-size: 1.1em; }
 
 label {
   font-weight: 600;
-  margin-bottom: 0.375em; }
+  margin-bottom: 0.4em; }
   label.required::after {
     content: "*"; }
   label abbr {
@@ -446,9 +446,9 @@ textarea {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
   font-family: "Open Sans", sans-serif;
-  font-size: 1em;
-  margin-bottom: 0.75em;
-  padding: 0.5em;
+  font-size: 1.1em;
+  margin-bottom: 0.8em;
+  padding: 0.53333em;
   transition: border-color;
   width: 100%; }
   input[type="color"]:hover, input[type="date"]:hover, input[type="datetime"]:hover, input[type="datetime-local"]:hover, input[type="email"]:hover, input[type="month"]:hover, input[type="number"]:hover, input[type="password"]:hover, input[type="search"]:hover, input[type="tel"]:hover, input[type="text"]:hover, input[type="time"]:hover, input[type="url"]:hover, input[type="week"]:hover, textarea:hover,
@@ -475,14 +475,14 @@ input[type="search"] {
 input[type="checkbox"],
 input[type="radio"] {
   display: inline;
-  margin-right: 0.375em; }
+  margin-right: 0.4em; }
 
 input[type="file"] {
-  padding-bottom: 0.75em;
+  padding-bottom: 0.8em;
   width: 100%; }
 
 select {
-  margin-bottom: 1.5em;
+  margin-bottom: 1.6em;
   max-width: 100%;
   width: auto; }
 
@@ -501,7 +501,7 @@ select {
     color: #6f6f6f;
     cursor: pointer;
     display: inline-block;
-    font-size: 1em;
+    font-size: 1.1em;
     font-weight: normal;
     line-height: 1;
     padding: 0.75em 1em;
@@ -545,7 +545,7 @@ select {
   cursor: pointer; }
 
 .dropdown {
-  line-height: 1.5; }
+  line-height: 1.6; }
   .dropdown .dropdown-container {
     display: inline-block;
     position: relative;
@@ -633,10 +633,10 @@ ol {
   margin: 0;
   padding: 0; }
 dl {
-  margin-bottom: 0.75em; }
+  margin-bottom: 0.8em; }
   dl dt {
     font-weight: bold;
-    margin-top: 0.75em; }
+    margin-top: 0.8em; }
   dl dd {
     margin: 0; }
 
@@ -720,13 +720,13 @@ body {
   -webkit-font-smoothing: antialiased;
   color: #222;
   font-family: "Open Sans", sans-serif;
-  font-size: 1em;
-  line-height: 1.5;
+  font-size: 1.1em;
+  line-height: 1.6;
   font-weight: 300;
   font-size: 16px; }
   @media screen and (min-width: 40em) {
     body {
-      font-size: 1em; } }
+      font-size: 1.1em; } }
 
 h1 {
   line-height: 1.2;
@@ -754,9 +754,9 @@ h4,
 h5,
 h6 {
   font-family: "Open Sans", sans-serif;
-  font-size: 1em;
+  font-size: 1.1em;
   line-height: 1.2;
-  margin: 0.75em 0 0.75em;
+  margin: 0.8em 0 0.8em;
   color: #000; }
 
 h1,
@@ -769,7 +769,7 @@ h6 {
 
 p {
   font-size: 1em;
-  margin: 0 0 0.75em; }
+  margin: 0 0 0.8em; }
 
 a {
   color: #00A850;
@@ -785,7 +785,7 @@ hr {
   border-left: none;
   border-right: none;
   border-top: none;
-  margin: 1.5em 0; }
+  margin: 1.6em 0; }
 
 img,
 picture {
@@ -2839,7 +2839,7 @@ body {
   .section__content .section__header {
     display: block;
     padding-top: 2em;
-    padding-bottom: 0.75em; }
+    padding-bottom: 0.8em; }
 
 .section__title--centered {
   text-align: center; }
@@ -3264,7 +3264,7 @@ body {
   border-radius: 3px;
   border: 0px solid #ddd;
   box-shadow: 0 2px 4px #cccccc;
-  margin: 0 1em 1.5em 1em;
+  margin: 0 1em 1.6em 1em;
   position: relative;
   overflow: hidden; }
   .topic .topic-image {
@@ -3289,14 +3289,14 @@ body {
     border-bottom: none;
     font-weight: bold;
     line-height: 1.5em;
-    padding: 0.5em 0.75em; }
+    padding: 0.53333em 0.8em; }
   .topic .topic-copy {
     font-size: 0.9em;
     line-height: 1.5em;
-    padding: 0.75em 0.75em;
+    padding: 0.8em 0.8em;
     padding-top: 0; }
     .topic .topic-copy p {
-      margin: 0 0 0.75em; }
+      margin: 0 0 0.8em; }
   .topic:focus, .topic:hover {
     box-shadow: 0 5px 10px gray; }
 
@@ -3646,7 +3646,7 @@ a.pdf-link:hover::before {
   border-bottom-left-radius: 25px;
   border: 0px solid #ddd;
   cursor: pointer;
-  margin: 0 1em 1.5em 1em;
+  margin: 0 1em 1.6em 1em;
   position: relative;
   overflow: hidden; }
   .smallcard .smallcard-image {
@@ -3663,7 +3663,7 @@ a.pdf-link:hover::before {
     float: right;
     color: #ccc; }
   .smallcard .smallcard__footer {
-    padding: 0.5em 0.75em;
+    padding: 0.53333em 0.8em;
     border-top: 1px solid #fff; }
   .smallcard .smallcard-header {
     -webkit-transition: all 0.2s ease-in-out;
@@ -3673,7 +3673,7 @@ a.pdf-link:hover::before {
     border-bottom: none;
     font-weight: bold;
     line-height: 1.5em;
-    padding: 0.5em 0.75em; }
+    padding: 0.53333em 0.8em; }
     .smallcard .smallcard-header .smallcard__extrainfo {
       padding-bottom: 0.5em; }
     .smallcard .smallcard-header .smallcard__title {
@@ -3681,10 +3681,10 @@ a.pdf-link:hover::before {
   .smallcard .smallcard-copy {
     font-size: 0.9em;
     line-height: 1.5em;
-    padding: 0.75em 0.75em;
+    padding: 0.8em 0.8em;
     padding-top: 0; }
     .smallcard .smallcard-copy p {
-      margin: 0 0 0.75em;
+      margin: 0 0 0.8em;
       color: #ddd; }
     .smallcard .smallcard-copy p:hover {
       color: #ddd; }
@@ -3767,7 +3767,7 @@ a.pdf-link:hover::before {
 .widecard {
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 1.5em;
+  margin-bottom: 1.6em;
   max-width: 850px;
   text-align: left;
   -webkit-flex-basis: 15em;
@@ -3804,13 +3804,13 @@ a.pdf-link:hover::before {
     border-radius: 3px 3px 0 0;
     font-weight: bold;
     line-height: 1.2;
-    padding: 0.5em 0.75em; }
+    padding: 0.53333em 0.8em; }
   .widecard .widecard-copy {
     font-size: 0.9em;
     line-height: 1.5;
-    padding: 0.75em 0.75em; }
+    padding: 0.8em 0.8em; }
     .widecard .widecard-copy p {
-      margin: 0 0 0.75em; }
+      margin: 0 0 0.8em; }
 
 .widecard--werkgroep {
   text-align: center; }
@@ -3838,7 +3838,7 @@ a.pdf-link:hover::before {
       border: 1px solid #ddd;
       color: #222;
       outline: none;
-      padding: 0.375em 0.809em;
+      padding: 0.4em 0.809em;
       text-decoration: none; }
       .pagination ul li a:hover, .pagination ul li a:focus {
         background: white;
@@ -4255,7 +4255,7 @@ body.down .navigation.clone {
 
 .footer {
   background: #222222;
-  padding: 3em 1.618em;
+  padding: 3.2em 1.618em;
   width: 100%; }
   .footer .footer-logo {
     margin-bottom: 3em;
@@ -4266,7 +4266,7 @@ body.down .navigation.clone {
     max-width: 65em;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 1.5em; }
+    margin-bottom: 1.6em; }
     .footer .footer-links::after {
       clear: both;
       content: "";
@@ -4276,7 +4276,7 @@ body.down .navigation.clone {
       content: "";
       display: table; }
   .footer ul {
-    margin-bottom: 3em;
+    margin-bottom: 3.2em;
     padding: 0; }
     @media screen and (min-width: 40em) and (max-width: 53.75em) {
       .footer ul {
@@ -4326,7 +4326,7 @@ body.down .navigation.clone {
     margin-bottom: 0.4em; }
   .footer hr {
     border: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 0 auto 1.5em;
+    margin: 0 auto 1.6em;
     width: 12em; }
   .footer p {
     color: rgba(255, 255, 255, 0.4);
@@ -4424,57 +4424,17 @@ ul.documenten {
   .team__support ul {
     padding: 0; }
 
-.section--forwards ul {
-  padding: 0; }
-
-.forwards--enkelekolom {
-  float: left;
-  display: block;
-  margin-right: 2.35765%;
-  width: 100%;
-  margin-bottom: 2em; }
-  .forwards--enkelekolom:last-child {
-    margin-right: 0; }
-
-.forward--current {
+.menulist__item--current {
   font-weight: 400; }
 
-.forwards--linkerkolom {
-  float: left;
+.menulist__item {
+  border-bottom: 1px solid rgba(0, 168, 80, 0.2);
   display: block;
-  margin-right: 2.35765%;
-  width: 100%;
-  margin-bottom: 2em; }
-  .forwards--linkerkolom:last-child {
-    margin-right: 0; }
-  @media screen and (min-width: 40em) {
-    .forwards--linkerkolom {
-      float: left;
-      display: block;
-      margin-right: 2.35765%;
-      width: 48.82117%; }
-      .forwards--linkerkolom:last-child {
-        margin-right: 0; } }
-
-.forwards--rechterkolom {
-  float: left;
-  display: block;
-  margin-right: 2.35765%;
-  width: 100%;
-  margin-bottom: 2em; }
-  .forwards--rechterkolom:last-child {
-    margin-right: 0; }
-  @media screen and (min-width: 40em) {
-    .forwards--rechterkolom {
-      float: left;
-      display: block;
-      margin-right: 2.35765%;
-      width: 48.82117%; }
-      .forwards--rechterkolom:last-child {
-        margin-right: 0; } }
-
-.forwards .forward--current {
-  font-weight: 400; }
+  margin-right: 1.6em;
+  outline: none;
+  padding: 0.8em 0; }
+  .menulist__item:last-child {
+    margin-bottom: 1.6em; }
 
 .sidebar {
   margin-bottom: 2em;
@@ -4497,13 +4457,37 @@ ul.documenten {
     .pagina:last-child {
       margin-right: 0; } }
 
-.forward {
-  border-bottom: 1px solid rgba(0, 168, 80, 0.2);
-  display: block;
-  margin-right: 1.5em;
-  outline: none;
-  padding: 0.75em 0; }
-  .forward:last-child {
-    margin-bottom: 1.5em; }
+.sidebar__top {
+  margin-bottom: 2em;
+  margin-top: 2em; }
+  @media screen and (min-width: 53.75em) {
+    .sidebar__top {
+      float: left;
+      display: block;
+      margin-right: 2.35765%;
+      width: 31.76157%; }
+      .sidebar__top:last-child {
+        margin-right: 0; } }
+
+.sidebar__bottom {
+  margin-bottom: 2em;
+  margin-top: 2em; }
+  @media screen and (min-width: 53.75em) {
+    .sidebar__bottom {
+      float: left;
+      display: block;
+      margin-right: 2.35765%;
+      width: 31.76157%; }
+      .sidebar__bottom:last-child {
+        margin-right: 0; } }
+
+@media screen and (min-width: 53.75em) {
+  .sidebar__pagina {
+    float: left;
+    display: block;
+    margin-right: 2.35765%;
+    width: 65.88078%; }
+    .sidebar__pagina:last-child {
+      margin-right: 0; } }
 
 /*# sourceMappingURL=main_discgolf.css.map */

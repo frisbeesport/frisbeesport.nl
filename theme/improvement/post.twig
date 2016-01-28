@@ -57,6 +57,24 @@
       
         {% include 'social-share.twig' with { 'tags': post.taxonomy.tags , 'title': post.title, 'url': paths.hosturl ~ post.link } %}
         
+
+          {% setcontent nieuwsberichten = 'nieuws/latest/12' where { afdelingen: afdeling } %}
+          <div class="menulist">
+                    
+                    {% for child in nieuwsberichten %}       
+                        
+                        {% if child.id == record.id %}
+                        <div class="menulist__item menulist__item--current">
+                            <a href="{{ child.link }}" class="menulist__item__caption">{{ child.title }}</a>
+                        </div>
+                        {% else %}
+                        <div class="menulist__item">
+                            <a href="{{ child.link }}" class="menulist__item__caption">{{ child.title }}</a>
+                        </div>
+                        {% endif %}
+                    {% endfor %}  
+                
+                </div>    
       </footer>
     
       <div class="entry-content afdeling--text">
