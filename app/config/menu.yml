@@ -146,13 +146,17 @@ spelers:
     path: pagina/spelers
     top: true
   - label: Ultimate competitie
-    title: Spelershome
-    path: pagina/spelers-ultimate-competitie
+    title: Ultimate competitie
+    link: http://www.nfbultimatecompetitie.nl
     top: true
-  - label: Ultimate jeugdcompetitie
-    title: Jeugdcompetitie
-    path: pagina/spelers-ultimate-jeugd-competitie
-    top: true    
+#  - label: Ultimate competitie
+#    title: Spelershome
+#    path: pagina/spelers-ultimate-competitie
+#    top: true
+#  - label: Ultimate jeugdcompetitie
+#    title: Jeugdcompetitie
+#    path: pagina/spelers-ultimate-jeugd-competitie
+#    top: true    
   - label: Disc Golf competitie
     title: Spelershome
     path: pagina/spelers-discgolf-competitie

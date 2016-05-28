@@ -3,8 +3,8 @@
 
     {% for item in menu | slice(1) %}
         
-    <li><a href="{{ paths.rooturl }}{{ item.path }}">{{ item.label }}</a></li>
-
+    <li><a href="{{ item.link }}">{{ item.label }}</a></li>
+    
     {% endfor %}  
 </ul>
 

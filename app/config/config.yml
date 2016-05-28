@@ -210,6 +210,9 @@ wysiwyg:
     disableNativeSpellChecker: true # If set to 'true' it will stop browsers from underlining spelling mistakes
     # viewSourceRoles: [ 'admin', 'developer' ] # the roles which are allowed to use the [Source]-button.
 
+# Global option to enable/disable the live editor
+liveeditor: false
+
 # by default, mail is sent using PHP's built-in mail function. In general, it's advised to use SMTP for sending mail
 # instead. Uncomment the following lines to use an SMTP server with authentication.
 # Please check http://silex.sensiolabs.org/doc/providers/swiftmailer.html for a full range of options
