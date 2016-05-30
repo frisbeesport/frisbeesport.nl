@@ -308,6 +308,9 @@ class Config
             if (!isset($taxonomy['has_sortorder'])) {
                 $taxonomy['has_sortorder'] = false;
             }
+            if (!isset($taxonomy['allow_spaces'])) {
+                $taxonomy['allow_spaces'] = false;
+            }
 
             // Make sure the options are $key => $value pairs, and not have implied integers for keys.
             if (!empty($taxonomy['options']) && is_array($taxonomy['options'])) {
@@ -361,7 +364,12 @@ class Config
      */
     protected function parseTheme($themePath, array $generalConfig)
     {
-        $themeConfig = $this->parseConfigYaml('config.yml', $themePath);
+        $themeConfig = $this->parseConfigYaml('theme.yml', $themePath);
+
+        /** @deprecated Since 2.2.16 and will be removed in Bolt v4.0 (config.yml was the old filename) */
+        if (empty($themeConfig)) {
+            $themeConfig = $this->parseConfigYaml('config.yml', $themePath);
+        }
 
         if ((isset($themeConfig['templatefields'])) && (is_array($themeConfig['templatefields']))) {
             $templateContentTypes = array();
@@ -407,6 +415,12 @@ class Config
         }
         if (!isset($contentType['singular_name']) && !isset($contentType['singular_slug'])) {
             $error = sprintf("In contenttype <code>%s</code>, neither 'singular_name' nor 'singular_slug' is set. Please edit <code>contenttypes.yml</code>, and correct this.", $key);
+            throw new LowlevelException($error);
+        }
+
+        // Contenttypes without fields make no sense.
+        if (!isset($contentType['fields'])) {
+            $error = sprintf("In contenttype <code>%s</code>, no 'fields' are set. Please edit <code>contenttypes.yml</code>, and correct this.", $key);
             throw new LowlevelException($error);
         }
 
@@ -753,7 +767,7 @@ class Config
 
                 // Check 'uses'. If it's an array, split it up, and check the separate parts. We also need to check
                 // for the fields that are always present, like 'id'.
-                if (is_array($field) && !empty($field['uses'])) {
+                if (!empty($field['uses']) && is_array($field['uses'])) {
                     foreach ($field['uses'] as $useField) {
                         if (!empty($field['uses']) && empty($ct['fields'][$useField]) && !in_array($useField, $this->reservedFieldNames)) {
                             $error = Trans::__(
@@ -1100,7 +1114,13 @@ class Config
     {
         // Check the timestamp for the theme's config.yml
         $paths = $this->app['resources']->getPaths();
-        $themeConfigFile = $paths['themepath'] . '/config.yml';
+        $themeConfigFile = $paths['themepath'] . '/theme.yml';
+
+        /** @deprecated Since 2.2.16 and will be removed in Bolt v4.0 (config.yml was the old filename) */
+        if (!file_exists($themeConfigFile)) {
+            $themeConfigFile = $paths['themepath'] . '/config.yml';
+        }
+
         // Note: we need to check if it exists, _and_ it's too old. Not _or_, hence the '0'
         $configTimestamp = file_exists($themeConfigFile) ? filemtime($themeConfigFile) : 0;
 

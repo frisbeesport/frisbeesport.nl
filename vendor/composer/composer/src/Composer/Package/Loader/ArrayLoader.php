@@ -18,6 +18,7 @@ use Composer\Package\Link;
 use Composer\Package\RootAliasPackage;
 use Composer\Package\RootPackageInterface;
 use Composer\Package\Version\VersionParser;
+use Composer\Semver\VersionParser as SemverVersionParser;
 
 /**
  * @author Konstantin Kudryashiv <ever.zet@gmail.com>
@@ -28,7 +29,7 @@ class ArrayLoader implements LoaderInterface
     protected $versionParser;
     protected $loadOptions;
 
-    public function __construct(VersionParser $parser = null, $loadOptions = false)
+    public function __construct(SemverVersionParser $parser = null, $loadOptions = false)
     {
         if (!$parser) {
             $parser = new VersionParser;
@@ -169,6 +170,9 @@ class ArrayLoader implements LoaderInterface
             if (isset($config['scripts']) && is_array($config['scripts'])) {
                 foreach ($config['scripts'] as $event => $listeners) {
                     $config['scripts'][$event] = (array) $listeners;
+                }
+                if (isset($config['scripts']['composer'])) {
+                    trigger_error('The `composer` script name is reserved for internal use, please avoid defining it', E_USER_DEPRECATED);
                 }
                 $package->setScripts($config['scripts']);
             }

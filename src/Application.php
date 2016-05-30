@@ -32,7 +32,7 @@ class Application extends Silex\Application
      */
     public function __construct(array $values = array())
     {
-        $values['bolt_version'] = '2.2.10';
+        $values['bolt_version'] = '2.2.21';
         $values['bolt_name'] = '';
         $values['bolt_released'] = true; // `true` for stable releases, `false` for alpha, beta and RC.
 
@@ -44,7 +44,7 @@ class Application extends Silex\Application
         $this->register(new PathServiceProvider());
 
         // Initialize the config. Note that we do this here, on 'construct'.
-        // All other initialisation is triggered from bootstrap.php
+        // All other initialization is triggered from bootstrap.php
         // Warning!
         // One of a valid ResourceManager ['resources'] or ClassLoader ['classloader']
         // must be defined for working properly
@@ -67,7 +67,7 @@ class Application extends Silex\Application
         $this['editlink'] = '';
         $this['edittitle'] = '';
 
-        // Initialise the JavaScipt data gateway
+        // Initialize the JavaScript data gateway
         $this['jsdata'] = array();
     }
 
@@ -100,7 +100,7 @@ class Application extends Silex\Application
 
     public function initialize()
     {
-        // Initialise logging
+        // Initialize logging.
         $this->initLogger();
 
         // Set up locale and translations.
@@ -109,7 +109,7 @@ class Application extends Silex\Application
         // Initialize Twig and our rendering Provider.
         $this->initRendering();
 
-        // Initialize Web Profiler Providers if enabled
+        // Initialize Web Profiler Providers if enabled.
         $this->initProfiler();
 
         // Initialize the Database Providers.
@@ -127,13 +127,13 @@ class Application extends Silex\Application
         // Mail config checks for extensions
         $this->before(array($this, 'initMailCheck'));
 
-        // Initialise the global 'before' handler.
+        // Initialize the global 'before' handler.
         $this->before(array($this, 'beforeHandler'));
 
-        // Initialise the global 'after' handler.
+        // Initialize the global 'after' handler.
         $this->after(array($this, 'afterHandler'));
 
-        // Initialise the 'error' handler.
+        // Initialize the 'error' handler.
         $this->error(array($this, 'errorHandler'));
     }
 
@@ -292,8 +292,10 @@ class Application extends Silex\Application
             $this->extend(
                 'twig.loader.filesystem',
                 function (\Twig_Loader_Filesystem $filesystem, Application $app) {
+                    $refProfilerClass = new \ReflectionClass('Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension');
+                    $webProfilerPath = dirname(dirname($refProfilerClass->getFileName()));
                     $filesystem->addPath(
-                        $app['resources']->getPath('root') . '/vendor/symfony/web-profiler-bundle/Symfony/Bundle/WebProfilerBundle/Resources/views',
+                        $webProfilerPath . '/Resources/views',
                         'WebProfiler'
                     );
                     $filesystem->addPath($app['resources']->getPath('app') . '/view', 'BoltProfiler');
@@ -448,7 +450,7 @@ class Application extends Silex\Application
      */
     public function initMailCheck()
     {
-        if (!$this['config']->get('general/mailoptions') && $this['extensions']->hasMailSenders()) {
+        if ($this['users']->getCurrentuser() && !$this['config']->get('general/mailoptions') && $this['extensions']->hasMailSenders()) {
             $error = "One or more installed extensions need to be able to send email. Please set up the 'mailoptions' in config.yml.";
             $this['session']->getFlashBag()->add('error', Trans::__($error));
         }
@@ -551,8 +553,16 @@ class Application extends Silex\Application
             $response->headers->set('Frame-Options', 'SAMEORIGIN');
         }
 
+        // Exit now if it's an AJAX call
+        if ($request->isXmlHttpRequest()) {
+            $this['stopwatch']->stop('bolt.app.after');
+
+            return;
+        }
+
         // true if we need to consider adding html snippets
-        if (isset($this['htmlsnippets']) && ($this['htmlsnippets'] === true)) {
+        // note we exclude cached requests where no additions should be made to the HTML
+        if (isset($this['htmlsnippets']) && ($this['htmlsnippets'] === true) && ($response->headers->get('Cache-Control') === "no-cache")) {
             // only add when content-type is text/html
             if (strpos($response->headers->get('Content-Type'), 'text/html') !== false) {
                 // Add our meta generator tag.
@@ -629,13 +639,17 @@ class Application extends Silex\Application
 
         $end = $this['config']->getWhichEnd();
         if (($exception instanceof HttpException) && ($end == 'frontend')) {
-            $content = $this['storage']->getContent($this['config']->get('general/notfound'), array('returnsingle' => true));
+            if (substr($this['config']->get('general/notfound'), -5) === '.twig') {
+                return $this['render']->render($this['config']->get('general/notfound'));
+            } else {
+                $content = $this['storage']->getContent($this['config']->get('general/notfound'), array('returnsingle' => true));
 
-            // Then, select which template to use, based on our 'cascading templates rules'
-            if ($content instanceof Content && !empty($content->id)) {
-                $template = $this['templatechooser']->record($content);
+                // Then, select which template to use, based on our 'cascading templates rules'
+                if ($content instanceof Content && !empty($content->id)) {
+                    $template = $this['templatechooser']->record($content);
 
-                return $this['render']->render($template, $content->getTemplateContext());
+                    return $this['render']->render($template, $content->getTemplateContext());
+                }
             }
 
             $message = "The page could not be found, and there is no 'notfound' set in 'config.yml'. Sorry about that.";

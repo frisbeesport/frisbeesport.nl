@@ -12,10 +12,11 @@
 
 namespace Composer\Command;
 
-use Composer\Factory;
 use Composer\Package\CompletePackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Repository\ArrayRepository;
+use Composer\Repository\RepositoryFactory;
+use Composer\Util\Platform;
 use Composer\Util\ProcessExecutor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,7 +26,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
  */
-class HomeCommand extends Command
+class HomeCommand extends BaseCommand
 {
     /**
      * {@inheritDoc}
@@ -57,6 +58,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $repos = $this->initializeRepos();
+        $io = $this->getIO();
         $return = 0;
 
         foreach ($input->getArgument('packages') as $packageName) {
@@ -65,7 +67,7 @@ EOT
             foreach ($repos as $repo) {
                 foreach ($repo->findPackages($packageName) as $package) {
                     $packageExists = true;
-                    if ($this->handlePackage($package, $input->getOption('homepage'), $input->getOption('show'))) {
+                    if ($package instanceof CompletePackageInterface && $this->handlePackage($package, $input->getOption('homepage'), $input->getOption('show'))) {
                         $handled = true;
                         break 2;
                     }
@@ -74,12 +76,12 @@ EOT
 
             if (!$packageExists) {
                 $return = 1;
-                $this->getIO()->writeError('<warning>Package '.$packageName.' not found</warning>');
+                $io->writeError('<warning>Package '.$packageName.' not found</warning>');
             }
 
             if (!$handled) {
                 $return = 1;
-                $this->getIO()->writeError('<warning>'.($input->getOption('homepage') ? 'Invalid or missing homepage' : 'Invalid or missing repository URL').' for '.$packageName.'</warning>');
+                $io->writeError('<warning>'.($input->getOption('homepage') ? 'Invalid or missing homepage' : 'Invalid or missing repository URL').' for '.$packageName.'</warning>');
             }
         }
 
@@ -116,7 +118,7 @@ EOT
     {
         $url = ProcessExecutor::escape($url);
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if (Platform::isWindows()) {
             return passthru('start "web" explorer "' . $url . '"');
         }
 
@@ -151,8 +153,6 @@ EOT
             );
         }
 
-        $defaultRepos = Factory::createDefaultRepositories($this->getIO());
-
-        return $defaultRepos;
+        return RepositoryFactory::defaultRepos($this->getIO());
     }
 }

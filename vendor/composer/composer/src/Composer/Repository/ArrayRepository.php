@@ -16,15 +16,15 @@ use Composer\Package\AliasPackage;
 use Composer\Package\PackageInterface;
 use Composer\Package\CompletePackageInterface;
 use Composer\Package\Version\VersionParser;
-use Composer\Package\LinkConstraint\LinkConstraintInterface;
-use Composer\Package\LinkConstraint\VersionConstraint;
+use Composer\Semver\Constraint\ConstraintInterface;
+use Composer\Semver\Constraint\Constraint;
 
 /**
  * A repository implementation that simply stores packages in an array
  *
  * @author Nils Adermann <naderman@naderman.de>
  */
-class ArrayRepository implements RepositoryInterface
+class ArrayRepository extends BaseRepository
 {
     /** @var PackageInterface[] */
     protected $packages;
@@ -43,19 +43,21 @@ class ArrayRepository implements RepositoryInterface
     {
         $name = strtolower($name);
 
-        if (!$constraint instanceof LinkConstraintInterface) {
+        if (!$constraint instanceof ConstraintInterface) {
             $versionParser = new VersionParser();
             $constraint = $versionParser->parseConstraints($constraint);
         }
 
         foreach ($this->getPackages() as $package) {
             if ($name === $package->getName()) {
-                $pkgConstraint = new VersionConstraint('==', $package->getVersion());
+                $pkgConstraint = new Constraint('==', $package->getVersion());
                 if ($constraint->matches($pkgConstraint)) {
                     return $package;
                 }
             }
         }
+
+        return null;
     }
 
     /**
@@ -67,14 +69,14 @@ class ArrayRepository implements RepositoryInterface
         $name = strtolower($name);
         $packages = array();
 
-        if (null !== $constraint && !$constraint instanceof LinkConstraintInterface) {
+        if (null !== $constraint && !$constraint instanceof ConstraintInterface) {
             $versionParser = new VersionParser();
             $constraint = $versionParser->parseConstraints($constraint);
         }
 
         foreach ($this->getPackages() as $package) {
             if ($name === $package->getName()) {
-                $pkgConstraint = new VersionConstraint('==', $package->getVersion());
+                $pkgConstraint = new Constraint('==', $package->getVersion());
                 if (null === $constraint || $constraint->matches($pkgConstraint)) {
                     $packages[] = $package;
                 }

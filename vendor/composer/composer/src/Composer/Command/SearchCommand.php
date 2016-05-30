@@ -12,6 +12,7 @@
 
 namespace Composer\Command;
 
+use Composer\Factory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,14 +20,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Composer\Repository\CompositeRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
-use Composer\Factory;
 use Composer\Plugin\CommandEvent;
 use Composer\Plugin\PluginEvents;
 
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
  */
-class SearchCommand extends Command
+class SearchCommand extends BaseCommand
 {
     protected $matches;
     protected $lowMatches = array();
@@ -56,21 +56,16 @@ EOT
     {
         // init repos
         $platformRepo = new PlatformRepository;
-        if ($composer = $this->getComposer(false)) {
-            $localRepo = $composer->getRepositoryManager()->getLocalRepository();
-            $installedRepo = new CompositeRepository(array($localRepo, $platformRepo));
-            $repos = new CompositeRepository(array_merge(array($installedRepo), $composer->getRepositoryManager()->getRepositories()));
-        } else {
-            $defaultRepos = Factory::createDefaultRepositories($this->getIO());
-            $this->getIO()->writeError('No composer.json found in the current directory, showing packages from ' . implode(', ', array_keys($defaultRepos)));
-            $installedRepo = $platformRepo;
-            $repos = new CompositeRepository(array_merge(array($installedRepo), $defaultRepos));
+        $io = $this->getIO();
+        if (!($composer = $this->getComposer(false))) {
+            $composer = Factory::create($this->getIO(), array());
         }
+        $localRepo = $composer->getRepositoryManager()->getLocalRepository();
+        $installedRepo = new CompositeRepository(array($localRepo, $platformRepo));
+        $repos = new CompositeRepository(array_merge(array($installedRepo), $composer->getRepositoryManager()->getRepositories()));
 
-        if ($composer) {
-            $commandEvent = new CommandEvent(PluginEvents::COMMAND, 'search', $input, $output);
-            $composer->getEventDispatcher()->dispatch($commandEvent->getName(), $commandEvent);
-        }
+        $commandEvent = new CommandEvent(PluginEvents::COMMAND, 'search', $input, $output);
+        $composer->getEventDispatcher()->dispatch($commandEvent->getName(), $commandEvent);
 
         $onlyName = $input->getOption('only-name');
 
@@ -78,7 +73,7 @@ EOT
         $results = $repos->search(implode(' ', $input->getArgument('tokens')), $flags);
 
         foreach ($results as $result) {
-            $this->getIO()->write($result['name'] . (isset($result['description']) ? ' '. $result['description'] : ''));
+            $io->write($result['name'] . (isset($result['description']) ? ' '. $result['description'] : ''));
         }
     }
 }

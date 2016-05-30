@@ -125,6 +125,9 @@ class PackageManager
      */
     private function setup()
     {
+        // Create our Factory
+        $this->factory = new Factory($this->app, $this->options);
+
         if ($this->app['extend.writeable']) {
             // Copy/update installer helper
             $this->copyInstaller();
@@ -143,9 +146,6 @@ class PackageManager
                 $this->messages[] = $this->app['extend.site'] . ' is unreachable.';
             }
         }
-
-        // Create our Factory
-        $this->factory = new Factory($this->app, $this->options);
     }
 
     /**
@@ -544,14 +544,27 @@ class PackageManager
             $query = array();
         }
 
+        $guzzleOptions = array(
+            'query' => $query,
+            'config' => array(
+                'curl' => array(
+                    CURLOPT_CONNECTTIMEOUT => 5
+                )
+            )
+        );
+
         try {
             /** @deprecated remove when PHP 5.3 support is dropped */
             if ($this->app['deprecated.php']) {
+                /** @var \Guzzle\Service\Client $client */
+                $client = $this->app['guzzle.client'];
                 /** @var $response \Guzzle\Http\Message\Response  */
-                $response = $this->app['guzzle.client']->head($uri, null, array('query' => $query))->send();
+                $response = $client->head($uri, null, $guzzleOptions)->send();
             } else {
-                /** @var $reponse \GuzzleHttp\Message\Response */
-                $response = $this->app['guzzle.client']->head($uri, array(), array('query' => $query));
+                /** @var \GuzzleHttp\Client $client */
+                $client = $this->app['guzzle.client'];
+                /** @var $response \GuzzleHttp\Message\Response */
+                $response = $client->head($uri, $guzzleOptions);
             }
 
             return $response->getStatusCode();
@@ -600,7 +613,7 @@ class PackageManager
         $this->getFactory()->downgradeSsl = true;
 
         $this->messages[] = Trans::__(
-            "System cURL library doesn't support TLS, or the Certificate Authority setup has not been completed (%ERROR%). See http://curl.haxx.se/docs/sslcerts.htmlfor more details. Downgrading to HTTP.",
+            "System cURL library doesn't support TLS, or the Certificate Authority setup has not been completed (%ERROR%). See http://curl.haxx.se/docs/sslcerts.html for more details. Downgrading to HTTP.",
             array('%ERROR%' => trim($err)));
 
         return Response::HTTP_OK;

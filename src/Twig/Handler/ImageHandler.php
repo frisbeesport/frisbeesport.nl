@@ -29,16 +29,16 @@ class ImageHandler
     /**
      * Helper function to make a path to an image.
      *
-     * @param string         $filename Target filename
-     * @param string|integer $width    Target width
-     * @param string|integer $height   Target height
-     * @param string         $crop     String identifier for cropped images
+     * @param string  $filename Target filename
+     * @param integer $width    Target width
+     * @param integer $height   Target height
+     * @param string  $crop     String identifier for cropped images
      *
      * @return string Image path
      */
-    public function image($filename, $width = '', $height = '', $crop = '')
+    public function image($filename = '', $width = 0, $height = 0, $crop = '')
     {
-        if ($width != '' || $height != '') {
+        if ($width !== 0 || $height !== 0) {
             // You don't want the image, you just want a thumbnail.
             return $this->thumbnail($filename, $width, $height, $crop);
         }
@@ -172,10 +172,20 @@ class ImageHandler
      *
      * @return string HTML output
      */
-    public function popup($filename = '', $width = 100, $height = 100, $crop = '', $title = '')
+    public function popup($filename = '', $width = 0, $height = 0, $crop = '', $title = '')
     {
-        if (!empty($filename)) {
+        if (empty($filename)) {
+            return '&nbsp;';
+        } else {
             $thumbconf = $this->app['config']->get('general/thumbnails');
+
+            if ($width === 0) {
+                $width = !empty($thumbconf['default_thumbnail'][0]) ? $thumbconf['default_thumbnail'][0] : 160;
+            }
+
+            if ($height === 0) {
+                $height = !empty($thumbconf['default_thumbnail'][1]) ? $thumbconf['default_thumbnail'][1] : 120;
+            }
 
             $fullwidth = !empty($thumbconf['default_image'][0]) ? $thumbconf['default_image'][0] : 1000;
             $fullheight = !empty($thumbconf['default_image'][1]) ? $thumbconf['default_image'][1] : 800;
@@ -184,22 +194,36 @@ class ImageHandler
             $large = $this->thumbnail($filename, $fullwidth, $fullheight, 'r');
 
             if (empty($title)) {
-                $title = sprintf('%s: %s', Trans::__('Image'), $filename);
+                // try to get title from filename array
+                if (is_array($filename) && isset($filename['title'])) {
+                    $title = $filename['title'];
+                } else {
+                    // fallback to filename from array
+                    if (is_array($filename) && isset($filename['filename'])) {
+                        $title = $filename['filename'];
+                    } else {
+                        // fallback to filename as provided (string)
+                        $title = sprintf('%s: %s', Trans::__('Image'), $filename);
+                    }
+                }
             }
 
-            $output = sprintf(
-                '<a href="%s" class="magnific" title="%s"><img src="%s" width="%s" height="%s"></a>',
+            if (is_array($filename) && isset($filename['alt'])) {
+                $alt = $filename['alt'];
+            } else {
+                $alt = $title;
+            }
+
+            return sprintf(
+                '<a href="%s" class="magnific" title="%s"><img src="%s" width="%s" height="%s" alt="%s"></a>',
                 $large,
                 $title,
                 $thumbnail,
                 $width,
-                $height
+                $height,
+                $alt
             );
-        } else {
-            $output = '&nbsp;';
         }
-
-        return $output;
     }
 
     /**
@@ -223,15 +247,30 @@ class ImageHandler
         if (empty($filename)) {
             return '&nbsp;';
         } else {
-            $width = intval($width);
-            $height = intval($height);
+            if (isset($filename['alt'])) {
+                $alt = $filename['alt'];
+            } elseif (isset($filename['title'])) {
+                $alt = $filename['title'];
+            } else {
+                $alt = '';
+            }
 
-            if ($width === 0 || $height === 0) {
-                $info = $this->imageInfo($filename);
+            if ($width === 0 && $height === 0) {
+                $thumbconf = $this->app['config']->get('general/thumbnails');
+                $width = !empty($thumbconf['default_image'][0]) ? $thumbconf['default_image'][0] : 1000;
+                $height = !empty($thumbconf['default_image'][1]) ? $thumbconf['default_image'][1] : 750;
+            } elseif ($width === 0 xor $height === 0) {
+                if (is_array($filename)) {
+                    $filename = isset($filename['filename']) ? $filename['filename'] : $filename['file'];
+                }
+
+                $info = $this->imageInfo($filename, false);
 
                 if ($width !== 0) {
+                    $width = min($width, $info['width']);
                     $height = round($width / $info['aspectratio']);
                 } elseif ($height !== 0) {
+                    $height = min($height, $info['height']);
                     $width = round($height * $info['aspectratio']);
                 } else {
                     $width = $info['width'];
@@ -241,35 +280,45 @@ class ImageHandler
 
             $image = $this->thumbnail($filename, $width, $height, $crop);
 
-            return '<img src="' . $image . '" width="' . $width . '" height="' . $height . '">';
+            return sprintf(
+                '<img src="%s" width="%s" height="%s" alt="%s">',
+                $image,
+                $width,
+                $height,
+                $alt
+            );
         }
     }
 
     /**
      * Helper function to make a path to an image thumbnail.
      *
-     * @param string     $filename Target filename
-     * @param string|int $width    Target width
-     * @param string|int $height   Target height
-     * @param string     $zoomcrop Zooming and cropping: Set to 'f(it)', 'b(orders)', 'r(esize)' or 'c(rop)'
+     * @param string  $filename Target filename
+     * @param integer $width    Target width
+     * @param integer $height   Target height
+     * @param string  $zoomcrop Zooming and cropping: Set to 'f(it)', 'b(orders)', 'r(esize)' or 'c(rop)'
      *                             Set width or height parameter to '0' for proportional scaling
      *                             Setting them to '' uses default values.
      *
      * @return string Thumbnail path
      */
-    public function thumbnail($filename, $width = '', $height = '', $zoomcrop = 'crop')
+    public function thumbnail($filename = '', $width = 0, $height = 0, $crop = '')
     {
-        if (!is_numeric($width)) {
-            $thumbconf = $this->app['config']->get('general/thumbnails');
-            $width = empty($thumbconf['default_thumbnail'][0]) ? 100 : $thumbconf['default_thumbnail'][0];
+        $thumbconf = $this->app['config']->get('general/thumbnails');
+
+        if ($width === 0) {
+            $width = !empty($thumbconf['default_thumbnail'][0]) ? $thumbconf['default_thumbnail'][0] : 100;
         }
 
-        if (!is_numeric($height)) {
-            $thumbconf = $this->app['config']->get('general/thumbnails');
-            $height = empty($thumbconf['default_thumbnail'][1]) ? 100 : $thumbconf['default_thumbnail'][1];
+        if ($height === 0) {
+            $height = !empty($thumbconf['default_thumbnail'][1]) ? $thumbconf['default_thumbnail'][1] : 100;
         }
 
-        switch ($zoomcrop) {
+        if (!in_array($crop, array('fit', 'f', 'resize', 'r', 'borders', 'b', 'crop', 'c'))) {
+            $crop = $thumbconf['cropping'];
+        }
+
+        switch ($crop) {
             case 'fit':
             case 'f':
                 $scale = 'f';
@@ -291,7 +340,7 @@ class ImageHandler
                 break;
 
             default:
-                $scale = !empty($thumbconf['cropping']) ? $thumbconf['cropping'] : 'c';
+                $scale = 'c';
         }
 
         // After v1.5.1 we store image data as an array

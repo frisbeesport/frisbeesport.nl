@@ -210,6 +210,8 @@ class Content implements \ArrayAccess
                     case 'select':
                         if (is_array($this->values[$field])) {
                             $newvalue[$field] = json_encode($this->values[$field]);
+                        } else {
+                            $newvalue[$field] = $this->values[$field];
                         }
                         break;
 
@@ -484,9 +486,13 @@ class Content implements \ArrayAccess
         }
 
         // Get the relations from the POST-ed values.
-        // @todo use $this->setRelation() for this
-        if (!empty($values['relation'])) {
-            $this->relation = $values['relation'];
+        if (!empty($values['relation']) && is_array($values['relation'])) {
+            foreach($values['relation'] as $key => $relationValues) {
+                $this->clearRelation($key);
+                foreach($relationValues as $value) {
+                    $this->setRelation($key, $value);
+                }
+            }
             unset($values['relation']);
         } else {
             $this->relation = array();
@@ -583,8 +589,7 @@ class Content implements \ArrayAccess
             return false;
         }
 
-        if ((!$this->contenttype['viewless'])
-            && (!empty($this['templatefields']))
+        if ((!empty($this['templatefields']))
             && ($templateFieldsConfig = $this->app['config']->get('theme/templatefields'))) {
                 $template = $this->app['templatechooser']->record($this);
                 if (array_key_exists($template, $templateFieldsConfig)) {
@@ -763,6 +768,20 @@ class Content implements \ArrayAccess
         sort($ids);
 
         $this->relation[$contenttype] = array_unique($ids);
+    }
+
+    /**
+     * Clears a relation.
+     *
+     * @param string|array $contenttype
+     *
+     * @return void
+     */
+    public function clearRelation($contenttype)
+    {
+        if (!empty($this->relation[$contenttype])) {
+            unset($this->relation[$contenttype]);
+        }
     }
 
     /**
@@ -1108,6 +1127,11 @@ class Content implements \ArrayAccess
             return null;
         }
 
+        // No links for records that are 'viewless'
+        if (isset($this->contenttype['viewless']) && $this->contenttype['viewless'] == true) {
+            return null;
+        }
+
         list($binding, $route) = $this->getRoute();
 
         if (!$route) {
@@ -1249,7 +1273,7 @@ class Content implements \ArrayAccess
             'limit'        => 1,
             'order'        => $field . $order,
             'returnsingle' => true,
-            'hydrate'      => false
+            'hydrate'      => true
         );
 
         $pager = array();
@@ -1280,7 +1304,7 @@ class Content implements \ArrayAccess
             'limit'        => 1,
             'order'        => $field . $order,
             'returnsingle' => true,
-            'hydrate'      => false
+            'hydrate'      => true
         );
 
         $pager = array();

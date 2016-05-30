@@ -21,7 +21,7 @@
     {# Bolt comes with Magnific Popup, as it's used in the backend. We can use it here, or you can
       just swap it out for the image-viewing script of your choice. Or delete it altogether. #}
     <link rel="stylesheet" href="{{ paths.theme }}css/magnific-popup.css">
-
+    <script src="{{ paths.theme }}javascripts/modernizr.js"></script>
 
     {#<!-- A variable from the theme's config: {{ theme.foo }} -->#}
 
@@ -38,7 +38,7 @@
         <nav class="top-bar" data-topbar>
             <ul class="title-area">
                 <li class="name"><h1><a href="{{ paths.root }}">{{ app.config.get('general/sitename') }}</a></h1></li>
-                <li class="toggle-topbar menu-icon"><a href="#">☰ menu</a></li>
+                <li class="toggle-topbar menu-icon"><a href="#">≡ menu</a></li>
             </ul>
 
             <section class="top-bar-section">
@@ -58,7 +58,7 @@
 
             {# You can either hardcode the filename for the header, or take a value from the current
                content in 'record', or - as we do in this example - take a random one from the list
-               in the /theme/base-2014/config.yml file. #}
+               in the /theme/base-2014/theme.yml file. #}
             {% set headerimage = paths.theme ~ 'images/' ~ random(theme.headerimage) %}
             <img src="{{ headerimage }} " alt="" />
 

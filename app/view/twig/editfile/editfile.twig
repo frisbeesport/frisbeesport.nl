@@ -64,7 +64,7 @@
 
             <p class='lastsaved' style='padding-top: 12px;'>
                 {{ __('Saved on:') }}
-                <strong>{{ context.datechanged|localdate("%b %e, %H:%M") }}</strong>
+                <strong>{{ context.datechanged|localdate("%c") }}</strong>
                 <small>({{ macro.datetime(context.datechanged) }})</small>
             </p>
 
@@ -82,7 +82,7 @@
         {% elseif context.filetype == "md" %}
             {% set codemirror = ['markdown'] %}
         {% elseif context.filetype in ['css', 'less'] %}
-            {% set codemirror = 'css' %}
+            {% set codemirror = ['css'] %}
         {% elseif context.filetype == "js" %}
             {% set codemirror = ['javascript'] %}
         {% else %}
@@ -93,6 +93,7 @@
         <link rel="stylesheet" property="stylesheet" href="{{ paths.app }}view/js/ckeditor/plugins/codemirror/css/codemirror.min.css">
         <script src="{{ paths.app }}view/js/ckeditor/ckeditor.js"></script>
         <script src="{{ paths.app }}view/js/ckeditor/plugins/codemirror/js/codemirror.min.js"></script>
+        <script src="{{ paths.app }}view/js/ckeditor/plugins/codemirror/js/codemirror.addons.search.min.js"></script>
         {% for file in codemirror %}
             <script src="{{ paths.app }}view/js/ckeditor/plugins/codemirror/plugins/{{ file }}.min.js"></script>
         {% endfor %}

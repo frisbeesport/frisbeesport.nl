@@ -16,7 +16,7 @@
         "bolt/thumbs" : "~2.0",
         "brandonwamboldt/utilphp" : "~1.0",
         "cocur/slugify" : "~1.0",
-        "composer/composer" : "dev-master",
+        "composer/composer" : "^1.0",
         "doctrine/dbal" : "2.5.1",
         "erusev/parsedown-extra" : "~0.2",
         "ext-mbstring" : "*",
@@ -33,9 +33,13 @@
         "silex/web-profiler" : "1.0.4",
         "stecman/symfony-console-completion" : "~0.4",
         "swiftmailer/swiftmailer" : "~5.3",
+        "symfony/browser-kit" : "<2.7",
         "symfony/config" : "<2.7",
         "symfony/console" : "<2.7",
+        "symfony/css-selector" : "<2.7",
         "symfony/debug" : "<2.7",
+        "symfony/dependency-injection" : "<2.7",
+        "symfony/dom-crawler" : "<2.7",
         "symfony/event-dispatcher" : "<2.7",
         "symfony/filesystem" : "<2.7",
         "symfony/finder" : "<2.7",
@@ -61,7 +65,7 @@
     },
     "require-dev" : {
         "bolt/codingstyle" : "~1.0",
-        "codeception/codeception" : "*",
+        "codeception/codeception" : "<=2.1.2",
         "lstrojny/phpunit-function-mocker" : "dev-master@dev",
         "m6web/symfony2-coding-standard" : "dev-master@dev",
         "phpmd/phpmd" : "~2.2.0",
@@ -71,11 +75,9 @@
         "sebastian/phpcpd" : "~2.0",
         "squizlabs/php_codesniffer" : "~2.0"
     },
-    "minimum-stability" : "beta",
     "config" : {
         "preferred-install" : "dist"
     },
-    "prefer-stable" : true,
     "autoload" : {
         "psr-4" : {
             "Bolt\\" : "src"

@@ -194,6 +194,7 @@ class Storage
             }
         }
 
+        $content['title'] = rtrim($content['title'], '.,;:');
         $content['slug'] = $this->app['slugify']->slugify($content['title']);
 
         $contentobject = $this->getContentObject($contenttype);
@@ -999,6 +1000,8 @@ class Storage
         // Make the query for the pager.
         $pagerquery = sprintf('SELECT COUNT(*) AS count FROM %s %s', $tablename, $where);
 
+        $orderby = (array_key_exists('has_sortorder', $taxonomytype)
+            && $taxonomytype['has_sortorder'] === true) ? 'sortorder' : 'id';
         // Sort on either 'ascending' or 'descending'
         // Make sure we set the order.
         $order = 'ASC';
@@ -1008,7 +1011,7 @@ class Storage
         }
 
         // Add the limit
-        $query = sprintf('SELECT * FROM %s %s ORDER BY id %s', $tablename, $where, $order);
+        $query = sprintf('SELECT * FROM %s %s ORDER BY %s %s', $tablename, $where, $orderby, $order);
         $query = $this->app['db']->getDatabasePlatform()->modifyLimitQuery($query, $limit, ($page - 1) * $limit);
 
         $taxorows = $this->app['db']->fetchAll($query);
@@ -1089,7 +1092,7 @@ class Storage
         try {
             // Check for record that need to be published/de-published
             $recordIds = $this->timedListRecords($contenttypeSlug, $type);
-            if ($recordIds === false) {
+            if (empty($recordIds)) {
                 return;
             }
 
@@ -1165,19 +1168,21 @@ class Storage
         if ($type === 'publish') {
             $query
                 ->where('status = :oldstatus')
-                ->andWhere('datepublish < CURRENT_TIMESTAMP')
+                ->andWhere('datepublish < :currenttime')
                 ->setParameter('oldstatus', 'timed')
                 ->setParameter('newstatus', 'published')
+                ->setParameter('currenttime', new \DateTime(), \Doctrine\DBAL\Types\Type::DATETIME)
             ;
         } else {
             $query
                 ->where('status = :oldstatus')
-                ->andWhere('datedepublish <= CURRENT_TIMESTAMP')
+                ->andWhere('datedepublish <= :currenttime')
                 ->andWhere('datedepublish > :zeroday')
                 ->andWhere('datechanged < datedepublish')
                 ->setParameter('oldstatus', 'published')
                 ->setParameter('newstatus', 'held')
                 ->setParameter('zeroday', '1900-01-01 00:00:01')
+                ->setParameter('currenttime', new \DateTime(), \Doctrine\DBAL\Types\Type::DATETIME)
             ;
         }
     }
@@ -2356,19 +2361,22 @@ class Storage
      * @see https://github.com/bolt/bolt/issues/3908
      *
      * @param Content $content
+     * @param string  $taxonomytype
      * @param array   $taxonomy
      *
      * @return array
      */
-    private function getIndexedTaxonomy($content, $taxonomy)
+    private function getIndexedTaxonomy($content, $taxonomytype, $taxonomy)
     {
+        $configTaxonomies = $this->app['config']->get('taxonomy');
+
         if (Arr::isIndexedArray($taxonomy)) {
             return $taxonomy;
         }
 
         $ret = array();
         foreach ($taxonomy as $key) {
-            if ($content->group !== null) {
+            if ($configTaxonomies[$taxonomytype]['behaves_like'] == 'grouping' && $content->group !== null) {
                 $ret[] = $content->group['slug'] . '#' . $content->group['order'];
             } else {
                 $ret[] = $key;
@@ -2406,7 +2414,7 @@ class Storage
         foreach ($contenttype['taxonomy'] as $taxonomytype) {
             // Set 'newvalues to 'empty array' if not defined
             if (!empty($taxonomy[$taxonomytype])) {
-                $newslugs = $this->getIndexedTaxonomy($content, $taxonomy[$taxonomytype]);
+                $newslugs = $this->getIndexedTaxonomy($content, $taxonomytype, $taxonomy[$taxonomytype]);
             } else {
                 $newslugs = array();
             }
@@ -2506,6 +2514,7 @@ class Storage
                 $slugkey = '/' . $configTaxonomies[$taxonomytype]['slug'] . '/' . $slug;
 
                 if (!in_array($slug, $newSlugsNormalised)
+                    && !in_array($this->app['slugify']->slugify($slug), $newSlugsNormalised)
                     && !in_array($valuewithorder, $newSlugsNormalised)
                     && !array_key_exists($slugkey, $newSlugsNormalised)) {
                     $this->app['db']->delete($tablename, array('id' => $id));

@@ -13,6 +13,9 @@
 namespace Composer;
 
 use Composer\Config\ConfigSourceInterface;
+use Composer\Downloader\TransportException;
+use Composer\IO\IOInterface;
+use Composer\Util\Platform;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
@@ -26,29 +29,40 @@ class Config
         'use-include-path' => false,
         'preferred-install' => 'auto',
         'notify-on-install' => true,
-        'github-protocols' => array('git', 'https', 'ssh'),
+        'github-protocols' => array('https', 'ssh', 'git'),
         'vendor-dir' => 'vendor',
         'bin-dir' => '{$vendor-dir}/bin',
         'cache-dir' => '{$home}/cache',
+        'data-dir' => '{$home}',
         'cache-files-dir' => '{$cache-dir}/files',
         'cache-repo-dir' => '{$cache-dir}/repo',
         'cache-vcs-dir' => '{$cache-dir}/vcs',
         'cache-ttl' => 15552000, // 6 months
         'cache-files-ttl' => null, // fallback to cache-ttl
         'cache-files-maxsize' => '300MiB',
+        'bin-compat' => 'auto',
         'discard-changes' => false,
         'autoloader-suffix' => null,
+        'sort-packages' => false,
         'optimize-autoloader' => false,
         'classmap-authoritative' => false,
         'prepend-autoloader' => true,
         'github-domains' => array('github.com'),
+        'bitbucket-expose-hostname' => true,
+        'disable-tls' => false,
+        'secure-http' => true,
+        'cafile' => null,
+        'capath' => null,
         'github-expose-hostname' => true,
+        'gitlab-domains' => array('gitlab.com'),
         'store-auths' => 'prompt',
         'platform' => array(),
         'archive-format' => 'tar',
         'archive-dir' => '.',
         // valid keys without defaults (auth config stuff):
+        // bitbucket-oauth
         // github-oauth
+        // gitlab-oauth
         // http-basic
     );
 
@@ -57,7 +71,7 @@ class Config
             'type' => 'composer',
             'url' => 'https?://packagist.org',
             'allow_ssl_downgrade' => true,
-        )
+        ),
     );
 
     private $config;
@@ -66,9 +80,11 @@ class Config
     private $configSource;
     private $authConfigSource;
     private $useEnvironment;
+    private $warnedHosts = array();
 
     /**
-     * @param boolean $useEnvironment Use COMPOSER_ environment variables to replace config settings
+     * @param bool   $useEnvironment Use COMPOSER_ environment variables to replace config settings
+     * @param string $baseDir        Optional base directory of the config
      */
     public function __construct($useEnvironment = true, $baseDir = null)
     {
@@ -109,8 +125,26 @@ class Config
         // override defaults with given config
         if (!empty($config['config']) && is_array($config['config'])) {
             foreach ($config['config'] as $key => $val) {
-                if (in_array($key, array('github-oauth', 'http-basic')) && isset($this->config[$key])) {
+                if (in_array($key, array('bitbucket-oauth', 'github-oauth', 'gitlab-oauth', 'http-basic')) && isset($this->config[$key])) {
                     $this->config[$key] = array_merge($this->config[$key], $val);
+                } elseif ('preferred-install' === $key && isset($this->config[$key])) {
+                    if (is_array($val) || is_array($this->config[$key])) {
+                        if (is_string($val)) {
+                            $val = array('*' => $val);
+                        }
+                        if (is_string($this->config[$key])) {
+                            $this->config[$key] = array('*' => $this->config[$key]);
+                        }
+                        $this->config[$key] = array_merge($this->config[$key], $val);
+                        // the full match pattern needs to be last
+                        if (isset($this->config[$key]['*'])) {
+                            $wildcard = $this->config[$key]['*'];
+                            unset($this->config[$key]['*']);
+                            $this->config[$key]['*'] = $wildcard;
+                        }
+                    } else {
+                        $this->config[$key] = $val;
+                    }
                 } else {
                     $this->config[$key] = $val;
                 }
@@ -166,21 +200,24 @@ class Config
             case 'vendor-dir':
             case 'bin-dir':
             case 'process-timeout':
+            case 'data-dir':
             case 'cache-dir':
             case 'cache-files-dir':
             case 'cache-repo-dir':
             case 'cache-vcs-dir':
+            case 'cafile':
+            case 'capath':
                 // convert foo-bar to COMPOSER_FOO_BAR and check if it exists since it overrides the local config
                 $env = 'COMPOSER_' . strtoupper(strtr($key, '-', '_'));
 
                 $val = rtrim($this->process($this->getComposerEnv($env) ?: $this->config[$key], $flags), '/\\');
-                $val = preg_replace('#^(\$HOME|~)(/|$)#', rtrim(getenv('HOME') ?: getenv('USERPROFILE'), '/\\') . '/', $val);
+                $val = Platform::expandPath($val);
 
                 if (substr($key, -4) !== '-dir') {
                     return $val;
                 }
 
-                return ($flags & self::RELATIVE_PATHS == 1) ? $val : $this->realpath($val);
+                return (($flags & self::RELATIVE_PATHS) == self::RELATIVE_PATHS) ? $val : $this->realpath($val);
 
             case 'cache-ttl':
                 return (int) $this->config[$key];
@@ -216,7 +253,20 @@ class Config
                 return (int) $this->config['cache-ttl'];
 
             case 'home':
-                return rtrim($this->process($this->config[$key], $flags), '/\\');
+                $val = preg_replace('#^(\$HOME|~)(/|$)#', rtrim(getenv('HOME') ?: getenv('USERPROFILE'), '/\\') . '/', $this->config[$key]);
+
+                return rtrim($this->process($val, $flags), '/\\');
+
+            case 'bin-compat':
+                $value = $this->getComposerEnv('COMPOSER_BIN_COMPAT') ?: $this->config[$key];
+
+                if (!in_array($value, array('auto', 'full'))) {
+                    throw new \RuntimeException(
+                        "Invalid value for 'bin-compat': {$value}. Expected auto, full"
+                    );
+                }
+
+                return $value;
 
             case 'discard-changes':
                 if ($env = $this->getComposerEnv('COMPOSER_DISCARD_CHANGES')) {
@@ -242,11 +292,21 @@ class Config
                 return $this->config[$key];
 
             case 'github-protocols':
-                if (reset($this->config['github-protocols']) === 'http') {
+                $protos = $this->config['github-protocols'];
+                if ($this->config['secure-http'] && false !== ($index = array_search('git', $protos))) {
+                    unset($protos[$index]);
+                }
+                if (reset($protos) === 'http') {
                     throw new \RuntimeException('The http protocol for github is not available anymore, update your config\'s github-protocols to use "https", "git" or "ssh"');
                 }
 
-                return $this->config[$key];
+                return $protos;
+
+            case 'disable-tls':
+                return $this->config[$key] !== 'false' && (bool) $this->config[$key];
+
+            case 'secure-http':
+                return $this->config[$key] !== 'false' && (bool) $this->config[$key];
 
             default:
                 if (!isset($this->config[$key])) {
@@ -318,7 +378,7 @@ class Config
      */
     private function realpath($path)
     {
-        if (substr($path, 0, 1) === '/' || substr($path, 1, 1) === ':') {
+        if (preg_match('{^(?:/|[a-z]:|[a-z0-9.]+://)}i', $path)) {
             return $path;
         }
 
@@ -331,8 +391,8 @@ class Config
      * This should be used to read COMPOSER_ environment variables
      * that overload config values.
      *
-     * @param  string         $var
-     * @return string|boolean
+     * @param  string      $var
+     * @return string|bool
      */
     private function getComposerEnv($var)
     {
@@ -341,5 +401,33 @@ class Config
         }
 
         return false;
+    }
+
+    /**
+     * Validates that the passed URL is allowed to be used by current config, or throws an exception.
+     *
+     * @param string      $url
+     * @param IOInterface $io
+     */
+    public function prohibitUrlByConfig($url, IOInterface $io = null)
+    {
+        // Return right away if the URL is malformed or custom (see issue #5173)
+        if (false === filter_var($url, FILTER_VALIDATE_URL)) {
+            return;
+        }
+
+        // Extract scheme and throw exception on known insecure protocols
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        if (in_array($scheme, array('http', 'git', 'ftp', 'svn'))) {
+            if ($this->get('secure-http')) {
+                throw new TransportException("Your configuration does not allow connections to $url. See https://getcomposer.org/doc/06-config.md#secure-http for details.");
+            } elseif ($io) {
+                $host = parse_url($url, PHP_URL_HOST);
+                if (!isset($this->warnedHosts[$host])) {
+                    $io->writeError("<warning>Warning: Accessing $host over $scheme which is an insecure protocol.</warning>");
+                }
+                $this->warnedHosts[$host] = true;
+            }
+        }
     }
 }

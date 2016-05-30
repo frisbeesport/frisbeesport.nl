@@ -1,10 +1,156 @@
-Bolt 2.2.next
--------------
+Bolt 2.2.21
+-----------
 
-Not yet released. Notable changes:
+Released 2016-05-22. Notable changes:
 
--
+ - Fixed: Before removing existing taxonomies, check the slugified value too. Fixes "Taxonomy lost after saving". [#5337](https://github.com/bolt/bolt/pull/5337)
+ - Fixed: Fix/jquery load order in base-2014 theme. [#5261](https://github.com/bolt/bolt/pull/5261)
+ - Fixed: Invalid translation (Finnish) [#5263](https://github.com/bolt/bolt/pull/5263)
+ - Fixed: Set list id to last id + 1 instead of list.length in file/imagelists. Fixes "Unable to update imagelist captions after update from 2.2.17 to 2.2.20" [#5295](https://github.com/bolt/bolt/pull/5295)
+ - Fixed: Trim `<a>`'s text content and remove redundant `<strong>` [#5264](https://github.com/bolt/bolt/pull/5264)
+ - Update: Rebuilt `.css` and `.js` files [#5300](https://github.com/bolt/bolt/pull/5300)
 
+
+
+Bolt 2.2.20
+-----------
+
+Released 2016-04-19. Notable changes:
+
+ - Fixed: templates output `{{ dump() }}` when not logged in. (See #5122)
+ - Change: Better log messages for failed login attempts (See #5197)
+ - Fixed: Strip tags from useragent. (minor security issue) ((See #5179)
+ - Fixed: Fix issue with imagelists not updating due to event checking. (See #5159)
+ - Change: Update Composer version constraint for stable version (See #5130)
+ - Fix: Only skip htmlsnippets if we are returning a cached response (See #5121)
+ - [Travis] Ensure that Composer install is built against Bolt 2.2 (See #5118)
+ - Move create factory to the start of setup in src/Composer/PackageManager (See #5048)
+
+Bolt 2.2.19
+-----------
+
+Released 2016-03-11. Notable changes:
+
+ - Updated: Updating bundled Javascript modules and libraries
+ - Updating dependencies (most notable, Foundation 5.5.3) (See #4856)
+ - Fix: Locking some more Symfony packages to Symfony 2.6.x, for PHP 5.3.3 compatibility (See #4984)
+ - Fix: Imagehandler updates and bugfixes (See #4973)
+ - Fix: Prevent duplicate content for paging requests (See #4981)
+ - Updated: Spanish Translation (See #4958)
+ - Updated: Set the Composer requirement to ^1.0@beta (See #4955)
+ - Fix: Fix Config Setting for certain options in config.yml (See #4940)
+ - Change: Set default error reporting to ignore 'warnings' (See #4926)
+ - Fix for image/file list blur (See #4923)
+ - Added: Multiple file select when "picking from server" (See #4879)
+ - Added the search dialog to the standalone file editor interface (See #4890)
+ - Fix: Add a default value for checkboxes (See #4869)
+ - Fix: PackageManager ping 504 Gateway Time-out (See #4735)
+ - Fix: Dashboardnews 504 Gateway Time-out (See #4734)
+ - [in PL1] Fixed: Checkbox displays wrong value directly after saving (See #4997)
+
+Bolt 2.2.18
+-----------
+
+Released 2016-02-08. Notable changes:
+
+ - Fix: Fix select fields in templatefields (See #4759)
+ - Fix: Now possible to set a page size for a taxonomy listing (see #4822)
+ - Fix: Viewing a preview of a record clears the unsaved record warning (See #4640)
+ - Fix: Don't use value on checkbox, and set with prop (See #4777)
+ - Change: Allow to set context for custom Twig functions and filters (See #4779)
+ - Change: Update `MenuBuilder.php`, don't do unneeded hydration on menu items. (See #4791)
+ - Fix: Fixes "non-interactive configuration" of composer-install by providing extra vars in composer.json (see #4750)
+ - Fix: Update form_div_layout.html.twig (see #4795)
+
+Bolt 2.2.17
+-----------
+
+Released 2016-01-27. Notable changes:
+
+ - Fix: No href around '…'-placeholders in pagers. (See #4650)
+ - Fix: Templatefields in 'Viewless' records work correctly now (#4653)
+ - Change: Move `NutSP::addCommand` to `$app['nut.commands.add']`` so it's not "static" (#4662)
+ - Fix: Don't whitescreen on a response with a Twig exception (#4668)
+ - Fix: Don't try writing to vendor on composer installs (#4677)
+ - Added: Added capability to set an amount of requested records for specific kind of taxonomy. (#4691)
+ - Change: Generate preview route from url generator. (See #4697)
+ - Change: Add JS events to editfile/editcontent ajax saving. (#4720)
+ - Fix: Block access to .git folders in .htaccess (#4749)
+
+Bolt 2.2.16
+-----------
+
+Released 2016-01-01. Notable changes:
+
+ - Change: Updating .gitignore. Add PHPstorm cruft. (See #4621)
+ - Change: Themes use `theme.yml` now, fallback to old `config.yml` (See #4414)
+ - Fixed: Fixed a 'Catchable Error' in the `record.twig` template for the old 'default' theme (#4645)
+ - Updated: A few Bower / Grunt modules were updated, and all JS / CSS rebuilt (See #4647)
+
+Bolt 2.2.15
+-----------
+
+Released 2015-12-29. Notable changes:
+
+ - Fixed: Exception is no longer thrown when editing an empty config file or template. (See #4636)
+ - Added: Add custom sidebar groups for contenttypes. (Backport of #3793)
+ - Fixed: Don't re-sort taxonomy listing pages, if the taxonomy has `has_sortorder` (See #4601)
+ - Fixed: Add JSON to list of denied file types for Apache (See #4610)
+ - Fixed: Fix/more spinners and missing icons (See #4573)
+ - Fixed: Sidebar Height Resize Issue (See #4573)
+ - Fixed: Fix preview unpublished content (See #4544)
+
+Bolt 2.2.14
+-----------
+
+Released 2015-11-27. Notable changes:
+
+ - Updated: Symfony components updated to 2.6.12
+ - Fixed: Determine web profiler location using Extension rather than bundle (See #4432)
+ - Fixed: No scrolling panes on "View Users" page. (See #4438)
+ - Fixed: Limit user agent strings to 128 characters on persist. (See #4413)
+ - Fixed: Make 'required' for `type: select` fields work. (See: #4420)
+ - Fixed: Fix alt and title tags for popup & showimage, height/width for showImage (See #4231)
+ - Fixed: Replace `☰` for `≡ `for better supported unicode on Android. (see #4388)
+ - Regex that insert snippets not working when </head> does not starts the line.  #4367
+ - Changed: Set `composer/composer` to dev stability. (See #4345)
+ - Fixed: Fixed priority issue in assets (See #4343)
+ - Fixed: Fixing reordering images in an ImageList. (See #3573)
+ - Fixed: Retrieve existing relations before setting them from POST. Fixes "No related entries on preview" issue. (See #4340)
+ - Fixed: Handle save status transition (See #4326)
+ - Added: Allow the `notfound:` status to point to a static template, instead of a contenttype record.
+ - Fixed: Don't insert Bolt meta tags on AJAX requests (See #4297)
+ - Fixed: Put correct cannonical link into html head on paging content request
+ - Fixed: Increase z-index, so popups cover `{{ dump() }}` output.
+
+Bolt 2.2.13
+-----------
+
+Released 2015-10-07. Notable changes:
+
+- Fixed: Taxonomies being wiped on status change using grouped taxonomy. (See #3868)
+- Fixed: Add edit permission to the `modifiable` property (See #4198)
+- Added: Allow height and autocomplete in categories taxonomies.
+- Added: Allow for 'type: hidden' fields in `contenttypes.yml`
+- Added: Allow the theme's `config.yml` to set add_jquery. Fixes #4098
+- Added: Optionally allow spaces in tags.
+- Updated: Updating UIkit(2.22), CodeMirror and Marked.js
+- Changed: Ignore theme directory except for base-* and default
+- Changed: Use tag names instead of slugs for autocomplete and tag cloud. #4125
+- Changed: Strip periods, commas, colons & semi-colons from prefill titles
+- Changed: date-time format uses a more i18n-friendly format (See #4053)
+- Changed: Moving 'Install new extension' to the top of the screen.
+- Fixed: Don't sort getContent in listing view, when the contenttype has a taxonomy that has a sortorder.
+- Fixed: Don't show (non working) drag'n'drop in list overviews.
+- Fixed: Fix the info text for imagelist fields (See #4051)
+- Fixed: Fix to #3991 – Geolocation snaps pin to matched address.
+- Fixed: No links for records that are 'viewless'. Fixes #3999 for [2.2]
+- Fixed: [2.2] Allow non-strings as query parameters with pager. issue #4109
+- Fixed: "Timed publish" fixed for SQLITE (Now using a `DateTime` object instead of `CURRENT_TIMESTAMP`)
+- Fixed: Fix: Don't show notice about `mailoptions` when not logged on.
+- Fixed: Alignment of #navpage-secondary menu item icons in FireFox. (See #4178)
+- Fixed: Strip tags from `<title>` in editcontent. Fixes: #3590.
+- Fixed: Fix secondary nav element's class not being output in certain cases.
 
 Bolt 2.2.10
 -----------
@@ -19,19 +165,26 @@ Bolt 2.2.9
 Released 2015-08-30. Notable changes:
 
 - Added: Add a button for `<hr>` / horizontal ruler in CKeditor for (see #3539)
+- Added: Show "profile" button on users page, if not allowed to edit other users than themselves. (See #4008)
+- Fixed: Truly allow edit permission to be assigned to the owner role (Thanks @fabschurt, see #4019)
+- Fixed: Fix record retrieval for ownership checking (Thanks @fabschurt, see #4024)
 - Fixed: Don't allow extension tables that do not use the configured prefix (see #3968)
 - Fixed: Don't attempt to log array elements that aren't set. (see #3969)
-- Chaned: Provide UI feedback on extension site timeouts. (see #3972)
+- Fixed: Changelog 'next' & 'previous' buttons didn't work as expected in Bolt 2.2.x (See #4009)
+- Fixed: Move `initMailCheck()` call to a `before()` handler (See #3953)
+- Fixed: Allow edit permission to be assigned to the owner role. Fixes "Unable to edit entry with owner permission". (See #3938)
+- Fixed: Fix path to Nut for Composer installs (See #3959)
+- Changed: Provide UI feedback on extension site timeouts. (see #3972)
+- Changed: Move the Showcases template select to the Meta tab (See #4006)
+- Changed: Don't `Content::preParse()` return an error, log it and return a generic message (See #3990)
+- Changed: Lock Silex to version 1.2.* for PHP 5.3.3 support (See #4021)
 - Updated: CKeditor updated to version 4.5.2
 - Updated: Symfony updated to 2.6.11
-- Updated: Silex updated to 1.3.1
+- Updated: Silex updated to 1.2.5
 - Updated: Font Awesome to 4.4
-- Fixed: Fix path to Nut for Composer installs (See #3959)
-- Tests: Allow getStatementMock() to be passed a desired return value (See #3957)
-- Fixed: Move initMailCheck() call to a before() handler (See #3953)
-- Fixed: Allow edit permission to be assigned to the owner role. Fixes "Unable to edit entry with
-  owner permission". (See #3938)
 - Updated: Database integrity checker. Add foreign key checks to IntegrityChecker (See #3872)
+- Tests: Allow `getStatementMock()` to be passed a desired return value (See #3957)
+
 
 Bolt 2.2.8
 ----------
