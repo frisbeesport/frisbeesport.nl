@@ -1,0 +1,65 @@
+<!-- Refill cards -->
+   
+{% set extraclass = "" %}     
+{% if afdeling == 'ultimate' and afdelingkleur %}
+{% set extraclass = "ultimate inverse" %}     
+{% endif %}
+{% if afdeling == 'discgolf' and afdelingkleur %}
+{% set extraclass = "discgolf inverse" %}     
+{% endif %}
+{% if afdeling == 'organisatie' and afdelingkleur %}
+{% set extraclass = "organisatie inverse" %}     
+{% endif %}
+
+<div class="smallcard {{ extraclass }}">   
+    {% if post.contenttype.name != "Berichten" %}
+    
+    <div class="smallcard-image">   
+        
+
+        {% if post.image %}
+           
+           <img class="smallcard__image lazyload" data-src="{{ post.image|image(500, 300, "c") }}">
+           <noscript>
+               <img class="smallcard__image" src="{{ post.image|image(500, 300, "c") }}">
+           </noscript>
+        {% else %}     
+
+            {% set defaultimage = paths.hosturl ~ paths.theme ~ "/images/post_default_500.jpg" %}
+        
+            <img class="card__image" src="{{ defaultimage }}">
+       
+        {% endif %}
+
+        
+        
+    </div>
+
+    {% endif %}
+    
+    <div class="smallcard-header">
+        <div class="smallcard__extrainfo">
+        {% for tag in post.taxonomy.tags  %}
+            <div class="smallcard__tag smallcard__tag--{{ tag }}">{{ tag }}</div>
+        {% endfor %}
+        <div class="smallcard__date">{{ post.datecreated  | localdate("%e %B, %Y") }}</div>
+        </div>
+        
+        <h3 class="smallcard__title">{{ post.title }}</h3>
+
+    </div>
+
+    <div class="smallcard-copy">
+    
+        {% if post.teaser is not empty %}
+        
+        <p>{{ post.teaser }}</p>
+        
+        {% endif %} 
+
+        <a class="arrow-link post-link" href="{{ post.link }}">Lees verder...</a>
+    
+    </div>
+        
+</div>                                      
+    

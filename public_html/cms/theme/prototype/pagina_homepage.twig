@@ -1,0 +1,25 @@
+{% extends "pagina.twig" %}
+
+{% block extended_content %}
+    {% setcontent nieuwsberichten = 'nieuws/latest/12' %}
+
+    <section class="section--cards--small section--nieuws">
+        <div class="container">
+            
+            <div class="section__content">
+                <div class="section__header">
+                    <div class="section__title section__title--centered"><h2>Nieuws</h2></div>
+                </div>
+           
+
+                <div class="smallcards">
+                    {% for nieuwsbericht in nieuwsberichten %}       
+                        {% include 'nieuwsbericht_card.twig' with { 'nieuwsbericht': nieuwsbericht } %} 
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+ 

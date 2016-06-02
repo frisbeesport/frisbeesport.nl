@@ -212,6 +212,10 @@ auteurs:
     singular_name: Auteur
     description: Auteurs schrijven nieuwsberichten, persberichten of spelersberichten.
     fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
         title:
             label: Naam
             type: text
@@ -473,6 +477,10 @@ documenten:
     singular_name: Document
     description: Documenten van de NFB.
     fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
         title:
             label: Titel
             type: text
@@ -503,6 +511,10 @@ aanbod:
     singular_name: Aanbieding
     description: Concepten (trainersopleiding, cityleague, beginnerscursus) aangeboden aan verenigingen door de NFB.
     fields: 
+        slug:
+            type: slug
+            uses: title
+            group: content
         title:
             label: Titel
             type: text
@@ -541,6 +553,10 @@ concepten:
     singular_name: Concept
     description: Concepten (trainersopleiding, cityleague, beginnerscursus) aangeboden aan verenigingen door de NFB.
     fields: 
+        slug:
+            type: slug
+            uses: title
+            group: content
         title:
             label: Titel
             type: text
@@ -757,6 +773,10 @@ secties:
     singular_name: Sectie
     description: Secties zijn onderdelen van de pagina's. Welke onderdelen van de sectie worden getoond hangt af van het gekozen template.
     fields: 
+        slug:
+            type: slug
+            uses: title
+            group: content
         title:
             label: Naam ter identificatie
             type: text
@@ -891,6 +911,10 @@ topics:
     singular_name: Topic
     description: Topics zijn onderwerpen die in een sectie met het sectie_topics template worden weergegeven.
     fields: 
+        slug:
+            type: slug
+            uses: title
+            group: content
         title:
             label: Naam ter identificatie
             type: text

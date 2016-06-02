@@ -1,0 +1,64 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+section--showcase
+
+{% endblock %}
+
+{% block sectie_content %}
+
+<div class="container">
+	<div class="grid  section__content">
+		<div class="section--showcase__content--right">
+
+		{% if sectie.caption  is not empty %}
+		
+		<div class="section__header">
+		 	<h2 class="section__title">{{ sectie.caption }}</h2>
+		</div>
+
+		{% endif %}
+
+		<div class="afdeling--text">
+
+		{% if sectie.body is not empty %}
+		
+		{{ sectie.body }}
+
+		{% endif %}
+
+
+		{% if sectie.body_advanced is not empty %}
+		
+		{{ sectie.body_advanced }}
+
+		{% endif %}
+
+		</div>	
+
+		{% if sectie.linktitle is not empty %}
+
+			{% if sectie.selectpagina != '0' %}
+                {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
+				<a class="arrow-link" href="{{ paginalink.link }}">{{ sectie.linktitle }}</a>
+			{% endif %}							
+
+			{% if sectie.url is not empty %}
+				<a class="arrow-link" href="{{ sectie.url }}">{{ sectie.linktitle }}</a> 
+			{% endif %}					
+			
+		{% endif %}	
+		
+		</div>	
+	</div>			
+</div>
+
+{% if sectie.image is not empty %}
+	<div class="lazyload section--showcase__image--left" data-bg="{{ paths.files }}{{ sectie.image }}"></div>
+    <noscript>
+        <div class="section--showcase__image--left" style="background-image: url('{{ paths.files }}{{ sectie.image }}')"></div>
+    </noscript>
+{% endif %}	
+
+{% endblock %}
