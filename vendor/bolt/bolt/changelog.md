@@ -1,6 +1,97 @@
 Changelog for Bolt
 ==================
 
+Bolt 3.0.9
+----------
+
+Released 2016-07-06. Notable changes:
+
+ - Added: Add option for google maps api key [#5492](https://github.com/bolt/bolt/pull/5492)
+ - Added: Allow pre-hydration data to be modified in event [#5510](https://github.com/bolt/bolt/pull/5510)
+ - Change: [Travis] Disable Composer install test [#5514](https://github.com/bolt/bolt/pull/5514)
+ - Change: [Travis] Drop installation of language packs & Codeception failures [#5498](https://github.com/bolt/bolt/pull/5498)
+ - Fixed: "Invalid Version String" on Ext Update Check [#5516](https://github.com/bolt/bolt/pull/5516)
+ - Fixed: Contenttype vs. Table name "_" and "-" [#5363](https://github.com/bolt/bolt/pull/5363)
+ - Fixed: Initialize `slugFields` variable [#5503](https://github.com/bolt/bolt/pull/5503)
+ - Fixed: Lock lstrojny/phpunit-function-mocker to 0.3.0 for PHP 5.5 support [#5493](https://github.com/bolt/bolt/pull/5493)
+ - Fixed: Don't hide exceptions when adding user with Nut [#5481](https://github.com/bolt/bolt/pull/5481)
+
+Bolt 3.0.8
+----------
+
+Released 2016-06-22. Notable changes:
+
+ - Fix: Postgres Fix: add missing second parameter to `string_agg` call [#5467](https://github.com/bolt/bolt/pull/5467)
+ - Fix: Various fixes for z-index positioning of modals. [#5459](https://github.com/bolt/bolt/pull/5459), [#5461](https://github.com/bolt/bolt/pull/5461), [#5475](https://github.com/bolt/bolt/pull/5475)
+ - Fix: Hotfix filesystem plugins. [#5450](https://github.com/bolt/bolt/pull/5450)
+ - Fix: Some Composer fixes. [#5472](https://github.com/bolt/bolt/pull/5472)
+
+Bolt 3.0.7
+----------
+
+Released 2016-06-17. Notable changes:
+
+ - Fixed: Mea culpa! Use `$zindex-modal` for the `.bootbox` z-index. (Prevents Modal dialogs from being not dismissable.) [#5459](https://github.com/bolt/bolt/pull/5459)
+ - Fixed: Set correct mount point / namespace in AdapterPlugin before plugin methods executes. [#5449](https://github.com/bolt/bolt/pull/5449) / [#5450](https://github.com/bolt/bolt/pull/5450)
+
+Bolt 3.0.6
+----------
+
+Released 2016-06-15. Notable changes:
+
+ - Added: Add an ability to delete a record from the 'mobile' version of the Bolt backend [#5444](https://github.com/bolt/bolt/pull/5444)
+ - Change: Move the assignment of COMPOSER_HOME to BaseAction::getComposer() [#5424](https://github.com/bolt/bolt/pull/5424)
+ - Fix: "Select all" button was visible when taxonomy `multiple: false` was set for category behaviour [#5443](https://github.com/bolt/bolt/pull/5443)
+ - Fix: Be more user friendly with file manager edit failures [#5447](https://github.com/bolt/bolt/pull/5447)
+ - Fix: BUG Select all button visible when taxanomy multiple set to false for category behaviour [#5437](https://github.com/bolt/bolt/pull/5437)
+ - Fix: Clicking on 'tags with spaces' wouldn't work. [#5431](https://github.com/bolt/bolt/pull/5431)
+ - Fix: Extensions: Don't evaluate an empty constraint [#5457](https://github.com/bolt/bolt/pull/5457)
+ - Fix: Fix the path for files, when found in Omnisearch. [#5422](https://github.com/bolt/bolt/pull/5422)
+ - Fix: Fixed `blur` in 'select all' and 'select none' in taxonomies. [#5452](https://github.com/bolt/bolt/pull/5452)
+ - Fix: Fixed invalid ExtensionInterface namespace in Controller Resolver [#5434](https://github.com/bolt/bolt/pull/5434)
+ - Fix: Fixing z-index for modals. [#5455](https://github.com/bolt/bolt/pull/5455)
+ - Fix: Repeaters: Fix duplicate button functionality in repeater groups [#5442](https://github.com/bolt/bolt/pull/5442)
+ - Fix: Repeaters: Fix hyphenated field names for repeating fields [#5436](https://github.com/bolt/bolt/pull/5436)
+ - Fix: Theme: fix wrong link to edit template in base-2016 theme [#5445](https://github.com/bolt/bolt/pull/5445)
+ - Update: French and Russion translations updated.
+
+Bolt 3.0.5
+----------
+
+Released 2016-06-08. Notable changes:
+
+ - Added: Optionally copy in Bolt's .gitignore file on `composer create-project` [#5420](https://github.com/bolt/bolt/pull/5420)
+ - Added: Refinements for content fetching [#5401](https://github.com/bolt/bolt/pull/5401)
+ - Added: Setting 'provided_link', allowing for more flexibility in "branding" [#5377](https://github.com/bolt/bolt/pull/5377)
+ - Changed: Remove version numbers from doc links to be more future-proof [#5416](https://github.com/bolt/bolt/pull/5416)
+ - Fixed: Don't trigger an exception on PostgreSQL if no table sequence is defined [#5412](https://github.com/bolt/bolt/pull/5412)
+ - Fixed: File asset priority & location [#5415](https://github.com/bolt/bolt/pull/5415)
+ - Fixed: Fix for lookup failures on hyphenated data names [#5399](https://github.com/bolt/bolt/pull/5399)
+ - Fixed: Fix for remaining doc links pointing to the incorrect version [#5414](https://github.com/bolt/bolt/pull/5414)
+ - Fixed: Handle site root directory moves on Sqlite [#5393](https://github.com/bolt/bolt/pull/5393)
+ - Fixed: MySQL error in select fields populated from content types [#5407](https://github.com/bolt/bolt/pull/5407)
+ - Fixed: Placing the delay parameter for Omnisearch to reduce the amount of cancelled XHRs. [#5408](https://github.com/bolt/bolt/pull/5408)
+ - Fixed: Set configured schemes from routing.yml [#5409](https://github.com/bolt/bolt/pull/5409)
+ - Fixed: Use the correct version for link to the docs [#5413](https://github.com/bolt/bolt/pull/5413)
+ - Travis: Remove dependency on Postfix [#5421](https://github.com/bolt/bolt/pull/5421)
+ - Updated: Update messages.en_GB.yml [#5386](https://github.com/bolt/bolt/pull/5386)
+ - Updated: Updating NPM dependencies, rebuild CSS and JS [#5410](https://github.com/bolt/bolt/pull/5410)
+
+
+Bolt 3.0.4
+----------
+
+Released 2016-06-01. Notable changes:
+
+ - Deprecation: Replace deprecated trimtext with excerpt. [#5381](https://github.com/bolt/bolt/pull/5381)
+ - Fixed: Adding style for widget(holders), pagination and record footers. Also updated `bower`/`npm` dependencies. [#5387](https://github.com/bolt/bolt/pull/5387)
+ - Fixed: Cast to string in thumbnail handling, prevent `substr() expects parameter 1 to be string` [#5329](https://github.com/bolt/bolt/pull/5329)
+ - Fixed: Missing PHP icon in webdev Toolbar. [#5376](https://github.com/bolt/bolt/pull/5376)
+ - Fixed: Tweak search input. No lowercasing search input, handle html and entities better. [#5374](https://github.com/bolt/bolt/pull/5374)
+ - Fixed: Update `_taxonomies.twig`, correctly add fields with `group: taxonomy` in contenttypes. [#5369](https://github.com/bolt/bolt/pull/5369)
+ - Fixed: Use path that includes subdirectories, to prevent breakage on Extend page. [#5389](https://github.com/bolt/bolt/pull/5389)
+ - Typo: Fixed Unfinished sentence in `config.yml` [#5370](https://github.com/bolt/bolt/pull/5370)
+
 Bolt 3.0.3
 ----------
 
@@ -166,7 +257,7 @@ Bolt 3.0.0 beta 1
 
 Released 2016-03-26. Notable changes:
 
- - So much new things, first release of majow new version. See: https://bolt.cm/newsitem/bolt-3-beta-1
+ - So much new things, first release of major new version. See: https://bolt.cm/newsitem/bolt-3-beta-1
 
 Bolt 2.2.20
 -----------

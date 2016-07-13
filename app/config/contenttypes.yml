@@ -288,6 +288,35 @@ werkgroepen:
             type: textarea
             height: 150px
         
+        leden:
+            type: repeater
+            prefix: "<p>Kaderleden zijn de leden van de werkgroepen (en het bestuur) binnen de NFB.</p>"
+            group: Leden
+            
+            fields:
+                title:
+                    label: Naam
+                    type: text
+                    required: true
+                    variant: inline
+                function:
+                    label: Functie in werkgroep
+                    type: text
+                    variant: inline
+                email:
+                    type: text
+                    pattern: email
+                    variant: inline
+                description:
+                    label: Omschrijving
+                    info: Deze korte omschrijving wordt getoond bij het kaderlid.
+                    type: textarea
+                    height: 150px
+                photo:
+                    label: Foto
+                    type: image
+                    upload: kader
+
         lid1:
             label: Lid 1
             type: select

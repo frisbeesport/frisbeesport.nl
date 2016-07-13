@@ -228,15 +228,14 @@ accept_file_types: [ twig, html, js, css, scss, gif, jpg, jpeg, png, ico, zip, t
 
 # If you want to 'brand' the Bolt backend for a client, you can change some key
 # variables here, that determine the name of the backend, and adds a primary
-# support/contact link to the footer.
+# support/contact link to the footer.  Add a scheme, like `mailto:` or
+# `https://` to the email or URL.
 #
-# Additionally you can change the mount
-# point for the backend, either for convenience or to obscure it from prying
-# eyes.
+# Additionally you can change the mount point for the backend, either for
+# convenience or to obscure it from prying eyes.
 #
-# The Bolt backend is accessible as /bolt/ by default, if you change it here,
+# The Bolt backend is accessible as `/bolt/` by default. If you change it here,
 # it will only be accessible through the value set in 'path'.
-#
 # Keep the path simple: lowercase only, no extra slashes or other special
 # characters.
 # branding:
@@ -299,6 +298,12 @@ wysiwyg:
         autoParagraph: true  # If set to 'true', any pasted content is wrapped in `<p>`-tags for multiple line-breaks
         disableNativeSpellChecker: true # If set to 'true' it will stop browsers from underlining spelling mistakes
         allowNbsp: false     # If set to 'false', the editor will strip out `&nbsp;` characters. If set to 'true', it will allow them. ¯\_(ツ)_/¯
+
+# Bolt uses the Google maps API for it's geolocation field and Google now
+# requires that it be loaded with an API key on new domains. You can generate
+# a key at https://console.developers.google.com and enter it here to make sure
+# that the geolocation field work.
+# google_api_key:
 
 # Global option to enable/disable the live editor
 liveeditor: false
@@ -366,7 +371,8 @@ cookies_domain:
 hash_strength: 10
 
 # Bolt sets the `X-Frame-Options` and `Frame-Options` to `SAMEORIGIN` by
-# default, to prevent.
+# default, to prevent the web browser from rendering an iframe if origin
+# mismatch (i.e. iframe source refers to a different domain).
 #
 # Setting this to 'false', will prevent the setting of these headers.
 # headers:

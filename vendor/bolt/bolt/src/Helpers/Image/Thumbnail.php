@@ -55,7 +55,7 @@ class Thumbnail
     {
         // After v1.5.1 we store image data as an array
         if (is_array($fileName)) {
-            $rawFileName = isset($fileName['filename']) ? $fileName['filename'] : $fileName['file'];
+            $rawFileName = isset($fileName['filename']) ? $fileName['filename'] : (isset($fileName['file']) ? $fileName['file'] : null);
             isset($fileName['title']) ? $this->title = $fileName['title'] : $rawFileName;
             isset($fileName['alt']) ? $this->altTitle = $fileName['alt'] : $rawFileName;
             $fileName = $rawFileName;
@@ -212,7 +212,7 @@ class Thumbnail
     public function setScale($scale)
     {
         $valid = ['b', 'c', 'f', 'r'];
-        $scale = substr($scale, 0, 1);
+        $scale = substr((string) $scale, 0, 1);
         $scale = in_array($scale, $valid)
             ? $scale
             : (!empty($this->thumbConf['cropping']) ? substr($this->thumbConf['cropping'], 0, 1) : 'c');

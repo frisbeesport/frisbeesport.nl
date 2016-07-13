@@ -1,7 +1,11 @@
 <div id="kaderlid{{ kaderlid.id }}" class="werkgroep--lid">
-    
-    {% if kaderlid.photo is not empty %}
-    	<img class="werkgroep--lid--image" src="{{ kaderlid.photo|image(500, 500, "c") }}">
+
+    {% if kaderlid.photo.value.file is not empty %}
+    	<img class="werkgroep--lid--image" src="{{ kaderlid.photo.value.file|image(500, 500, "c") }}">
+    {% elseif kaderlid.photo.value.file is defined %}
+        <img class="werkgroep--lid--image" src="{{ 'kader/frisbeesport.jpg'|image(500, 500, "c") }}">
+    {% elseif kaderlid.photo is not empty %}
+        <img class="werkgroep--lid--image" src="{{ kaderlid.photo|image(500, 500, "c") }}">    
     {% else %}
     	<img class="werkgroep--lid--image" src="{{ 'kader/frisbeesport.jpg'|image(500, 500, "c") }}">
     {% endif %}

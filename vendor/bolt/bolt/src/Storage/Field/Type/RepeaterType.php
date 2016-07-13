@@ -85,7 +85,10 @@ class RepeaterType extends FieldTypeBase
         $values = [];
         foreach ($vals as $fieldKey) {
             $split = explode('_', $fieldKey);
-            $values[$split[0]][$split[1]][] = $split[2];
+            $id = array_pop($split);
+            $group = array_pop($split);
+            $field = join('_', $split);
+            $values[$field][$group][] = $id;
         }
 
         $collection = new RepeatingFieldCollection($this->em, $this->mapping);
@@ -174,7 +177,7 @@ class RepeaterType extends FieldTypeBase
             case 'sqlite':
                 return 'GROUP_CONCAT(DISTINCT ' . $dummy . ".name||'_'||" . $dummy . ".grouping||'_'||" . $dummy . ".id) as $alias";
             case 'postgresql':
-                return 'string_agg(DISTINCT ' . $dummy . ".name||'_'||" . $dummy . ".grouping||'_'||" . $dummy . ".id) as $alias";
+                return 'string_agg(DISTINCT ' . $dummy . ".name||'_'||" . $dummy . ".grouping||'_'||" . $dummy . ".id, ',') as $alias";
         }
     }
 

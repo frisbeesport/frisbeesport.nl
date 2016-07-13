@@ -88,6 +88,7 @@ trait ContentSearchTrait
         $searchableTypes = ['text', 'textarea', 'html', 'markdown'];
 
         $fields = [];
+        $slugFields = [];
 
         // The field(s) that are used by the slug need to be bumped, unless configured explicitly
         foreach ($this->contenttype['fields'] as $config) {
@@ -99,7 +100,7 @@ trait ContentSearchTrait
         // Set the searchweights to the configured value, otherwise default to '50' or '100'
         foreach ($this->contenttype['fields'] as $key => $config) {
             if (in_array($config['type'], $searchableTypes)) {
-                $defaultValue = 50;//in_array($key, $slugFields) ? 100 : 50;
+                $defaultValue = in_array($key, $slugFields) ? 100 : 50;
                 $fields[$key] = isset($config['searchweight']) ? $config['searchweight'] : $defaultValue;
             }
         }

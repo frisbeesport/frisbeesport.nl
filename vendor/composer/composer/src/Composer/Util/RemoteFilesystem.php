@@ -233,7 +233,10 @@ class RemoteFilesystem
         $origFileUrl = $fileUrl;
 
         if (isset($options['github-token'])) {
-            $fileUrl .= (false === strpos($fileUrl, '?') ? '?' : '&') . 'access_token='.$options['github-token'];
+            // only add the access_token if it is actually a github URL (in case we were redirected to S3)
+            if (preg_match('{^https?://([a-z0-9-]+\.)*github\.com/}', $fileUrl)) {
+                $fileUrl .= (false === strpos($fileUrl, '?') ? '?' : '&') . 'access_token='.$options['github-token'];
+            }
             unset($options['github-token']);
         }
 
@@ -249,6 +252,7 @@ class RemoteFilesystem
         if ($this->degradedMode && substr($fileUrl, 0, 21) === 'http://packagist.org/') {
             // access packagist using the resolved IPv4 instead of the hostname to force IPv4 protocol
             $fileUrl = 'http://' . gethostbyname('packagist.org') . substr($fileUrl, 20);
+            $degradedPackagist = true;
         }
 
         $ctx = StreamContextFactory::getContext($fileUrl, $options, array('notification' => array($this, 'callbackGet')));
@@ -259,7 +263,7 @@ class RemoteFilesystem
         unset($origFileUrl, $actualContextOptions);
 
         // Check for secure HTTP, but allow insecure Packagist calls to $hashed providers as file integrity is verified with sha256
-        if ((substr($fileUrl, 0, 23) !== 'http://packagist.org/p/' || (false === strpos($fileUrl, '$') && false === strpos($fileUrl, '%24'))) && $this->config) {
+        if ((substr($fileUrl, 0, 23) !== 'http://packagist.org/p/' || (false === strpos($fileUrl, '$') && false === strpos($fileUrl, '%24'))) && empty($degradedPackagist) && $this->config) {
             $this->config->prohibitUrlByConfig($fileUrl, $this->io);
         }
 

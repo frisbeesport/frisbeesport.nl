@@ -18,7 +18,7 @@ Options -Indexes
     Deny from all
   </IfModule>
 </FilesMatch>
- 
+
 <IfModule mod_rewrite.c>
   RewriteEngine on
 

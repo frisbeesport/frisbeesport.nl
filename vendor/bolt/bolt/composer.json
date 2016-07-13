@@ -10,10 +10,10 @@
     ],
     "license" : "MIT",
     "require" : {
-        "bolt/filesystem" : "^2.0@beta",
+        "bolt/filesystem" : "^2.0",
         "bolt/package-wrapper": "^3.0",
         "bolt/pathogen" : "~0.6",
-        "bolt/thumbs" : "~3.0@beta",
+        "bolt/thumbs" : "^3.0",
         "brandonwamboldt/utilphp" : "~1.0",
         "cocur/slugify" : "~1.0",
         "composer/composer" : "^1.0",
@@ -64,8 +64,8 @@
     },
     "require-dev" : {
         "bolt/codingstyle" : "~1.0",
-        "codeception/codeception" : "^2.1",
-        "lstrojny/phpunit-function-mocker" : "dev-master@dev",
+        "codeception/codeception" : "2.2.1",
+        "lstrojny/phpunit-function-mocker" : "0.3.0",
         "phpmd/phpmd" : "~2.2",
         "phpunit/dbunit" : "~1.3",
         "phpunit/php-code-coverage" : "~2.0",

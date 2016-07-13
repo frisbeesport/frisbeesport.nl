@@ -11,6 +11,4 @@ if ($app === false) {
     return false;
 }
 
-putenv('COMPOSER_HOME=' . $app['resources']->getPath('cache/composer'));
-
 $app->run();

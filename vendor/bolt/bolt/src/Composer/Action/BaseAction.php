@@ -5,6 +5,8 @@ namespace Bolt\Composer\Action;
 use Bolt\Exception\PackageManagerException;
 use Composer\DependencyResolver\Pool;
 use Composer\Factory;
+use Composer\Package\PackageInterface;
+use Composer\Package\Version\VersionParser;
 use Composer\Package\Version\VersionSelector;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\ConfigurableRepositoryInterface;
@@ -66,6 +68,9 @@ abstract class BaseAction
     protected function getComposer()
     {
         if (!$this->composer) {
+            // Set composer environment variables
+            putenv('COMPOSER_HOME=' . $this->app['resources']->getPath('cache/composer'));
+
             // Set working directory
             chdir($this->getOptions()->baseDir());
 
@@ -174,24 +179,40 @@ abstract class BaseAction
     /**
      * Given a package name, this determines the best version to use in the require key.
      *
-     * This returns a version with the ~ operator prefixed when possible.
+     * This returns a version with the ^ operator prefixed when possible.
      *
-     * @param string $name
+     * @param string $packageName
+     * @param string $targetPackageVersion
+     * @param bool   $returnArray
      *
-     * @return array
+     * @throws \InvalidArgumentException
+     *
+     * @return PackageInterface|array
      */
-    protected function findBestVersionForPackage($name)
+    protected function findBestVersionForPackage($packageName, $targetPackageVersion = null, $returnArray = false)
     {
-        // find the latest version allowed in this pool
         $versionSelector = new VersionSelector($this->getPool());
-        $package = $versionSelector->findBestCandidate($name);
-
+        $package = $versionSelector->findBestCandidate($packageName, $targetPackageVersion, PHP_VERSION, $this->getComposer()->getPackage()->getStability());
         if (!$package) {
+            if ($returnArray === false) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Could not find package %s at any version for your minimum-stability (%s). Check the package spelling or your minimum-stability',
+                        $packageName,
+                        $this->getMinimumStability()
+                    )
+                );
+            }
+
             return null;
         }
 
+        if ($returnArray === false) {
+            return $versionSelector->findRecommendedRequireVersion($package);
+        }
+
         return [
-            'name'          => $name,
+            'name'          => $packageName,
             'version'       => $package->getVersion(),
             'prettyversion' => $package->getPrettyVersion(),
             'package'       => $package,
@@ -246,5 +267,35 @@ abstract class BaseAction
         }
 
         return $this->repos;
+    }
+
+    /**
+     * @param array $packages
+     *
+     * @return array
+     */
+    protected function formatRequirements(array $packages)
+    {
+        $requires = [];
+        $packages = $this->normalizeRequirements($packages);
+        foreach ($packages as $package) {
+            $requires[$package['name']] = $package['version'];
+        }
+
+        return $requires;
+    }
+
+    /**
+     * Parses a name/version pairs and returns an array of pairs.
+     *
+     * @param array $packages a set of package/version pairs separated by ":", "=" or " "
+     *
+     * @return array[] An array of arrays containing a name and (if provided) a version
+     */
+    protected function normalizeRequirements(array $packages)
+    {
+        $parser = new VersionParser();
+
+        return $parser->parseNameVersionPairs($packages);
     }
 }
