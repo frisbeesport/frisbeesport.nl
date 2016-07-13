@@ -2797,20 +2797,10 @@ body {
   padding: 0;
   width: 100%; }
 
-.background {
-  background: #cccccc url("../images/background.jpg") no-repeat fixed center center;
-  background-size: cover;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover; }
-
 .sheet {
-  margin: 0px auto;
-  max-width: 100%;
-  width: 1500px;
-  background-color: #ffffff;
-  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25); }
+  margin: 0px;
+  width: 100%;
+  background-color: #ffffff; }
 
 .container {
   max-width: 68.236em;

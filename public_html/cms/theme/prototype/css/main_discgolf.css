@@ -373,7 +373,7 @@ button, .button {
   -o-appearance: none;
   appearance: none;
   -webkit-font-smoothing: antialiased;
-  background-color: #00A850;
+  background-color: #1296D4;
   border-radius: 3px;
   border: none;
   color: #fff;
@@ -390,7 +390,7 @@ button, .button {
   button:hover, button:focus, input[type="button"]:hover, input[type="button"]:focus, input[type="reset"]:hover, input[type="reset"]:focus, input[type="submit"]:hover, input[type="submit"]:focus,
   button:hover,
   button:focus, .button:hover, .button:focus {
-    background-color: #005c2c;
+    background-color: #0c648d;
     color: #fff; }
   button:disabled, input[type="button"]:disabled, input[type="reset"]:disabled, input[type="submit"]:disabled,
   button:disabled, .button:disabled {
@@ -458,8 +458,8 @@ textarea {
   input[type="color"]:focus, input[type="date"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="email"]:focus, input[type="month"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="text"]:focus, input[type="time"]:focus, input[type="url"]:focus, input[type="week"]:focus, textarea:focus,
   select[multiple=multiple]:focus,
   textarea:focus {
-    border-color: #00A850;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 5px rgba(0, 143, 68, 0.7);
+    border-color: #1296D4;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 5px rgba(16, 133, 188, 0.7);
     outline: none; }
 
 textarea {
@@ -536,9 +536,9 @@ select {
         border-right: 1px solid silver;
         border-top-right-radius: 3px; } }
   .button-group label input:checked + .button-group-item {
-    background: #00A850;
-    border: 1px solid #005c2c;
-    box-shadow: inset 0 1px 2px #007538;
+    background: #1296D4;
+    border: 1px solid #0c648d;
+    box-shadow: inset 0 1px 2px #0e75a5;
     color: white; }
 
 .selectable {
@@ -680,11 +680,11 @@ th {
   .tables tbody {
     background-color: #fff; }
     .tables tbody tr:hover > td, .tables tbody tr:hover > th {
-      background-color: #aFFFbE; }
+      background-color: #cFFFdE; }
     .tables tbody tr:nth-child(even) {
-      background-color: #e1FFe5; }
+      background-color: #E8FCFC; }
       .tables tbody tr:nth-child(even):hover > td {
-        background-color: #aFFFbE; }
+        background-color: #cFFFdE; }
   .tables thead:first-of-type tr:first-child > th:first-child {
     border-top-left-radius: 3px; }
   .tables thead:first-of-type tr:first-child > th:last-child {
@@ -694,7 +694,7 @@ th {
   .tables tbody:last-child tr:last-child > td:last-child {
     border-bottom-right-radius: 3px; }
   .tables thead th {
-    background-color: #00A850;
+    background-color: #1296D4;
     color: #fff;
     border-bottom: 0px;
     border-left: 0px;
@@ -772,11 +772,11 @@ p {
   margin: 0 0 0.75em; }
 
 a {
-  color: #00A850;
+  color: #1296D4;
   text-decoration: none;
   transition: color 0.1s linear; }
   a:active, a:focus, a:hover {
-    color: #005c2c; }
+    color: #0c648d; }
   a:active, a:focus {
     outline: none; }
 
@@ -2785,32 +2785,22 @@ img.mfp-img {
     font-size: 1.0625em;
     padding: 0.5625em 1.5em;
     color: #fff;
-    border-color: #00A850;
+    border-color: #1296D4;
     cursor: pointer;
-    background: #00A850; }
+    background: #1296D4; }
   .btn-landing a:hover {
     background: none;
-    color: #00A850; }
+    color: #1296D4; }
 
 body {
   margin: 0;
   padding: 0;
   width: 100%; }
 
-.background {
-  background: #cccccc url("../images/background.jpg") no-repeat fixed center center;
-  background-size: cover;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover; }
-
 .sheet {
-  margin: 0px auto;
-  max-width: 100%;
-  width: 1500px;
-  background-color: #ffffff;
-  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25); }
+  margin: 0px;
+  width: 100%;
+  background-color: #ffffff; }
 
 .container {
   max-width: 68.236em;
@@ -2884,11 +2874,11 @@ body {
   background-color: #ececec; }
 
 .section--inverse {
-  background-color: #00A850;
+  background-color: #1296D4;
   color: #fff; }
 
 .inverse {
-  background-color: #00A850;
+  background-color: #1296D4;
   color: #fff; }
 
 .section--cards--small {
@@ -3080,7 +3070,7 @@ body {
 .section__background {
   background-position: top;
   background-size: cover;
-  background-color: #00A850;
+  background-color: #1296D4;
   left: 0;
   position: absolute;
   top: 0;
@@ -3098,7 +3088,7 @@ body {
   z-index: 2; }
 
 .separator {
-  border-top: dashed 1px #00A850;
+  border-top: dashed 1px #1296D4;
   opacity: 0.3;
   margin-bottom: -1px;
   width: 100%; }
@@ -3192,7 +3182,7 @@ body {
 
 .header-content {
   width: 100%;
-  background-color: #00A850; }
+  background-color: #1296D4; }
 
 .header-content__text {
   padding: 20px;
@@ -3307,7 +3297,7 @@ body {
   padding: 0;
   width: 100%;
   height: 28px;
-  background-color: #00A850; }
+  background-color: #1296D4; }
   @media screen and (min-width: 53.75em) {
     .navigatie-afdelingen {
       display: block; } }
@@ -3340,12 +3330,12 @@ body {
   background-color: transparent; }
 
 .navigatie-afdelingen__tab--inactive:hover {
-  color: #00A850;
-  background-color: #e1FFe5; }
+  color: #1296D4;
+  background-color: #E8FCFC; }
 
 .navigatie-afdelingen__tab--active {
   background-color: white;
-  color: #00A850; }
+  color: #1296D4; }
 
 .navigatie-afdelingen__title {
   float: left;
@@ -3459,7 +3449,7 @@ span + .entry-title {
   .afdeling--link--inverse:visited {
     color: #fff; }
   .afdeling--link--inverse:hover, .afdeling--link--inverse:focus, .afdeling--link--inverse:active {
-    color: #00A850;
+    color: #1296D4;
     text-decoration: underline; }
 
 a.arrow-link {
@@ -3473,7 +3463,7 @@ a.arrow-link::before {
   content: "\f178";
   font-family: "FontAwesome";
   margin-right: 15px;
-  color: #00A850;
+  color: #1296D4;
   transition: all 0.5s ease; }
 
 a.arrow-link:visited {
@@ -3506,7 +3496,7 @@ a.pdf-link::before {
   content: "\f1c1";
   font-family: "FontAwesome";
   margin-right: 15px;
-  color: #00A850;
+  color: #1296D4;
   transition: all 0.5s ease; }
 
 a.pdf-link:visited {
@@ -3854,13 +3844,13 @@ a.pdf-link:hover::before {
       text-decoration: none; }
       .pagination ul li a:hover, .pagination ul li a:focus {
         background: white;
-        color: #00A850; }
+        color: #1296D4; }
       .pagination ul li a:active {
         background: #f7f7f7; }
 
 header.navigation {
   background-color: #fff;
-  border-bottom: 5px solid #00A850;
+  border-bottom: 5px solid #1296D4;
   min-height: 60px;
   width: 100%;
   z-index: 999; }
@@ -3888,7 +3878,7 @@ header.navigation {
       header.navigation .navigation-menu-button {
         display: none; } }
     header.navigation .navigation-menu-button:focus, header.navigation .navigation-menu-button:hover {
-      color: #00A850; }
+      color: #1296D4; }
   header.navigation nav {
     float: none;
     min-height: 60px;
@@ -3937,7 +3927,7 @@ header.navigation {
         header.navigation ul li.nav-link a {
           padding-right: 1em; } }
       header.navigation ul li.nav-link a:focus, header.navigation ul li.nav-link a:hover {
-        color: #00A850; }
+        color: #1296D4; }
   header.navigation .active-nav-item a {
     border-bottom: 1px solid #000;
     padding-bottom: 3px; }
@@ -4131,7 +4121,7 @@ body.down .navigation.clone {
     .sliding-panel-content li a:focus {
       background-color: #4d4d4d; }
     .sliding-panel-content li a:hover {
-      background-color: #00A850;
+      background-color: #1296D4;
       color: #fff; }
   .sliding-panel-content.is-visible {
     -webkit-transform: translateX(0);
@@ -4202,7 +4192,7 @@ body.down .navigation.clone {
     .sliding-search-panel-content li a:focus {
       background-color: #4d4d4d; }
     .sliding-search-panel-content li a:hover {
-      background-color: #00A850;
+      background-color: #1296D4;
       color: #fff; }
   .sliding-search-panel-content.is-visible {
     -webkit-transform: translateY(0);
@@ -4330,7 +4320,7 @@ body.down .navigation.clone {
     color: white;
     text-decoration: none; }
     .footer li a:focus, .footer li a:hover {
-      color: #00A850; }
+      color: #1296D4; }
   .footer li h3 {
     color: white;
     font-size: 1em;
@@ -4510,7 +4500,7 @@ ul.documenten {
       margin-right: 0; } }
 
 .forward {
-  border-bottom: 1px solid rgba(0, 168, 80, 0.2);
+  border-bottom: 1px solid rgba(18, 150, 212, 0.2);
   display: block;
   margin-right: 1.5em;
   outline: none;
