@@ -79,9 +79,8 @@ class ObjectConstraint extends Constraint
      */
     public function validateElement($element, $matches, $objectDefinition = null, $path = null, $additionalProp = null)
     {
+        $this->validateMinMaxConstraint($element, $objectDefinition, $path);
         foreach ($element as $i => $value) {
-
-            $property = $this->getProperty($element, $i, new UndefinedConstraint());
             $definition = $this->getProperty($objectDefinition, $i);
 
             // no additional properties allowed
@@ -107,6 +106,11 @@ class ObjectConstraint extends Constraint
             if (!$definition) {
                 // normal property verification
                 $this->checkUndefined($value, new \stdClass(), $path, $i);
+            }
+
+            $property = $this->getProperty($element, $i, new UndefinedConstraint());
+            if (is_object($property)) {
+                $this->validateMinMaxConstraint(!($property instanceof UndefinedConstraint) ? $property : $element, $definition, $path);
             }
         }
     }
@@ -145,5 +149,27 @@ class ObjectConstraint extends Constraint
         }
 
         return $fallback;
+    }
+
+    /**
+     * validating minimum and maximum property constraints (if present) against an element
+     *
+     * @param \stdClass $element          Element to validate
+     * @param \stdClass $objectDefinition ObjectConstraint definition
+     * @param string    $path             Path to test?
+     */
+    protected function validateMinMaxConstraint($element, $objectDefinition, $path) {
+        // Verify minimum number of properties
+        if (isset($objectDefinition->minProperties) && !is_object($objectDefinition->minProperties)) {
+            if (count(get_object_vars($element)) < $objectDefinition->minProperties) {
+                $this->addError($path, "Must contain a minimum of " . $objectDefinition->minProperties . " properties", 'minProperties', array('minProperties' => $objectDefinition->minProperties,));
+            }
+        }
+        // Verify maximum number of properties
+        if (isset($objectDefinition->maxProperties) && !is_object($objectDefinition->maxProperties)) {
+            if (count(get_object_vars($element)) > $objectDefinition->maxProperties) {
+                $this->addError($path, "Must contain no more than " . $objectDefinition->maxProperties . " properties", 'maxProperties', array('maxProperties' => $objectDefinition->maxProperties,));
+            }
+        }
     }
 }
