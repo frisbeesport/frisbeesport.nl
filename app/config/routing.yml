@@ -42,7 +42,7 @@ organisatie:
   recordslug: pagina/organisatie
 
 spelers:
-  path: /organisatie
+  path: /spelers
   defaults:
     _controller: controller.frontend:record
     contenttypeslug: pagina
@@ -50,7 +50,7 @@ spelers:
   recordslug: pagina/spelers
 
 pers:
-  path: /spelers
+  path: /pers
   defaults:
     _controller: controller.frontend:record
     contenttypeslug: pagina
