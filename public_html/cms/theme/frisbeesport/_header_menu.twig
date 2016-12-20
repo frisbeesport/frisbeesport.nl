@@ -1,0 +1,273 @@
+<style>
+    .header__afdelingen
+    {
+        list-style:none;
+        position:relative;
+        float:left;
+        margin:0;
+        padding:0
+    }
+
+    .header__afdelingen ul 
+    {
+        float:none;
+    }
+
+    .header__afdelingen ul a
+    {
+
+        display:block;
+        color:#333;
+        text-decoration:none;
+        font-weight:700;
+        font-size:12px;
+        line-height:32px;
+        padding:0 15px;
+        font-family:"HelveticaNeue","Helvetica Neue",Helvetica,Arial,sans-serif
+    }
+
+    .header__afdelingen ul li
+    {
+        position:relative;
+        float:left;
+        margin:0;
+        padding:0
+    }
+
+    .header__afdelingen ul li.current-menu-item
+    {
+        background:#ddd
+    }
+
+    .header__afdelingen ul li:hover
+    {
+        background:#f6f6f6
+    }
+
+#primary_nav_wrap ul ul
+{
+	display:none;
+	position:absolute;
+	top:100%;
+	left:0;
+	background:#fff;
+	padding:0
+}
+
+#primary_nav_wrap ul ul li
+{
+	float:none;
+	width:200px
+}
+
+#primary_nav_wrap ul ul a
+{
+	line-height:120%;
+	padding:10px 15px
+}
+
+#primary_nav_wrap ul ul ul
+{
+	top:0;
+	left:100%
+}
+
+#primary_nav_wrap ul li:hover > ul
+{
+	display:block
+}
+
+.navigation{
+width: 100%;
+height: 50px;
+background-color: #1296D4;
+ 
+display: block;
+}  
+.navigation nav 
+{
+float: left; 
+} 
+
+.navigation .header__social-icons-nav 
+{
+float: right; 
+}
+.header__afdelingen
+{
+margin-top: -15px;
+    -webkit-transition: all .25s ease;
+       -moz-transition: all .25s ease;
+        -ms-transition: all .25s ease;
+         -o-transition: all .25s ease;
+            transition: all .25s ease;
+display: block;
+visibility: hidden;
+    opacity: 0;
+} 
+.afdelingen:hover .header__afdelingen
+{margin-top: 0px;
+visibility: visible;
+    opacity: 1;
+}
+
+.header__menu li 
+{
+float: left;
+}
+.header__social-icons li 
+{
+float: left;
+}
+</style>
+
+
+<header class="navigation" role="banner">
+
+        <button style="float: left;" type="button" id="js-centered-navigation-mobile-menu" class="navigation-menu-button centered-navigation-mobile-menu js-menu-trigger sliding-panel-button">
+            <i class="fa fa-bars"></i>
+        </button>
+
+<nav class="afdelingen">
+
+
+         <a  style="display: block;">Frisbeesport</a>
+        <ul style="position: absolute;"  class="header__afdelingen">
+                <li><a href="">Ultimate</a></li>
+                <li><a href="">Discgolf</a></li>
+                <li><a href="">Organisatie</a></li>
+        </ul>
+        </nav>
+        <nav> 
+
+        <ul class="header__menu">
+                <li>Courses</li>
+                <li>Competitie<li>
+                <li>Verenigingen</li>
+                <li>Contact</li>
+        </ul>  
+</nav>
+<div class="header__social-icons-nav">
+        <ul class="header__social-icons">
+                <li>F</li>
+                <li>O</li>
+                <li>
+                  <button   type="button" id="js-centered-navigation-mobile-menu" class="navigation-menu-button centered-navigation-mobile-menu js-menu-trigger sliding-panel-button">
+            <i class="fa fa-search"></i>
+        </button>
+                </li>
+        </ul>
+        </div>  
+     
+
+</header>
+<img src="theme/frisbeesport/images/hero-ultimate.jpg" />   
+<div class="banner-content">
+    <div class="container">
+        <div class="banner-content__text">
+            
+            <h1>Disc Golf</h1>
+     
+        </div>
+    </div>
+</div>
+        
+    
+    </div>
+
+{% if afdeling != 'homepage' %}
+
+<div class="navigatie-afdelingen afdeling--background">
+    <div class="navigatie-afdelingen__tabs">
+        <ul>
+            {% if afdeling == 'homepage' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}"><i class="fa fa-home"></i></a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}"><i class="fa fa-home"></i></a></li>
+            {% endif %}
+            
+            {% if afdeling == 'ultimate' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}ultimate">Ultimate</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}ultimate">Ultimate</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'discgolf' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}discgolf">Disc Golf</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}discgolf">Disc Golf</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'organisatie' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}organisatie">Organisatie</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}organisatie">Organisatie</a></li>
+            {% endif %}
+            
+            {% if afdeling == 'spelers' %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ paths.rooturl }}spelers">Spelersinfo</a></li>
+            {% else %}
+            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ paths.rooturl }}spelers">Spelersinfo</a></li>
+            {% endif %}          
+        </ul>
+    </div>
+</div>
+
+{% endif %}
+
+<header class="navigation" role="banner">
+    <div class="navigation-wrapper">
+
+    <a href="{{ paths.root }}{{ logourl }}" class="logo" title="Frisbeesport.nl {{ afdeling }}">
+        <img src="{{ paths.theme }}{{ logoimage }}" alt="{{ site.title }} {{ afdeling }} logo">
+    </a>
+
+        <button type="button" id="js-centered-navigation-mobile-menu" class="navigation-menu-button centered-navigation-mobile-menu js-search-trigger sliding-search-panel-button">
+            <i class="fa fa-search"></i>
+        </button>
+      
+        <button type="button" id="js-centered-navigation-mobile-menu" class="navigation-menu-button centered-navigation-mobile-menu js-menu-trigger sliding-panel-button">
+            <i class="fa fa-bars"></i>
+        </button>
+
+        <nav role="navigation">
+            <ul id="js-navigation-menu" class="navigation-menu show">
+
+                {{ menu(afdeling, '_header_menu_top.twig') }}
+            </ul>
+        </nav>
+
+        <div class="navigation-tools" >
+        
+        {% if afdeling == 'ultimate' %}
+        
+            <ul class="header__social-icons">
+                <li class="header__facebook"><a href="https://www.facebook.com/pages/NFB-Ultimate-Frisbee/217928458228204" target="_blank" title="NFB Ultimate op Facebook"></a></li>
+            </ul>  
+            
+        {% endif %} 
+            
+        {% if afdeling == 'discgolf' %}
+            
+            <ul class="header__social-icons">
+                <li class="header__facebook"><a href="https://www.facebook.com/pages/NFB-Disc-Golf/179546828767517" target="_blank" title="NFB Disc Golf op Facebook"></a></li>
+            </ul>  
+            
+        {% endif %} 
+        
+        <div class="search-bar">
+            <form role="search" method="get" action="{{ paths.rooturl }}search"  enctype="text/plain">
+                <input type="search" placeholder="Zoek..." name="search"/>
+                <button type="submit"><i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+            
+        </div>
+    </div>
+</header>
+
+{{ menu(afdeling, '_sliding_panel_menu.twig') }}
+
+{% include '_sliding_panel_search.twig' %}
+

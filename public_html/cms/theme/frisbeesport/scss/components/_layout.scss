@@ -1,0 +1,46 @@
+body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+.sheet {
+    margin: 0px;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+.container {
+    max-width: $max-width + $gutter + $gutter;
+    margin: 0 auto;  
+    z-index: 1;
+}
+
+.container--post {
+    background-color: #ffffff;
+    margin-top: -20px;  
+}
+
+.grid {
+    @include outer-container();
+    margin: 0 ($gutter / 2);
+    
+    
+    @include media($medium) {
+		margin: 0 $gutter;
+	}
+}
+
+.lazyload {
+    visibility: collapse;
+    transition: opacity .3s ease-in;
+}
+
+
+
+
+
+
+
+
+

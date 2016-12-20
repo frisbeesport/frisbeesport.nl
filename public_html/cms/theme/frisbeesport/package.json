@@ -1,0 +1,18 @@
+{
+  "name": "frisbeesport-2016",
+  "version": "0.1.0",
+  "devDependencies": {
+    "sass" : "latest",
+    "jshint" : "latest",
+    "watch": "latest"
+  },
+  "scripts" :
+  { "lint": "./node_modules/.bin/jshint **.js",
+    "build:cssdiscgolf" : "sass scss/main_discgolf.scss css/discgolf.css",
+    "build:cssultimate" : "sass scss/main_ultimate.scss css/ultimate.css",
+    "build:cssorganisatie" : "sass scss/main_organisatie.scss css/organisatie.css",
+    "build:js": "npm run lint",
+    "build" : "npm run build:cssdiscgolf && npm run build:cssultimate && npm run build:cssorganisatie",
+    "watch" : "./node_modules/.bin/watch \"npm run build\" --ignoreDirectoryPattern=/css/g"
+  }
+}

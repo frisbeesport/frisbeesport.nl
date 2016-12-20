@@ -1,0 +1,364 @@
+
+// Sections
+// --------------------------------------------------
+
+
+.section__content {
+    padding-bottom: $base-vertical-margin;
+
+    .section__header {
+        display: block;
+        padding-top: $base-vertical-margin;
+        padding-bottom: $base-spacing / 2;
+    }
+}
+
+.section__title--centered {
+    text-align: center;
+}
+
+.section__button {
+    text-align: center;
+    margin-bottom: $base-vertical-margin;
+    margin-top: $base-vertical-margin;
+}
+
+.section--text {
+    margin-bottom: $base-vertical-margin; // because it has no header
+    margin-top: $base-vertical-margin; // because it has no content
+    text-align: left;
+}
+
+
+
+.section--background {
+    text-shadow: 0px 0px 10px #000;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-attachment: scroll;    
+}
+
+
+// Call to Action
+// --------------------------------------------------
+
+.section--call-to-action {
+    text-align: center;
+}
+
+// Centered
+// --------------------------------------------------
+
+.section--centered {
+    text-align: center;
+}
+
+// Topics
+// --------------------------------------------------
+
+.section--topics {
+    text-align: center;
+}
+
+// Nieuws
+// --------------------------------------------------
+
+.section--nieuws {
+    background-color: #ececec;
+}
+
+// Verenigingen
+// --------------------------------------------------
+
+.section--verenigingen {
+    background-color: #ececec;
+}
+
+// Inverse
+// --------------------------------------------------
+
+.section--inverse {
+    background-color: $nfb-theme;
+    color: #fff;
+}
+
+.inverse {
+    background-color: $nfb-theme;
+    color: #fff;
+}
+
+// Smallcards
+// --------------------------------------------------
+
+.section--cards--small {
+    background-color: #eee;
+    @include media($large) {
+        text-align: center;
+	}
+}
+
+// Widecards
+// --------------------------------------------------
+
+.section--cards--wide {
+    background-color: #ececec;
+    text-align: center;
+}
+ 
+// Newsletter
+// --------------------------------------------------
+
+.section--newsletter {
+    background: url('/images/heroes/hero-newsletter.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: #fff;
+    text-align: center;
+}
+
+// Showcase
+// --------------------------------------------------
+
+.section--showcase {
+    position: relative;
+}
+
+// Showcase image right
+// --------------------------------------------------
+
+.section--showcase__content--left {
+    margin-right: 0;
+
+    @include media($large-screen) {
+        margin-right: 40%;
+    }
+}
+
+.section--showcase__image--right {
+    width: 100%;
+    height: 200px;
+    @include media($large-screen) {
+        width: 38%;
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        height: inherit;
+    }
+
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-attachment: scroll;
+    
+}
+
+// Showcase image left
+// --------------------------------------------------
+
+.section--showcase__image--left {
+    width: 100%;
+    height: 200px;
+    @include media($large-screen) {
+        width: 38%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        height: inherit;
+    }
+
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-attachment: scroll;
+}
+
+.section--showcase__content--right {
+    margin-left: 0;
+    @include media($large-screen) {
+        margin-left: 40%;
+    }
+}
+
+// Double content
+// --------------------------------------------------
+
+.section__title--double {
+    text-align: left;
+    
+    @include media($medium-screen) {
+        text-align: center;
+    }
+}
+
+.section--showcase--double__left {
+    @include span-columns(12);
+    @include media($medium-screen) {
+        @include span-columns(6);
+    }
+    margin-bottom: $base-vertical-margin;
+}
+
+.section--showcase--double__right {
+    @include span-columns(12);
+    @include media($medium-screen) {
+        @include span-columns(6);
+    }
+    margin-bottom: $base-vertical-margin;
+}
+
+
+// Showcase image right wide
+// --------------------------------------------------
+
+.section--showcase__image--right--wide {
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-attachment: scroll;
+        
+    width: 100%;
+    height: 200px;
+
+    @include media($large-screen) {
+        width: 55%;
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        height: inherit;
+    }
+}
+
+.section--showcase__content--right--wide {
+    margin-left: 0;
+    @include media($large-screen) {
+        margin-left: 61%;
+    }
+}
+
+
+// Showcase image left wide
+// --------------------------------------------------
+
+.section--showcase__image--left--wide {
+    width: 67%;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-attachment: scroll;
+    
+    width: 100%;
+    height: 200px;
+
+    @include media($large-screen) {
+        width: 55%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        height: inherit;
+    }
+}
+
+
+
+.section--showcase__content--left--wide {
+    margin-right: 0;
+    @include media($large-screen) {
+        margin-right: 61%;
+    }
+}
+// Partners
+// --------------------------------------------------
+
+.c-partner {
+    text-align: center;
+    
+    @include media($medium-screen) {
+        display: inline-block;
+        float:none;
+        width:25%;
+        margin:0px 20px 30px 20px;
+    }   
+    
+    @include media($large-screen) {
+        display: inline-block;
+        width:20%;
+        margin:0px 20px 30px 20px;
+    }
+    
+    margin:0px 20px 50px 20px;
+}
+
+
+
+// (Parallax) background
+// --------------------------------------------------
+
+$parallax-window-height: 30em;
+$parallax-background-height: $parallax-window-height * 2;
+
+.section--parallax {
+  //max-height: $parallax-window-height;
+  overflow: hidden;
+  position: relative;
+  //text-align: center;
+  width: 100%;
+}
+
+.section__foreground {
+  //color: #9A9A8A;
+  //padding: 8em 0;
+  position: relative;
+  z-index: 3;
+}
+
+.section__background {
+  //background: url("/cms/thumbs/2000x800c/secties/carousel3.jpg") repeat;
+  background-position: top;
+  background-size: cover;
+  background-color: $nfb-theme;
+  //height: $parallax-background-height;
+  left: 0;
+  position: absolute;
+
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.section--parallax.section__background {
+  //top: - $parallax-window-height / 3;
+}
+
+.color-overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: #000;
+  opacity: 0.3;
+  z-index: 2;
+}
+
+// Based on http://codepen.io/skeurentjes/

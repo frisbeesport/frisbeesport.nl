@@ -1,0 +1,55 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+
+
+{% set afdeling = "" %}
+{% set style = "" %}
+
+{% for tag in pagina.taxonomy.afdelingen %}
+	{% set afdeling = tag %}
+{% endfor %}
+
+{% if afdeling == "ultimate" %}
+	{% set style = 'ultimate' %}
+{% elseif afdeling == "discgolf" %}
+	{% set style = 'discgolf' %}
+{% else %}
+	{% set style = 'organisatie' %}
+{% endif %}
+ 
+{% set children = "" %}
+{% set title = pagina.title %}
+{% set lead = pagina.lead %}
+{% if pagina.parent != 0 and pagina.parent is not empty  %}
+    {% setcontent parentpagina = "paginas" where { 'id': pagina.parent } %}
+    {% set title = parentpagina.title %}
+    {% set lead = parentpagina.lead %}
+    
+    {% setcontent children = "paginas" where { 'parent': pagina.parent, 'volgnummer': '>0' } orderby 'volgnummer' %}
+    {% if children is not empty and pagina.volgnummer == 0 %}
+        {% set pagina = children|first %}
+    {% endif %}
+{% endif %}
+
+{% include '_head.twig' with { 'title': title, 'description': pagina.lead, 'image': pagina.image, 'url': pagina.link } %}
+
+<body class="background afdeling--{{ style }} ">
+
+    <div class="sheet">
+ 
+    <article>
+
+    {% include '_header.twig' with { 'afdeling': afdeling, 'image': pagina.image, 'title': title, 'header': lead, 'buttons': pagina, 'fotograaf': pagina.fotograaf } %}
+
+        
+        
+        
+	
+    </article>
+      
+   
+</body>
+</html>

@@ -1,0 +1,59 @@
+{% if afdeling == 'ultimate' %}
+    {% set logoimage = 'images/logo_ultimate_200.png' %}
+    {% set bannerimage = 'images/hero-ultimate_1500.jpg' %}
+    {% set logourl = 'ultimate' %}
+{% elseif afdeling == 'discgolf' %}
+    {% set logoimage = 'images/logo_discgolf_200.png' %}
+    {% set bannerimage = 'images/hero-discgolf_1500.jpg' %}
+    {% set logourl = 'discgolf' %}
+{% elseif afdeling == 'organisatie' %}
+    {% set logoimage = 'images/logo_organisatie_200.png' %}
+    {% set bannerimage = 'images/hero-organisatie_1500.jpg' %}
+    {% set logourl = 'organisatie' %}
+{% elseif afdeling == 'spelers' %}
+    {% set logoimage = 'images/logo_spelers_200.png' %}
+    {% set bannerimage = 'images/hero-spelers_1500.jpg' %}
+    {% set logourl = 'spelers' %}    
+{% else %}
+    {% set logoimage = 'images/logo_nfb_200.png' %}
+    {% set bannerimage = 'images/hero-ultimate_1500.jpg' %}
+    {% set logourl = '' %}
+{% endif %}
+
+{% include '_header_menu.twig' %}
+{% include '_header_banner.twig' %}
+
+<!--
+<div class="header">
+     
+    
+
+    <form method="get" action="{{ paths.rooturl }}search"  enctype="text/plain">
+                  <input type="search" value="{% if search is defined %}{{ search|escape }}{% endif %}" placeholder="{{ __("Search …") }}" name="search">
+                  <input type="submit" value="Zoeken">           
+    </form>-->
+<!--
+    {% if afdeling == 'spelers' %}
+        <ul class="header__social-icons">
+            <li class="header__facebook"><a href="https://www.facebook.com/groups/64115108734" target="_blank" title="Facebook"></a></li>
+            <li class="header__facebook"><a href="https://www.facebook.com/groups/discgolfnederland" target="_blank" title="Facebook"></a></li>
+        </ul>  
+    {% endif %} 
+    {% if afdeling == 'ultimate' %}
+        <ul class="header__social-icons">
+            <li class="header__facebook"><a href="https://www.facebook.com/pages/NFB-Ultimate-Frisbee/217928458228204" target="_blank" title="Facebook"></a></li>
+        </ul>  
+    {% endif %} 
+    {% if afdeling == 'discgolf' %}
+        <ul class="header__social-icons">
+            <li class="header__facebook"><a href="https://www.facebook.com/pages/NFB-Disc-Golf/179546828767517" target="_blank" title="Facebook"></a></li>
+        </ul>  
+    {% endif %} 
+
+
+
+       
+</div>-->
+
+
+

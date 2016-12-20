@@ -1,0 +1,34 @@
+
+.team__subtitle {
+    padding-bottom: $base-vertical-margin;
+}
+
+.team__omschrijving {
+    font-weight: 300;
+}
+
+.team__spelers
+{
+    padding-bottom: $base-vertical-margin;
+    
+    ul { 
+        padding: 0; 
+    }
+
+    @include media($medium-screen) {
+        ul {
+            -webkit-column-count: 2; /* Chrome, Safari, Opera */
+            -moz-column-count: 2;
+            column-count: 2;
+            padding: 0;
+        }
+    }
+}
+.team__support
+{
+    padding-bottom: $base-vertical-margin;
+    
+    ul { 
+        padding: 0; 
+    }
+}

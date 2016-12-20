@@ -1,0 +1,27 @@
+
+//$column: 40px;
+//$gutter: 44px;
+//$grid-columns: 12;
+
+// Neat Overrides
+// $column: 90px;
+// $gutter: 30px;
+
+@import "../vendor/neat/neat-helpers";
+
+// Change the grid settings
+$column: em(90);
+$gutter: em(30);
+$grid-columns: 12;
+$max-width: 1340px;
+
+// Neat Breakpoints
+$mobile-screen: em(480);
+$tablet-screen: em(768);
+$laptop-screen: em(1340);
+$desktop-screen: em(1920);
+
+$mobile: new-breakpoint(min-width $mobile-screen  4);
+$tablet: new-breakpoint(min-width $tablet-screen 8);
+$laptop: new-breakpoint(min-width $laptop-screen  12);
+$desktop: new-breakpoint(min-width $desktop-screen   12);
