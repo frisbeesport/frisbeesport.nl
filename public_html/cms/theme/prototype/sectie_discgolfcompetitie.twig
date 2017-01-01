@@ -1,0 +1,136 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+ 
+
+{% endblock %}
+
+{% block sectie_content %}
+
+    <div class="container">
+        <div class="grid section__content">
+
+            {% if sectie.caption  is not empty %}
+			
+            <div class="section__header">
+                <div class="section__title">
+                    <h2>{{ sectie.caption }}</h2>
+                </div>
+			</div>
+            
+			{% endif %}
+
+             <div class="afdeling--text">
+           
+            {% if sectie.body is not empty %}
+			
+			{{ sectie.body }}
+
+			{% endif %}
+
+
+<noscript>
+  <iframe id="idIframe" src="http://www.frisbeesport.nl/discgolf/index2.php" style="width: 100%; border-width: 0px;"></iframe>
+</noscript>
+<div class="discgolf-competitie"></div>
+<style type="text/css">
+  .discgolf-competitie {
+    font-size: 14px;
+    margin-top: 2em;
+  }
+   .results {
+    margin-bottom:1em;
+  }
+
+  .selected {
+    font-weight: bold;
+  }
+
+  .span_1_of_2 {
+    float: left;
+    margin-right: 30px;
+  }
+
+  #tour_id {
+    width: 100%;
+    font-size: 1.4em;
+  }
+
+  .results tbody td {
+    padding: 0.75em 0.4em;
+  }
+
+  .tables thead th {
+    padding: 0.75em 0.4em;
+  }
+</style>
+<script type="text/javascript">
+window.onpopstate = function(event) {
+  if (window.location.search) {
+    search = window.location.search.split('?')[1];
+    loadUrl(search, '');
+  } else {
+    loadUrl('', '');
+  }
+};
+  loadUrl = function(search, anchor) {
+    $.get( "/discgolf/index3.php?" + search, function( data ) {
+
+        
+
+        // remove whitespace for ie
+        data = data.replace(/>\s+(?=<\/?(t|c)[hardfob])/gm,'>');
+
+        $(".discgolf-competitie").html( data );
+        $("#tour_id").removeAttr("onchange");
+
+        $("a").removeAttr("onclick");
+        $("a").click(function(event) {
+            url = this.href;
+            if (url.indexOf("index2.php") > -1) {
+                event.preventDefault();
+                search = url.split('?')[1];
+                anchor = url.substring(url.indexOf("#")+1);
+              loadUrl(search, anchor);
+              if (search) {
+          window.history.pushState(null, null, window.location.pathname + "?" + search);
+        }
+              
+                
+            }
+        });
+
+        $( "#tour_id" ).change(function() {
+          loadUrl('tour_id=' + this.value, '');
+        });
+
+    });
+  };
+
+  if (window.location.search) {
+    search = window.location.search.split('?')[1];
+    loadUrl(search, '');
+  } else {
+    loadUrl('', '');
+  }
+</script>
+            
+            </div>
+            
+            {% if sectie.linktitle is not empty %}
+				
+				{% if sectie.selectpagina is not empty %}
+                    {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
+					<a class="btn-ghost" href="{{ paginalink.link }}">{{ sectie.linktitle }}</a> 
+				{% endif %}						
+
+				{% if sectie.url is not empty %}
+					<a class="arrow-link" href="{{ sectie.url }}">{{ sectie.linktitle }}</a> 
+				{% endif %}					
+				
+			{% endif %}	
+            
+        </div>
+    </div>
+{% endblock %}
