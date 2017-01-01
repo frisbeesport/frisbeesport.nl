@@ -1,5 +1,5 @@
 # This file defines the contenttypes on the website. See the documentation for
-# details: https://docs.bolt.cm/manual/contenttypes
+# details: https://docs.bolt.cm/contenttypes/intro
 
 # Pages can be used for the more 'static' pages on your site. Things like
 # 'about us', 'contact' or a 'disclaimer'. This content-type has a 'templateselect'
@@ -189,7 +189,7 @@ showcases:
     taxonomy: [ categories, tags ]
     show_on_dashboard: true
     default_status: publish
-    searchable: false
+    searchable: true
     icon_many: "fa:gift"
     icon_one: "fa:gift"
 

@@ -81,7 +81,7 @@
                         {% if algemeen.groupcontactwerkgroep is not empty %}
                 
                         {% setcontent werkgroep = 'werkgroepen' where {'id':  algemeen.groupcontactwerkgroep } %}
-                        <p><a href="{{ paths.rooturl }}pagina/organisatie-kader/#werkgroep{{  werkgroep.id }}">{{  werkgroep.title }}</a></p>
+                        <p><a href="../pagina/organisatie-kader/#werkgroep{{  werkgroep.id }}">{{  werkgroep.title }}</a></p>
                                      
                         {% endif %}
 
@@ -101,7 +101,7 @@
                             {% for bestand in algemeen.groupfiles %}      
                             
                             <li id="document{{ document.id }}" class="document" style="font-style: none">
-                                <a class="pdf-link" href="{{ paths.files }}{{ bestand.filename }}">{{ bestand.title }}</a>
+                                <a class="pdf-link" href="{{ asset(bestand.filename, files) }}">{{ bestand.title }}</a>
                             </li>
                             
                             {% endfor %} 

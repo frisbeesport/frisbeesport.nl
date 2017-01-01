@@ -25,7 +25,7 @@
            </noscript>
         {% else %}     
 
-            {% set defaultimage = paths.hosturl ~ paths.theme ~ "/images/post_default_500.jpg" %}
+            {% set defaultimage = asset('images/post_default_500.jpg', 'theme') %}
         
             <img class="card__image" src="{{ defaultimage }}">
        

@@ -25,7 +25,7 @@
 	            <script src="{{ paths.root }}angularapps/{{sectie.application}}/js/app.js"></script>
                 <script src="{{ paths.root }}angularapps/{{sectie.application}}/js/services.js"></script>
                 <script src="{{ paths.root }}angularapps/{{sectie.application}}/js/filters.js"></script>-->
-                <script src="{{ paths.root }}angularapps/{{sectie.application | lower}}/app.min.js"></script>
+                <script src="{{ asset('angularapps/' ~ (sectie.application | lower) ~ '/app.min.js' , 'bolt') }}"></script>
                 <div ng-app="{{sectie.application}}">
                     <div ng-view></div>
                 </div>

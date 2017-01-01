@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\Storage\Entity;
 
 use Bolt\Configuration\ResourceManager;
@@ -61,10 +62,7 @@ trait ContentRouteTrait
             return null;
         }
 
-        $slug = $this->values['slug'];
-        if (empty($slug)) {
-            $slug = $this->id;
-        }
+        $slug = $this->getLinkSlug();
         $link = $this->app['url_generator']->generate(
             $binding,
             array_filter(
@@ -128,7 +126,7 @@ trait ContentRouteTrait
     }
 
     /**
-     * Build a Contenttype's route parameters
+     * Build a ContentType's route parameters
      *
      * @param array $route
      *
@@ -141,18 +139,22 @@ trait ContentRouteTrait
             foreach ($route['requirements'] as $fieldName => $requirement) {
                 if ('\d{4}-\d{2}-\d{2}' === $requirement) {
                     // Special case, if we need to have a date
-                    $params[$fieldName] = substr($this->values[$fieldName], 0, 10);
+                    $params[$fieldName] = substr($this->get($fieldName), 0, 10);
+                } elseif ($this->getTaxonomy() !== null && !$this->getTaxonomy()->getField($fieldName)->isEmpty()) {
+                    // This is for new storage handling of taxonomies in
+                    // contentroutes. If in legacy it will fall back to the one
+                    // below.
+                    $params[$fieldName] = $this->getTaxonomy()->getField($fieldName)->first()->getSlug();
                 } elseif (isset($this->taxonomy[$fieldName])) {
-                    // Turn something like '/groups/meta' to 'meta'. Note: we use
-                    // two temp vars here, to prevent "Only variables should be passed
-                    // by reference"-notices.
+                    // Turn something like '/groups/meta' to 'meta'. This is
+                    // only for legacy storage.
                     $tempKeys = array_keys($this->taxonomy[$fieldName]);
                     $tempValues = explode('/', array_shift($tempKeys));
                     $params[$fieldName] = array_pop($tempValues);
-                } elseif (isset($this->values[$fieldName])) {
-                    $params[$fieldName] = $this->values[$fieldName];
+                } elseif ($this->get($fieldName)) {
+                    $params[$fieldName] = $this->get($fieldName);
                 } else {
-                    // unkown
+                    // unknown
                     $params[$fieldName] = null;
                 }
             }
@@ -182,8 +184,26 @@ trait ContentRouteTrait
      */
     protected function getReference()
     {
-        $reference = $this->contenttype['singular_slug'] . '/' . $this->values['slug'];
+        $reference = $this->contenttype['singular_slug'] . '/' . $this->getLinkSlug();
 
         return $reference;
+    }
+
+    /**
+     * Get a record's slug depending on the type of object used.
+     *
+     * @return string|int
+     */
+    private function getLinkSlug()
+    {
+        if ($this instanceof Content) {
+            return $this->slug ?: $this->id;
+        }
+
+        if (isset($this->values['slug'])) {
+            return $this->values['slug'];
+        }
+
+        return $this->id;
     }
 }

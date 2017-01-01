@@ -39,15 +39,7 @@ class RelationType extends FieldTypeBase
 
         foreach ($query->getFilters() as $filter) {
             if ($filter->getKey() == $field) {
-                // This gets the method name, one of andX() / orX() depending on type of expression
-                $method = strtolower($filter->getExpressionObject()->getType()) . 'X';
-
-                $newExpr = $query->getQueryBuilder()->expr()->$method();
-                foreach ($filter->getParameters() as $k => $v) {
-                    $newExpr->add("$field.to_id = :$k");
-                }
-
-                $filter->setExpression($newExpr);
+                $this->rewriteQueryFilterParameters($filter, $query, $field, 'to_id');
             }
         }
     }
@@ -109,7 +101,7 @@ class RelationType extends FieldTypeBase
             $entity->getRelation()->add($relEntity);
             $fieldRels->add($relEntity);
         }
-        $this->set($entity, $fieldRels);
+        $this->set($entity, $fieldRels[$field]);
     }
 
     /**
@@ -124,18 +116,26 @@ class RelationType extends FieldTypeBase
         // Fetch existing relations and create two sets of records, updates and deletes.
         $existingDB = $this->getExistingRelations($entity) ?: [];
         $existingInverse = $this->getInverseRelations($entity) ?: [];
+
         $collection = $this->em->createCollection('Bolt\Storage\Entity\Relations');
         $collection->setFromDatabaseValues($existingDB);
         $toDelete = $collection->update($relations);
-        $collection->filterInverseValues($existingInverse);
         $repo = $this->em->getRepository('Bolt\Storage\Entity\Relations');
+
+        // If we have bidirectional relations we need to delete the old inverted relations
+        $inverseCollection = $this->em->createCollection('Bolt\Storage\Entity\Relations');
+        $inverseCollection->setFromDatabaseValues($existingInverse);
 
         // Add a listener to the main query save that sets the from ID on save and then saves the relations
         $queries->onResult(
-            function ($query, $result, $id) use ($repo, $collection, $toDelete) {
+            function ($query, $result, $id) use ($repo, $collection, $toDelete, $inverseCollection) {
                 foreach ($collection as $entity) {
                     $entity->from_id = $id;
-                    $repo->save($entity);
+                    $repo->save($entity, $silenceEvents = true);
+                }
+
+                foreach ($inverseCollection as $entity) {
+                    $repo->delete($entity);
                 }
 
                 foreach ($toDelete as $entity) {
@@ -192,9 +192,11 @@ class RelationType extends FieldTypeBase
             ->from($this->mapping['target'])
             ->where('to_id = :to_id')
             ->andWhere('to_contenttype = :to_contenttype')
+            ->andWhere('from_contenttype = :from_contenttype')
             ->setParameters([
-                'to_id'          => $entity->id,
-                'to_contenttype' => $entity->getContenttype(),
+                'to_id'            => $entity->id,
+                'to_contenttype'   => $entity->getContenttype(),
+                'from_contenttype' => $this->mapping['fieldname'],
             ]);
         $result = $query->execute()->fetchAll();
 

@@ -148,29 +148,12 @@ class Content implements \ArrayAccess
 
             switch ($fieldtype) {
                 case 'markdown':
-                    // Parse the field as Markdown, return HTML
+                    // Deprecated: This should be moved to a render function in
+                    // Bolt\Storage\Field\Type\MarkdownType eventually.
                     $value = $this->app['markdown']->text($this->values[$name]);
-
-                    $config = $this->app['config']->get('general/htmlcleaner');
-                    $allowed_tags = !empty($config['allowed_tags']) ? $config['allowed_tags'] :
-                        ['div', 'p', 'br', 'hr', 's', 'u', 'strong', 'em', 'i', 'b', 'li', 'ul', 'ol', 'blockquote', 'pre', 'code', 'tt', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'dd', 'dl', 'dt', 'table', 'tbody', 'thead', 'tfoot', 'th', 'td', 'tr', 'a', 'img'];
-                    $allowed_attributes = !empty($config['allowed_attributes']) ? $config['allowed_attributes'] :
-                        ['id', 'class', 'name', 'value', 'href', 'src'];
-
-                    // Sanitize/clean the HTML.
-                    $maid = new Maid(
-                        [
-                            'output-format'   => 'html',
-                            'allowed-tags'    => $allowed_tags,
-                            'allowed-attribs' => $allowed_attributes,
-                        ]
-                    );
-                    $value = $maid->clean($value);
-
-                    // If we allow Twig in content, we parse the field as a Twig template.
                     $value = $this->preParse($value, $allowtwig);
-
                     $value = new \Twig_Markup($value, 'UTF-8');
+
                     break;
 
                 case 'html':
@@ -220,20 +203,26 @@ class Content implements \ArrayAccess
     public function preParse($snippet, $allowtwig)
     {
         // Quickly verify that we actually need to parse the snippet!
-        if ($allowtwig && preg_match('/[{][{%#]/', $snippet)) {
-            $snippet = html_entity_decode($snippet, ENT_QUOTES, 'UTF-8');
-
-            try {
-                return $this->app['safe_render']->render($snippet, $this->getTemplateContext());
-            } catch (\Twig_Error $e) {
-                $message = sprintf('Rendering a record Twig snippet failed: %s', $e->getRawMessage());
-                $this->app['logger.system']->critical($message, ['event' => 'exception', 'exception' => $e]);
-
-                return $message;
-            }
+        if (!$allowtwig || !preg_match('/[{][{%#]/', $snippet)) {
+            return $snippet;
         }
 
-        return $snippet;
+        // Don't parse Twig for live editor.
+        $request = $this->app['request_stack']->getCurrentRequest();
+        if ($request && $request->request->getBoolean('_live-editor-preview')) {
+            return $snippet;
+        }
+
+        $snippet = html_entity_decode($snippet, ENT_QUOTES, 'UTF-8');
+
+        try {
+            return $this->app['safe_render']->render($snippet, $this->getTemplateContext());
+        } catch (\Twig_Error $e) {
+            $message = sprintf('Rendering a record Twig snippet failed: %s', $e->getRawMessage());
+            $this->app['logger.system']->critical($message, ['event' => 'exception', 'exception' => $e]);
+
+            return $message;
+        }
     }
 
     public function getTemplateContext()

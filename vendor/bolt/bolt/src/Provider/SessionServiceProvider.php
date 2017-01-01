@@ -5,11 +5,13 @@ namespace Bolt\Provider;
 use Bolt\Session\Generator\RandomGenerator;
 use Bolt\Session\Handler\FileHandler;
 use Bolt\Session\Handler\FilesystemHandler;
+use Bolt\Session\Handler\MemcacheHandler;
 use Bolt\Session\Handler\RedisHandler;
 use Bolt\Session\OptionsBag;
 use Bolt\Session\Serializer\NativeSerializer;
 use Bolt\Session\SessionListener;
 use Bolt\Session\SessionStorage;
+use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Uri;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -17,8 +19,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler as MemcachedHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 
 /**
@@ -105,11 +106,9 @@ class SessionServiceProvider implements ServiceProviderInterface
      */
     public function configure(Application $app)
     {
-        $app['session.options'] = [
-            'name'            => 'bolt_session_',
+        $app['session.options'] = $app['config']->get('general/session', []) + [
+            'name'            => 'bolt_session',
             'restrict_realm'  => true,
-            'save_handler'    => 'filesystem',
-            'save_path'       => 'cache://.sessions',
             'cookie_lifetime' => $app['config']->get('general/cookies_lifetime'),
             'cookie_path'     => $app['resources']->getUrl('root'),
             'cookie_domain'   => $app['config']->get('general/cookies_domain'),
@@ -165,11 +164,26 @@ class SessionServiceProvider implements ServiceProviderInterface
                     }
                 }
 
+                // @deprecated backwards compatibility:
                 if (isset($app['session.storage.options'])) {
                     $options->add($app['session.storage.options']);
                 }
 
-                $options->add($app['session.options']);
+                // PHP's native C code accesses filesystem with different permissions than userland code.
+                // If php.ini is using the default (files) handler, use ours instead to prevent this problem.
+                if ($options->get('save_handler') === 'files') {
+                    $options->set('save_handler', 'filesystem');
+                    $options->set('save_path', 'cache://.sessions');
+                }
+
+                $overrides = $app['session.options'];
+
+                // Don't let save_path for different save_handler bleed in.
+                if (isset($overrides['save_handler']) && $overrides['save_handler'] !== $options['save_handler']) {
+                    $options->remove('save_path');
+                }
+
+                $options->add($overrides);
 
                 return $options;
             }
@@ -221,12 +235,36 @@ class SessionServiceProvider implements ServiceProviderInterface
                 $memcache = new \Memcache();
 
                 foreach ($connections as $conn) {
-                    $memcache->addServer(
+                    $args = [
                         $conn['host'] ?: 'localhost',
                         $conn['port'] ?: 11211,
                         $conn['persistent'] ?: false,
-                        $conn['weight'] ?: 0,
-                        $conn['timeout'] ?: 1
+                    ];
+                    if ($conn['weight'] > 0) {
+                        $args[] = $conn['weight'];
+                        if ($conn['timeout'] > 1) {
+                            $args[] = $conn['timeout'];
+                        }
+                    }
+                    call_user_func_array([$memcache, 'addServer'], $args);
+                    if ($conn['weight'] <= 0 && $conn['timeout'] > 1) {
+                        $memcache->setServerParams($args[0], $args[1], $conn['timeout']);
+                    }
+                }
+
+                return $memcache;
+            }
+        );
+
+        $app['session.handler_factory.backing_memcached'] = $app->protect(
+            function ($connections) {
+                $memcache = new \Memcached();
+
+                foreach ($connections as $conn) {
+                    $memcache->addServer(
+                        $conn['host'] ?: 'localhost',
+                        $conn['port'] ?: 11211,
+                        $conn['weight'] ?: 0
                     );
                 }
 
@@ -248,9 +286,9 @@ class SessionServiceProvider implements ServiceProviderInterface
                 }
 
                 if ($key === 'memcache') {
-                    return new MemcacheSessionHandler($memcache, $handlerOptions);
+                    return new MemcacheHandler($memcache, $handlerOptions);
                 } else {
-                    return new MemcachedSessionHandler($memcache, $handlerOptions);
+                    return new MemcachedHandler($memcache, $handlerOptions);
                 }
             }
         );
@@ -309,7 +347,7 @@ class SessionServiceProvider implements ServiceProviderInterface
         );
     }
 
-    protected function parseConnections($options, $defaultHost, $defaultPort)
+    protected function parseConnections($options, $defaultHost, $defaultPort, $defaultScheme = 'tcp')
     {
         if (isset($options['host']) || isset($options['port'])) {
             $options['connections'][] = $options;
@@ -325,7 +363,7 @@ class SessionServiceProvider implements ServiceProviderInterface
                     $conn = ['host' => $conn];
                 }
                 $conn += [
-                    'scheme' => 'tcp',
+                    'scheme' => $defaultScheme,
                     'host'   => $defaultHost,
                     'port'   => $defaultPort,
                 ];
@@ -339,11 +377,24 @@ class SessionServiceProvider implements ServiceProviderInterface
 
                 $toParse[] = $conn;
             }
-        } elseif (isset($options['save_path'])) {
-            foreach (explode(',', $options['save_path']) as $conn) {
-                $conn = new ParameterBag($conn);
-                $conn->set('uri', new Uri($conn));
-                $toParse[] = $conn;
+        } else {
+            $connections = isset($options['save_path']) ? (array) explode(',', $options['save_path']) : [];
+            if (empty($connections)) {
+                $connections[] = $defaultHost . ':' . $defaultPort;
+            }
+            foreach ($connections as $conn) {
+                // Default scheme if not given so parse_url works correctly.
+                if (!preg_match('~^\w+://.+~', $conn)) {
+                    $conn = $defaultScheme . '://' . $conn;
+                }
+
+                $uri = new Uri($conn);
+
+                $connBag = new ParameterBag();
+                $connBag->set('uri', $uri);
+                $connBag->add(Psr7\parse_query($uri->getQuery()));
+
+                $toParse[] = $connBag;
             }
         }
 

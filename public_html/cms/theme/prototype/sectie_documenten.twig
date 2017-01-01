@@ -58,7 +58,7 @@
                         {% set werkgroeplink = "organisatie-kader/#werkgroep#{document.werkgroep}" %}
 					
 	                	<li id="document{{ document.id }}" class="document">
-                            <div class="document__title"><a class="pdf-link" href="{{ paths.files }}{{ document.file }}">{{ document.title }}</a></div>
+                            <div class="document__title"><a class="pdf-link" href="{{ asset(document.file, 'files') }}">{{ document.title }}</a></div>
                             <div class="document__datum">{{ document.date }}</div>
                             <div class="document__contact"><a href="{{ werkgroeplink }}">{{ werkgroep.title }}</a></div>
                         </li>
@@ -70,7 +70,7 @@
 
             {% if sectie.linktitle is not empty %}
 				
-				{% if sectie.selectpagina != '0' %}
+				{% if sectie.selectpagina is not empty %}
                     {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
 					<a class="btn-ghost" href="{{ paginalink.link }}">{{ sectie.linktitle }}</a> 
 				{% endif %}						

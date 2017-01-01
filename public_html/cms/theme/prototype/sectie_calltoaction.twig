@@ -36,7 +36,7 @@ section--call-to-action
 
 			{% if sectie.linktitle is not empty %}
 
-                {% if sectie.selectpagina != '0' %}
+                {% if sectie.selectpagina is not empty %}
                     {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
             		<div class="btn-ghost"><a href="{{ paginalink.link }}">{{ sectie.linktitle }}</a> </div>
 				{% endif %}		

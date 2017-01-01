@@ -39,7 +39,7 @@ section--showcase
 
 		{% if sectie.linktitle is not empty %}
 
-			{% if sectie.selectpagina != '0' %}
+			{% if sectie.selectpagina is not empty %}
                 {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
 				<a class="arrow-link" href="{{ paginalink.link }}">{{ sectie.linktitle }}</a> 
 			{% endif %}					
@@ -55,9 +55,9 @@ section--showcase
 </div>
 
 {% if sectie.image is not empty %}
-	<div class="lazyload section--showcase__image--right" data-bg="{{ paths.files }}{{ sectie.image }}"></div>
+	<div class="lazyload section--showcase__image--right" data-bg=" asset(sectie.image, 'files')"></div>
     <noscript>
-        <div class="section--showcase__image--right" style="background-image: url('{{ paths.files }}{{ sectie.image }}')"></div>
+        <div class="section--showcase__image--right" style="background-image: url(' asset(sectie.image, 'files')')"></div>
     </noscript>
 {% endif %}	
 

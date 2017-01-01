@@ -1,12 +1,15 @@
 <?php
 namespace Bolt\Storage\Mapping;
 
+use Bolt\Configuration\ConfigurationValueProxy;
 use Bolt\Exception\StorageException;
+use Bolt\Storage\CaseTransformTrait;
 use Bolt\Storage\Database\Schema\Manager;
 use Bolt\Storage\Mapping\ClassMetadata as BoltClassMetadata;
 use Bolt\Storage\NamingStrategy;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 
 /**
@@ -19,6 +22,8 @@ use Doctrine\DBAL\Schema\Table;
  */
 class MetadataDriver implements MappingDriver
 {
+    use CaseTransformTrait;
+
     /** @var \Bolt\Storage\Database\Schema\Manager */
     protected $schemaManager;
     /** @var array */
@@ -64,12 +69,13 @@ class MetadataDriver implements MappingDriver
     /**
      * Constructor.
      *
-     * @param Manager $schemaManager
-     * @param array   $contenttypes
-     * @param array   $taxonomies
-     * @param array   $typemap
+     * @param Manager                 $schemaManager
+     * @param ConfigurationValueProxy $contenttypes
+     * @param ConfigurationValueProxy $taxonomies
+     * @param array                   $typemap
+     * @param NamingStrategy          $namingStrategy
      */
-    public function __construct(Manager $schemaManager, array $contenttypes, array $taxonomies, array $typemap, NamingStrategy $namingStrategy = null)
+    public function __construct(Manager $schemaManager, ConfigurationValueProxy $contenttypes, ConfigurationValueProxy $taxonomies, array $typemap, NamingStrategy $namingStrategy = null)
     {
         $this->schemaManager = $schemaManager;
         $this->contenttypes = $contenttypes;
@@ -84,6 +90,7 @@ class MetadataDriver implements MappingDriver
     public function initialize()
     {
         $this->initializeShortAliases();
+        $this->initializeDefaultAliases();
         foreach ($this->schemaManager->getSchemaTables() as $table) {
             $this->loadMetadataForTable($table);
         }
@@ -97,7 +104,25 @@ class MetadataDriver implements MappingDriver
     {
         foreach ($this->schemaManager->getSchemaTables() as $table) {
             if ($tableName = $table->getName()) {
-                $this->aliases[$table->getOption('alias')] = $tableName;
+                $mainAlias = $this->getContentTypeFromAlias($table->getOption('alias'));
+                $this->aliases[$mainAlias] = $tableName;
+                $slugAlias = $this->getContentTypeFromAlias($table->getOption('alias'), true);
+                if ($mainAlias !== $slugAlias) {
+                    $this->aliases[$slugAlias] = $tableName;
+                }
+            }
+        }
+    }
+
+    /**
+     *  This seeds the defaultAliases array with the correctly prefixed mappings
+     */
+    public function initializeDefaultAliases()
+    {
+        foreach ($this->aliases as $prefixed) {
+            $entity = isset($this->defaultAliases[$prefixed]) ? $this->defaultAliases[$prefixed] : null;
+            if ($entity !== null) {
+                $this->setDefaultAlias($prefixed, $entity);
             }
         }
     }
@@ -152,7 +177,7 @@ class MetadataDriver implements MappingDriver
             $this->unmapped[] = $tblName;
         }
 
-        $contentKey = $table->getOption('alias');
+        $contentKey = $this->getContenttypeFromAlias($table->getOption('alias'));
         $this->metadata[$className] = [];
         $this->metadata[$className]['identifier'] = $table->getPrimaryKey();
         $this->metadata[$className]['table'] = $table->getName();
@@ -160,8 +185,9 @@ class MetadataDriver implements MappingDriver
         foreach ($table->getColumns() as $colName => $column) {
             $mapping = [
                 'fieldname'        => $column->getName(),
+                'attribute'        => $this->camelize($column->getName()),
                 'type'             => $column->getType()->getName(),
-                'fieldtype'        => $this->getFieldTypeFor($table->getOption('alias'), $column),
+                'fieldtype'        => $this->getFieldTypeFor($contentKey, $column),
                 'length'           => $column->getLength(),
                 'nullable'         => $column->getNotnull(),
                 'platformOptions'  => $column->getPlatformOptions(),
@@ -174,13 +200,13 @@ class MetadataDriver implements MappingDriver
 
             $this->metadata[$className]['fields'][$colName] = $mapping;
 
-            if (isset($this->contenttypes[$contentKey]['fields'][$colName])) {
+            if (isset($this->contenttypes[$contentKey]) && isset($this->contenttypes[$contentKey]['fields'][$colName])) {
                 $this->metadata[$className]['fields'][$colName]['data'] = $this->contenttypes[$contentKey]['fields'][$colName];
             }
         }
 
         // This loop checks the contenttypes definition for any non-db fields and adds them.
-        if ($contentKey) {
+        if ($contentKey && isset($this->contenttypes[$contentKey])) {
             $this->setRelations($contentKey, $className, $table);
             $this->setIncomingRelations($contentKey, $className);
             $this->setTaxonomies($contentKey, $className, $table);
@@ -195,12 +221,19 @@ class MetadataDriver implements MappingDriver
         }
     }
 
+    /**
+     * @param string $contentKey
+     * @param string $className
+     * @param array  $inputData
+     *
+     * @return array|null
+     */
     public function setRepeaters($contentKey, $className, $inputData = null)
     {
         $standalone = false;
 
         if ($inputData === null && !isset($this->contenttypes[$contentKey])) {
-            return;
+            return null;
         }
 
         if ($inputData === null) {
@@ -212,6 +245,7 @@ class MetadataDriver implements MappingDriver
         foreach ($inputData as $key => $data) {
             $mapping = [
                 'fieldname'        => $key,
+                'attribute'        => $this->camelize($key),
                 'type'             => 'null',
                 'fieldtype'        => $this->typemap['repeater'],
                 'tables'           => [
@@ -245,11 +279,12 @@ class MetadataDriver implements MappingDriver
         }
     }
 
-
     /**
      * This is a helper method to get a correct mapping from an array config. It's designed to take raw array config
      * to generate a correct format mapping for repeaters.
+     *
      * @param array $config
+     *
      * @return array
      */
     public function getRepeaterMapping(array $config)
@@ -423,32 +458,54 @@ class MetadataDriver implements MappingDriver
      *
      * @param string                       $name
      * @param \Doctrine\DBAL\Schema\Column $column
+     * @param null                         $field  Optional field value for repeaters/array based columns
      *
      * @return string
      */
-    protected function getFieldTypeFor($name, $column)
+    public function getFieldTypeFor($name, $column, $field = null)
     {
-        if (isset($this->contenttypes[$name]['fields'][$column->getName()])) {
-            $type = $this->contenttypes[$name]['fields'][$column->getName()]['type'];
-        } elseif ($column->getType()) {
-            $type = get_class($column->getType());
+        if ($column instanceof Column) {
+            if ($column->getType()) {
+                $type = get_class($column->getType());
+            }
+            $column = $column->getName();
+        }
+        if ($field !== null) {
+            if (isset($this->contenttypes[$name]) && isset($this->contenttypes[$name]['fields'][$column]['fields'][$field])) {
+                $type = $this->contenttypes[$name]['fields'][$column]['fields'][$field]['type'];
+            }
+        } elseif (isset($this->contenttypes[$name]) && isset($this->contenttypes[$name]['fields'][$column])) {
+            $type = $this->contenttypes[$name]['fields'][$column]['type'];
         }
 
-        if ($column->getName() === 'slug') {
+        if ($column === 'slug') {
             $type = 'slug';
         }
 
-        if ($type === 'select' && isset($this->contenttypes[$name]['fields'][$column->getName()]['multiple']) && $this->contenttypes[$name]['fields'][$column->getName()]['multiple'] === true) {
+        if ($type === 'select' && isset($this->contenttypes[$name]['fields'][$column]['multiple']) && $this->contenttypes[$name]['fields'][$column]['multiple'] === true) {
             $type = 'selectmultiple';
         }
 
-        if (isset($this->typemap[$type])) {
+        if ($type && isset($this->typemap[$type])) {
             $type = $this->typemap[$type];
         } else {
             $type = $this->typemap['text'];
         }
 
         return $type;
+    }
+
+    public function getFieldMetadata($contenttype, $column, $field = null)
+    {
+        if ($field !== null) {
+            if (isset($this->metadata[$contenttype]['fields'][$column]['data']['fields'][$field])) {
+                $metadata = $this->metadata[$contenttype]['fields'][$column]['data']['fields'][$field];
+            }
+        } elseif (isset($this->metadata[$contenttype]['fields'][$column])) {
+            $metadata = $this->metadata[$contenttype]['fields'][$column];
+        }
+
+        return $metadata;
     }
 
     /**
@@ -534,5 +591,33 @@ class MetadataDriver implements MappingDriver
     public function getTaxonomyConfig()
     {
         return $this->taxonomies;
+    }
+
+    /**
+     * Given a tablename or slug get the correct Bolt keyname from the config
+     *
+     * @param $alias
+     * @param bool $forceSlug
+     *
+     * @return string $key
+     */
+    public function getContentTypeFromAlias($alias, $forceSlug = false)
+    {
+        foreach ($this->contenttypes->getData() as $key => $contenttype) {
+            if ($forceSlug) {
+                if (isset($contenttype['slug']) && ($contenttype['slug'] == $alias || $contenttype['tablename'] == $alias)) {
+                    return $contenttype['slug'];
+                }
+            }
+            if (isset($contenttype['tablename']) && $contenttype['tablename'] == $alias) {
+                return $key;
+            }
+
+            if (isset($contenttype['slug']) && $contenttype['slug'] == $alias) {
+                return $key;
+            }
+        }
+
+        return $alias;
     }
 }

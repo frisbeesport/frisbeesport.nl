@@ -53,6 +53,9 @@ roles:
     trainerft2:
         description: Toegang tot Trainersopleiding pagina's.
         label: Trainersopleiding
+    paginaset:
+        description: Toegang tot paginasets.
+        label: Paginaset
     paginas_vacatures:
         description: Toegang tot Vacature pagina's.
         label: Vacatures
@@ -205,6 +208,13 @@ contenttype-default:
     frontend: [ developer ]
 
 contenttypes:
+    paginaset:
+        edit: [ hoofdredacteur, paginaset ]
+        create: [ hoofdredacteur, paginaset ]
+        publish: [ hoofdredacteur, paginaset ]
+        depublish: [ hoofdredacteur, paginaset ]
+        delete: [ hoofdredacteur, paginaset ]
+        view: [ hoofdredacteur, paginaset ]
     paginas-trainerft2:
         edit: [ hoofdredacteur, trainerft2 ]
         create: [ hoofdredacteur, trainerft2 ]

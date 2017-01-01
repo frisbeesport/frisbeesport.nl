@@ -96,7 +96,7 @@ class Builder
             $entity = new $class();
         }
 
-        if (!$entity->getContenttype() && $ct = $this->getClassMetadata()->getBoltName()) {
+        if ($entity instanceof Content && !$entity->getContenttype() && $ct = $this->getClassMetadata()->getBoltName()) {
             $entity->setContenttype($ct);
         }
 
@@ -185,5 +185,37 @@ class Builder
                 call_user_func_array([$fieldType, 'set'], [$entity, $value]);
             }
         }
+    }
+
+    /**
+     * @param $value
+     * @param $field
+     * @param null $subField
+     *
+     * @return FieldValue|bool
+     */
+    public function getHydratedValue($value, $field, $subField = null)
+    {
+        $fields = $this->getFields();
+
+        foreach ($fields as $key => $mapping) {
+            if ($key !== $field) {
+                continue;
+            }
+            $fieldType = $this->fieldManager->get($mapping['fieldtype'], $mapping);
+
+            if ($subField !== null) {
+                $subMapping = $mapping['data']['fields'][$subField];
+                $fieldType = $this->fieldManager->get($subMapping['fieldtype'], $subMapping);
+                $field = $subField;
+            }
+
+            $tmpentity = new FieldValue();
+            $fieldType->hydrate([$field => $value], $tmpentity);
+
+            return $tmpentity[$field];
+        }
+
+        return false;
     }
 }

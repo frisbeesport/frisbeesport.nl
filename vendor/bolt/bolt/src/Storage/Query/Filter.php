@@ -14,7 +14,9 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 class Filter
 {
     protected $key;
+    /** @var CompositeExpression */
     protected $expression;
+    /** @var array */
     protected $parameters = [];
 
     /**
@@ -106,8 +108,8 @@ class Filter
     /**
      * Allows setting a parameter for a single key.
      *
-     * @param type  $param
-     * @param mixed $value
+     * @param string $param
+     * @param mixed  $value
      */
     public function setParameter($param, $value)
     {

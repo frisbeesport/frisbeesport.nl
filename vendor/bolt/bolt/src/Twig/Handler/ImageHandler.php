@@ -39,6 +39,11 @@ class ImageHandler
      */
     public function image($fileName = null, $width = null, $height = null, $crop = null)
     {
+        //Check if it's an alias as the only parameter after $filename
+        if ($width && !$height && !$crop && $this->isAlias($width)) {
+            return $this->getAliasedUri($filename, $width);
+        }
+
         if ($width || $height) {
             // You don't want the image, you just want a thumbnail.
             return $this->thumbnail($fileName, $width, $height, $crop);
@@ -199,6 +204,11 @@ class ImageHandler
      */
     public function thumbnail($fileName = null, $width = null, $height = null, $crop = null)
     {
+        //Check if it's an alias as the only parameter after $filename
+        if ($width && !$height && !$crop && $this->isAlias($width)) {
+            return $this->getAliasedUri($fileName, $width);
+        }
+
         $thumb = $this->getThumbnail($fileName, $width, $height, $crop);
 
         return $this->getThumbnailUri($thumb);
@@ -228,7 +238,7 @@ class ImageHandler
     }
 
     /**
-     * Get the thumbnail relative URI.
+     * Get the thumbnail relative URI, using width, height and action.
      *
      * @param Thumbnail $thumb
      *
@@ -249,5 +259,38 @@ class ImageHandler
                 'file'   => $thumb->getFileName(),
             ]
         );
+    }
+
+    /**
+     * Get the thumbnail relative URI, using an alias.
+     *
+     * @param mixed  $filename
+     * @param string $alias
+     *
+     * @return mixed
+     */
+    private function getAliasedUri($filename, $alias)
+    {
+        if (!$this->isAlias($alias)) {
+            return false;
+        }
+
+        // If we're passing in an image as array, instead of a single filename.
+        if (is_array($filename) && isset($filename['file'])) {
+            $filename = $filename['file'];
+        }
+
+        return $this->app['url_generator']->generate(
+            'thumb_alias',
+            [
+                'alias'  => $alias,
+                'file'   => $filename,
+            ]
+        );
+    }
+
+    private function isAlias($alias)
+    {
+        return (bool) $this->app['config']->get('theme/thumbnails/aliases/' . $alias, false);
     }
 }

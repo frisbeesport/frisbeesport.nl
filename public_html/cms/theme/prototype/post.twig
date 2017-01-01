@@ -55,7 +55,7 @@
         {# todo: url #}
         {# todo: check tags #}
       
-        {% include 'social-share.twig' with { 'tags': post.taxonomy.tags , 'title': post.title, 'url': paths.hosturl ~ post.link } %}
+        {% include 'social-share.twig' with { 'tags': post.taxonomy.tags , 'title': post.title, 'url': post.link } %}
         
       </footer>
     
@@ -85,7 +85,7 @@
     
             {% for file in post.files %}
                     <li id="document{{ document.id }}" class="document">
-                            <div class="document__title"><a class="pdf-link" href="{{ paths.files }}{{ file.filename }}">{{ file.title }}</a></div>
+                            <div class="document__title"><a class="pdf-link" href="{{ asset(file.filename, 'files') }}">{{ file.title }}</a></div>
                     </li>
                 {% endfor %}
             </ul>
@@ -103,7 +103,7 @@
           {% if post.images %}
                 {% for image in post.images %}
                 <div class="image--page">
-                    <a alt="Ultimate video" href="{{ paths.files }}{{ image.filename }}" class="html5lightbox" title="{{ image.title }}">
+                    <a alt="Ultimate video" href="{{ asset(image.filename, 'files') }}" class="html5lightbox" title="{{ image.title }}">
                  
                         
                         <img class="lazyload picturefill image--wide" data-srcset="{{ image.filename|image(1600, 900, "c") }} 1024w, {{ image.filename|image(1200, 675, "c") }} 640w, {{ image.filename|image(600, 337, "c") }} 320w" alt="{{ image.title }}" />

@@ -9,6 +9,7 @@ use Bolt\Logger\FlashLoggerInterface;
 use Bolt\Storage\Entity\Content;
 use Bolt\Storage\Entity\TemplateFields;
 use Bolt\Storage\EntityManager;
+use Bolt\Storage\Mapping\ContentType;
 use Bolt\Storage\Repository;
 use Bolt\Translation\Translator as Trans;
 use Bolt\Users;
@@ -66,13 +67,13 @@ class Edit
     /**
      * Do the edit form for a record.
      *
-     * @param Content $content     A content record
-     * @param array   $contentType The contenttype data
-     * @param boolean $duplicate   If TRUE create a duplicate record
+     * @param Content     $content     A content record
+     * @param ContentType $contentType The contenttype data
+     * @param boolean     $duplicate   If TRUE create a duplicate record
      *
      * @return array
      */
-    public function action(Content $content, array $contentType, $duplicate)
+    public function action(Content $content, ContentType $contentType, $duplicate)
     {
         $contentTypeSlug = $contentType['slug'];
         $new = $content->getId() === null ?: false;
@@ -140,7 +141,7 @@ class Edit
         $contextHas = [
             'incoming_relations' => count($incomingNotInverted) > 0,
             'relations'          => isset($contentType['relations']),
-            'tabs'               => $contentType['groups'] !== false,
+            'tabs'               => $contentType['groups'] !== [],
             'taxonomy'           => isset($contentType['taxonomy']),
             'templatefields'     => empty($templateFieldsData) ? false : true,
         ];
@@ -149,19 +150,19 @@ class Edit
             'datedepublish'      => $this->getPublishingDate($content->getDatedepublish()),
         ];
         $context = [
-            'incoming_not_inv'   => $incomingNotInverted,
-            'contenttype'        => $contentType,
-            'content'            => $content,
-            'allowed_status'     => $allowedStatuses,
-            'contentowner'       => $contentowner,
-            'fields'             => $this->config->fields->fields(),
-            'fieldtemplates'     => $this->getTemplateFieldTemplates($contentType, $content),
-            'fieldtypes'         => $this->getUsedFieldtypes($contentType, $content, $contextHas),
-            'groups'             => $this->createGroupTabs($contentType, $contextHas),
-            'can'                => $contextCan,
-            'has'                => $contextHas,
-            'values'             => $contextValues,
-            'relations_list'     => $this->getRelationsList($contentType),
+            'incoming_not_inv' => $incomingNotInverted,
+            'contenttype'      => $contentType,
+            'content'          => $content,
+            'allowed_status'   => $allowedStatuses,
+            'contentowner'     => $contentowner,
+            'fields'           => $this->config->fields->fields(),
+            'fieldtemplates'   => $this->getTemplateFieldTemplates($contentType, $content),
+            'fieldtypes'       => $this->getUsedFieldtypes($contentType, $content, $contextHas),
+            'groups'           => $this->createGroupTabs($contentType, $contextHas),
+            'can'              => $contextCan,
+            'has'              => $contextHas,
+            'values'           => $contextValues,
+            'relations_list'   => $this->getRelationsList($contentType),
         ];
 
         return $context;
@@ -171,11 +172,11 @@ class Edit
      * Convert POST relationship values to an array of Entity objects keyed by
      * ContentType.
      *
-     * @param array $contentType
+     * @param ContentType $contentType
      *
      * @return array
      */
-    private function getRelationsList(array $contentType)
+    private function getRelationsList(ContentType $contentType)
     {
         $list = [];
         if (!isset($contentType['relations']) || !is_array($contentType['relations'])) {
@@ -187,8 +188,9 @@ class Edit
             $repo = $this->em->getRepository($relationName);
             $relationConfig = $this->config->get('contenttypes/' . $relationName, []);
             $neededFields = $this->neededFields($relationValues, $relationConfig);
+            $order = isset($relationValues['order']) ? $relationValues['order'] : null;
 
-            $list[$relationName] = $repo->getSelectList($relationConfig, $relationValues['order'], $neededFields);
+            $list[$relationName] = $repo->getSelectList($relationConfig, $order, $neededFields);
         }
 
         return $list;
@@ -269,12 +271,12 @@ class Edit
     /**
      * Determine which templates will result in templatefields.
      *
-     * @param array   $contentType
-     * @param Content $content
+     * @param ContentType $contentType
+     * @param Content     $content
      *
      * @return array
      */
-    private function getTemplateFieldTemplates(array $contentType, Content $content)
+    private function getTemplateFieldTemplates(ContentType $contentType, Content $content)
     {
         $templateFieldTemplates = [];
         $templateFieldsConfig = $this->config->get('theme/templatefields');
@@ -323,12 +325,12 @@ class Edit
     /**
      * Generate tab groups.
      *
-     * @param array $contentType
-     * @param array $has
+     * @param ContentType $contentType
+     * @param array       $has
      *
      * @return array
      */
-    private function createGroupTabs(array $contentType, array $has)
+    private function createGroupTabs(ContentType $contentType, array $has)
     {
         $groups = [];
         $groupIds = [];
@@ -387,13 +389,13 @@ class Edit
     /**
      * Create a list of fields types used in regular, template and virtual fields.
      *
-     * @param array   $contentType
-     * @param Content $content
-     * @param array   $has
+     * @param ContentType $contentType
+     * @param Content     $content
+     * @param array       $has
      *
      * @return array
      */
-    private function getUsedFieldtypes(array $contentType, Content $content, array $has)
+    private function getUsedFieldtypes(ContentType $contentType, Content $content, array $has)
     {
         $fieldtypes = [
             'meta' => true,

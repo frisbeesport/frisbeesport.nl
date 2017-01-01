@@ -3,6 +3,7 @@
 namespace Bolt\Storage\Query;
 
 use Bolt\Exception\QueryParseException;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
@@ -19,10 +20,17 @@ use Doctrine\DBAL\Query\QueryBuilder;
  */
 class SearchQuery extends SelectQuery
 {
+    /** @var string */
     protected $search;
+    /** @var SearchConfig */
+    protected $config;
 
     /**
-     * @param QueryBuilder $qb
+     * Constructor.
+     *
+     * @param QueryBuilder         $qb
+     * @param QueryParameterParser $parser
+     * @param SearchConfig         $config
      */
     public function __construct(QueryBuilder $qb, QueryParameterParser $parser, SearchConfig $config)
     {
@@ -88,12 +96,12 @@ class SearchQuery extends SelectQuery
      */
     protected function processFilters()
     {
-        if (!$this->contenttype) {
-            throw new QueryParseException('You have attempted to run a search query without specifying a contenttype', 1);
+        if (!$this->contentType) {
+            throw new QueryParseException('You have attempted to run a search query without specifying a ContentType', 1);
         }
 
-        if (!$config = $this->config->getConfig($this->contenttype)) {
-            throw new QueryParseException('You have attempted to run a search query on an unknown contenttype or one that is not searchable', 1);
+        if (!$config = $this->config->getConfig($this->contentType)) {
+            throw new QueryParseException('You have attempted to run a search query on an unknown ContentType or one that is not searchable', 1);
         }
 
         $params = $this->params;
@@ -117,10 +125,11 @@ class SearchQuery extends SelectQuery
     public function getWhereExpression()
     {
         if (!count($this->filters)) {
-            return;
+            return null;
         }
 
         $expr = $this->qb->expr()->orX();
+        /** @var Filter $filter */
         foreach ($this->filters as $filter) {
             $expr = $expr->add($filter->getExpression());
         }

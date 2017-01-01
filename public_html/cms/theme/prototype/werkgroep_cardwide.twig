@@ -33,37 +33,37 @@
                 {% include 'kaderlid_part.twig' with { 'kaderlid': lid1 } %}
             {% endif %}
 
-            {% if werkgroep.lid2 is not empty %}
+            {% if werkgroep.lid2 != '0' and werkgroep.lid2  is not empty %}
                 {% setcontent lid2 = "kader/#{werkgroep.lid2}" %}
                 {% include 'kaderlid_part.twig' with { 'kaderlid': lid2 } %}
             {% endif %}
 
-            {% if werkgroep.lid3 is not empty %}
+            {% if werkgroep.lid3 != '0' and werkgroep.lid3 is not empty %}
                 {% setcontent lid3 = "kader/#{werkgroep.lid3}" %}
                 {% include 'kaderlid_part.twig' with { 'kaderlid': lid3 } %}
             {% endif %}
 
-            {% if werkgroep.lid4 is not empty %}
+            {% if werkgroep.lid4 != '0' and werkgroep.lid4 is not empty %}
                 {% setcontent lid4 = "kader/#{werkgroep.lid4}" %}
                 {% include 'kaderlid_part.twig' with { 'kaderlid': lid4 } %}
             {% endif %}
 
-            {% if werkgroep.lid5 is not empty %}
+            {% if werkgroep.lid5 != '0' and werkgroep.lid5 is not empty %}
                 {% setcontent lid5 = "kader/#{werkgroep.lid5}" %}
                 {% include 'kaderlid_part.twig' with { 'kaderlid': lid5 } %}
             {% endif %}
 
-            {% if werkgroep.lid6 is not empty %}
+            {% if werkgroep.lid6 != '0' and werkgroep.lid6 is not empty %}
                 {% setcontent lid6 = "kader/#{werkgroep.lid6}" %}
                 {% include 'kaderlid_part.twig' with { 'kaderlid': lid6 } %}
             {% endif %}
 
-            {% if werkgroep.lid7 is not empty %}
+            {% if werkgroep.lid7 != '0' and werkgroep.lid7 is not empty %}
                 {% setcontent lid7 = "kader/#{werkgroep.lid7}" %}
                 {% include 'kaderlid_part.twig' with { 'kaderlid': lid7 } %}
             {% endif %}
 
-            {% if werkgroep.lid8 is not empty %}
+            {% if werkgroep.lid8 != '0' and werkgroep.lid8 is not empty %}
                 {% setcontent lid8 = "kader/#{werkgroep.lid8}" %}
                 {% include 'kaderlid_part.twig' with { 'kaderlid': lid8 } %}
             {% endif %}

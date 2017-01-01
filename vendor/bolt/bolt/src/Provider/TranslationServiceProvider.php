@@ -16,11 +16,23 @@ class TranslationServiceProvider implements ServiceProviderInterface
             $app->register(
                 new Silex\Provider\TranslationServiceProvider(),
                 [
-                    'translator.cache_dir' => $app['resources']->getPath('cache/trans'),
                     'locale_fallbacks'     => ['en_GB', 'en'],
                 ]
             );
         }
+
+        $app['translator.caching'] = true;
+        if ($app['config']->get('general/caching/translations') === false) {
+            $app['translator.caching'] = false;
+        }
+
+        $app['translator.cache_dir'] = $app->share(function ($app) {
+            if ($app['translator.caching'] === false) {
+                return null;
+            }
+
+            return $app['resources']->getPath('cache/trans');
+        });
 
         $app['translator'] = $app->share(
             $app->extend(
@@ -72,8 +84,7 @@ class TranslationServiceProvider implements ServiceProviderInterface
         // Set locales for native php...not sure why?
         setlocale(LC_ALL, $locales);
 
-        // Set the default timezone if provided in the Config
-        date_default_timezone_set($app['config']->get('general/timezone') ?: ini_get('date.timezone') ?: 'UTC');
+        $this->setDefaultTimezone($app);
 
         // for javascript datetime calculations, timezone offset. e.g. "+02:00"
         $app['timezone_offset'] = date('P');
@@ -176,5 +187,32 @@ class TranslationServiceProvider implements ServiceProviderInterface
         }
 
         return $locales;
+    }
+
+    protected function setDefaultTimezone(Application $app)
+    {
+        if (($timezone = $app['config']->get('general/timezone')) !== null) {
+            date_default_timezone_set($timezone);
+
+            return;
+        }
+
+        // PHP 7.0+ doesn't emit warning for no timezone set.
+        if (PHP_MAJOR_VERSION > 5) {
+            return;
+        }
+
+        // Run check to see if a default timezone has been set
+        $hasDefault = true;
+        set_error_handler(function () use (&$hasDefault) {
+            $hasDefault = false;
+        });
+        date_default_timezone_get();
+        restore_error_handler();
+
+        // If no default, set to UTC to prevent default not defined warnings
+        if (!$hasDefault) {
+            date_default_timezone_set('UTC');
+        }
     }
 }

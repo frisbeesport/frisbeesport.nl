@@ -88,7 +88,7 @@ class SchemaCheck
     /**
      * Get the response messages as a string.
      *
-     * @return string
+     * @return string[]
      */
     public function getResponseStrings()
     {
@@ -300,7 +300,7 @@ class SchemaCheck
      * Add a message for a foreign key change.
      *
      * @param string               $tableName
-     * @param ForeignKeyConstraint $index
+     * @param ForeignKeyConstraint $foreignKey
      * @param string               $format
      */
     private function addForeignKeysMessage($tableName, ForeignKeyConstraint $foreignKey, $format)

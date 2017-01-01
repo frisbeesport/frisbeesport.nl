@@ -8,6 +8,7 @@ use Bolt\Twig\TwigExtension;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
+use Symfony\Bridge\Twig\Extension\HttpFoundationExtension;
 
 class TwigServiceProvider implements ServiceProviderInterface
 {
@@ -53,15 +54,16 @@ class TwigServiceProvider implements ServiceProviderInterface
                 return new \Pimple(
                     [
                         // @codingStandardsIgnoreStart
-                        'admin'  => $app->share(function () use ($app) { return new Handler\AdminHandler($app); }),
-                        'array'  => $app->share(function () use ($app) { return new Handler\ArrayHandler($app); }),
-                        'html'   => $app->share(function () use ($app) { return new Handler\HtmlHandler($app); }),
-                        'image'  => $app->share(function () use ($app) { return new Handler\ImageHandler($app); }),
-                        'record' => $app->share(function () use ($app) { return new Handler\RecordHandler($app); }),
-                        'text'   => $app->share(function () use ($app) { return new Handler\TextHandler($app); }),
-                        'user'   => $app->share(function () use ($app) { return new Handler\UserHandler($app); }),
-                        'utils'  => $app->share(function () use ($app) { return new Handler\UtilsHandler($app); }),
-                        'widget' => $app->share(function () use ($app) { return new Handler\WidgetHandler($app); }),
+                        'admin'   => $app->share(function () use ($app) { return new Handler\AdminHandler($app); }),
+                        'array'   => $app->share(function () use ($app) { return new Handler\ArrayHandler($app); }),
+                        'html'    => $app->share(function () use ($app) { return new Handler\HtmlHandler($app); }),
+                        'image'   => $app->share(function () use ($app) { return new Handler\ImageHandler($app); }),
+                        'record'  => $app->share(function () use ($app) { return new Handler\RecordHandler($app); }),
+                        'routing' => $app->share(function () use ($app) { return new Handler\RoutingHandler($app); }),
+                        'text'    => $app->share(function () use ($app) { return new Handler\TextHandler($app); }),
+                        'user'    => $app->share(function () use ($app) { return new Handler\UserHandler($app); }),
+                        'utils'   => $app->share(function () use ($app) { return new Handler\UtilsHandler($app); }),
+                        'widget'  => $app->share(function () use ($app) { return new Handler\WidgetHandler($app); }),
                         // @codingStandardsIgnoreEnd
                     ]
                 );
@@ -75,6 +77,7 @@ class TwigServiceProvider implements ServiceProviderInterface
                 function (\Twig_Environment $twig, $app) {
                     $twig->addExtension(new TwigExtension($app, $app['twig.handlers'], false));
                     $twig->addExtension($app['twig.extension.asset']);
+                    $twig->addExtension($app['twig.extension.http_foundation']);
 
                     if (isset($app['dump'])) {
                         $twig->addExtension(new DumpExtension(
@@ -92,7 +95,13 @@ class TwigServiceProvider implements ServiceProviderInterface
 
         $app['twig.extension.asset'] = $app->share(
             function ($app) {
-                return new AssetExtension($app['asset.packages']);
+                return new AssetExtension($app['asset.packages'], $app['twig.extension.http_foundation']);
+            }
+        );
+
+        $app['twig.extension.http_foundation'] = $app->share(
+            function ($app) {
+                return new HttpFoundationExtension($app['request_stack'], $app['request_context']);
             }
         );
 
@@ -117,19 +126,19 @@ class TwigServiceProvider implements ServiceProviderInterface
 
         // Twig options
         $app['twig.options'] = function () use ($app) {
+            $options = [];
+
             // Should we cache or not?
             if ($app['config']->get('general/caching/templates')) {
-                $cache = $app['resources']->getPath('cache');
-            } else {
-                $cache = false;
+                $key = hash('md5', $app['config']->get('general/theme'));
+                $options['cache'] = $app['resources']->getPath('cache/' . $app['environment'] . '/twig/' . $key);
             }
 
-            return [
-                'debug'            => true,
-                'cache'            => $cache,
-                'strict_variables' => $app['config']->get('general/strict_variables'),
-                'autoescape'       => 'html',
-            ];
+            if (($strict = $app['config']->get('general/strict_variables')) !== null) {
+                $options['strict_variables'] = $strict;
+            }
+
+            return $options;
         };
 
         $app['safe_twig.bolt_extension'] = function () use ($app) {

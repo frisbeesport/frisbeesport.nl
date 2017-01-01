@@ -11,6 +11,7 @@ use Bolt\Filesystem\Handler\JsonFile;
 use Bolt\Logger\FlashLoggerInterface;
 use Bolt\Translation\LazyTranslator as Trans;
 use Silex\Application;
+use Symfony\Component\Debug\Exception\ContextErrorException;
 
 /**
  * Class to manage loading of extensions.
@@ -232,8 +233,8 @@ class Manager
     private function addManagedExtension(PackageDescriptor $descriptor)
     {
         $className = $descriptor->getClass();
-        if (@class_exists($className) === false) {
-            if ($descriptor->getType() === 'local' && @class_exists('Wikimedia\Composer\MergePlugin') === false) {
+        if ($this->isClassLoadable($className) === false) {
+            if ($descriptor->getType() === 'local' && $this->isClassLoadable('Wikimedia\Composer\MergePlugin') === false) {
                 $this->flashLogger->error(Trans::__('general.phrase.error-local-extension-set-up-incomplete', ['%NAME%' => $descriptor->getName(), '%CLASS%' => $className]));
             } else {
                 $this->flashLogger->error(Trans::__("Extension package %NAME% has an invalid class '%CLASS%' and has been skipped.", ['%NAME%' => $descriptor->getName(), '%CLASS%' => $className]));
@@ -253,6 +254,32 @@ class Manager
         } else {
             $this->flashLogger->error(Trans::__("Extension package %NAME% base class '%CLASS%' does not implement \\Bolt\\Extension\\ExtensionInterface and has been skipped.", ['%NAME%' => $descriptor->getName(), '%CLASS%' => $className]));
         }
+    }
+
+    /**
+     * Check if a class is loadable.
+     *
+     * This comes about as local extensions that are moved or removed will over
+     * emmit warnings while trying to validly rebuild autoloaders.
+     *
+     * @param string $className
+     *
+     * @throws ContextErrorException
+     *
+     * @return bool
+     */
+    private function isClassLoadable($className)
+    {
+        try {
+            $exists = class_exists($className);
+        } catch (ContextErrorException $e) {
+            if ($e->getSeverity() === E_WARNING && basename($e->getFile()) === 'ClassLoader.php') {
+                return false;
+            }
+            throw $e;
+        }
+
+        return $exists;
     }
 
     /**

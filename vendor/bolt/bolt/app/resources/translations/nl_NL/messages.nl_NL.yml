@@ -1,4 +1,4 @@
-# app/resources/translations/nl_NL/messages.nl_NL.yml – generated on 2016-05-09 07:28:29 Europe/Amsterdam
+# app/resources/translations/nl_NL/messages.nl_NL.yml – generated on 2016-11-06 08:42:34 Europe/Amsterdam
 
 # Warning: Translations are in the process of being moved to a new keyword-based translation
 #          at the moment. This is an ongoing process. Translations currently in the 
@@ -8,20 +8,26 @@
 #          updating your translations, it's best to ask on IRC to time your contribution
 #          in order to prevent merge conflicts.
 
-#   1 unused messages
-#  10 untranslated messages
-#   8 untranslated keyword based messages
+#   5 unused messages
+#  12 untranslated messages
+#  25 untranslated keyword based messages
 #  80 translations
-# 504 keyword based translations
+# 505 keyword based translations
 
-#--- 1 unused messages --------------------------------------------------------
+#--- 5 unused messages --------------------------------------------------------
 
 "Selection:": "Selectie:"
+"page.extend.button.config": "Instellingen"
+"page.extend.button.readme": "Leesmij"
+"page.extend.button.uninstall": "Deinstalleer"
+"page.extend.button.versions": "Versies"
 
-#--- 10 untranslated messages -------------------------------------------------
+#--- 12 untranslated messages -------------------------------------------------
 
+"Dependencies": #
 "Detected Bolt version change to <b>%VERSION%</b>, and the cache has been cleared. Please <a href=\"%URI%\">check the database</a>, if you haven't done so already.": #
 "Extend": #
+"Finding packages that require this one…": #
 "Group": #
 "Groups": #
 "Link": #
@@ -31,16 +37,33 @@
 "Unable to duplicate file: %FILE%": #
 "Unfortunately, no content could be found. Try another page, or go to the <a href=\"%paths_root%\">homepage</a>.": #
 
-#--- 8 untranslated keyword based messages ------------------------------------
+#--- 25 untranslated keyword based messages -----------------------------------
 
+"contenttypes.generic.invalid-hyphen": # "In the ContentType for '%contenttype%', you have used a hyphen in the definition which is not supported. Please edit contenttypes.yml and remove the hyphen or alternatively replace with an underscore."
 "general.phrase.clear-cache-complete": # "Cleared cache."
 "general.phrase.error-cache-clear": # "Failed to clear cache. You should delete it manually."
+"general.phrase.invalid-taxonomy-slug": # "In the taxonomy '%taxonomy%' the slug for option '%option%' contains a slash. Please edit taxonomy.yml, and correct this."
 "general.phrase.missing-about-page-block": # "There currently is no Block with 'about-us' as its slug. If you create one, it will be shown here. Go to 'Configuration' > 'Check Database' and select 'Add sample Records' to automatically generate this Block."
-"general.phrase.related-content": #
+"general.phrase.related-content": # "Related content"
 "general.phrase.selection": # "Selection"
 "general.phrase.value-maximum-variable": # "The value must not be greater than “%MAXVAL%”!"
 "general.phrase.value-minimum-variable": # "The value has to be at least “%MINVAL%”!"
+"page.extend.button.link-config": # "Edit configuration"
+"page.extend.button.link-marketplace": # "View on marketplace"
+"page.extend.button.link-readme": # "View README"
+"page.extend.button.link-repository": # "View source repository"
+"page.extend.button.link-uninstall": # "Uninstall extension"
+"page.extend.button.link-versions": # "Install different version"
+"page.extend.button.manage": # "Manage"
+"page.extend.button.package-dependencies": # "Identify installed packages requiring this"
 "page.extend.error-composer-json-not-readable": # "The Bolt extensions composer.json isn't readable."
+"page.extend.message.autoloader-start": # "Loading Composer autoload dumper"
+"page.extend.message.autoloader-update": # "Updating Composer autoloader"
+"page.extend.message.installation-running": # "Installation running"
+"page.extend.message.invalid-theme-source-dir": # "Invalid theme source directory: %SOURCE%"
+"page.extend.message.package-dependencies": # "Packages that depend on this"
+"page.extend.message.running-update-all": # "Running updates"
+"page.file-management.message.upload-not-writable": # "Unable to write to upload destination. Check permissions on %TARGET%"
 
 #--- 80 translations ----------------------------------------------------------
 
@@ -125,7 +148,7 @@
 "You've been logged on successfully.": "Je bent succesvol ingelogd."
 "filtered by <em>'%filter%'</em>": "gefilterd door <em>'%filter%'</em>"
 
-#--- 504 keyword based translations -------------------------------------------
+#--- 505 keyword based translations -------------------------------------------
 
 contenttypes.generic.actions-all: "Handelingen voor %contenttypes%"
 contenttypes.generic.actions-one: "Handelingen voor deze %contenttype%"
@@ -183,7 +206,7 @@ field.markdown.label.markedview: "Markdown"
 field.markdown.label.preview: "Voorvertoning"
 
 field.slug.button.edit: "Bewerk"
-field.slug.button.link: "Link naar:"
+field.slug.button.generate: "Genereer van:"
 field.slug.button.lock: "Vergrendelen"
 field.slug.message.warning: "Het aanpassen van dit bewerkingsvlak kan bestaande koppelingen aan deze record verbreken!"
 field.slug.permalink: "Permalink"
@@ -271,7 +294,8 @@ general.phrase.delete-set: "Set verwijderen"
 general.phrase.delete-user-name: "Verwijder %username%"
 general.phrase.depublication-date-colon: "Depublicatiedatum:"
 general.phrase.depublish: "Publicatie opheffen"
-general.phrase.depublish-date-past: "De datum van het opheffen van de publicatie ligt in het verleden. Wijzig de status als je de publicatie nu wilt opheffen"
+general.phrase.depublish-date-past: "De datum van het opheffen van de publicatie ligt in het verleden. Wijzig de status als je de publicatie nu wilt opheffen."
+general.phrase.depublish-explanation: "Als hier iets is ingevoerd, wordt deze record automatisch gedepubliceerd op deze datum."
 general.phrase.deselect-all: "Deselecteer alles"
 general.phrase.details: "Details"
 general.phrase.directory-not-found-writable: "De map '%s' kon niet worden gevonden of is niet schrijfbaar."
@@ -382,12 +406,13 @@ general.phrase.profile: "Profiel"
 general.phrase.provided-by-colon: "Geleverd door:"
 general.phrase.publication-date-colon: "Publicatiedatum:"
 general.phrase.publish: "Publiceren"
-general.phrase.publish-timed: "Publicatiedatum"
+general.phrase.publish-timed: "Publiceer op datum"
 general.phrase.published: "Gepubliceerd"
 general.phrase.published-on-colon: "Gepubliceerd op:"
 general.phrase.read-more: "Lees verder"
 general.phrase.record-related-to-variable: "Deze record heeft betrekking op de volgende %CTNAME%:"
 general.phrase.records: "Records"
+general.phrase.redirect-detected: "Redirect gedetecteerd. Controleer of je nog steeds ingelogd bent."
 general.phrase.relationships: "Relaties"
 general.phrase.rename-foldername: "Hernoem %foldername%"
 general.phrase.required-character-count: "Tenminste %NUM% tekens zijn vereist"
@@ -427,6 +452,7 @@ general.phrase.status-change-held: "Zet status op 'niet gepubliceerd'"
 general.phrase.status-colon: "Status:"
 general.phrase.status-current-colon: "Huidige status:"
 general.phrase.status-default: "Standaard status"
+general.phrase.status-explanation: "De status bepaalt of deze record gepubliceerd is. Kies 'Publiceer op datum' om automatisch te publiceren op de opgegeven Publicatiedatum."
 general.phrase.stay-classy-colon: "Class"
 general.phrase.system-config-checks: "Systeem Configuratie Controles"
 general.phrase.taxonomy: "Taxonomie"
@@ -486,6 +512,10 @@ logs.system-log.cleared: "De systeemlog is gewist."
 logs.system-log.trimmed: "De systeemlog is verkleind."
 
 menu.configuration.routing: "Route instellingen"
+
+nut.greeting: "Welkom bij Bolt!"
+
+nut.version: "versie"
 
 page.checks.run-all: "Controleer alles"
 page.checks.run-directory-checks: "Controleer directories op fouten"
@@ -552,19 +582,15 @@ page.edit-users.user-edit: "Gebruiker bewerken"
 
 page.extend.button.autoload-dump: "Autoloader herstellen"
 page.extend.button.browse-versions: "Blader tussen versies"
-page.extend.button.config: "Instellingen"
 page.extend.button.copy-to-theme-folder: "kopiëer naar thema map"
 page.extend.button.info-help: "Meer info/help"
 page.extend.button.install-all: "Installeer alle packages"
 page.extend.button.install-package: "Installeer package"
 page.extend.button.install-this-version: "Installeer deze versie"
-page.extend.button.readme: "Leesmij"
 page.extend.button.show-all-versions: "Toon alle versies"
-page.extend.button.uninstall: "Deinstalleer"
 page.extend.button.update-all: "Doe alle updates"
 page.extend.button.update-check: "Doe update check"
 page.extend.button.update-package: "Package bijwerken"
-page.extend.button.versions: "Versies"
 page.extend.error-composer-json-not-writable: "Het Bolt extensies bestand composer.json is niet schrijfbaar."
 page.extend.headline.currently-installed: "Geïnstalleerde extensies"
 page.extend.headline.install-new-extension: "Installeer een nieuwe extensie"
@@ -584,8 +610,8 @@ page.extend.message.autoload-dump: "Deze handeling zal zowel de autoload bestand
 page.extend.message.bad-json: "Misvormde JSON respons. Zorg ervoor dat er geen debugging of andere code wordt toegevoegd aan de reactie"
 page.extend.message.before-theme-start: "Voordat je deze theme kunt gebruiken, moeten we een kopie maken naar je theme map. Als je een alternatieve naam wilt opgeven voor het theme, dan kan dat hier."
 page.extend.message.check-for-updates: "Controleer op updates"
+page.extend.message.checking-for-updates: "Updates aan het controleren (dit kan tot 60 seconden duren)"
 page.extend.message.checking-installed-packages: "Controleer geïnstalleerde packages"
-page.extend.message.checkung-for-updates: "Updates aan het controleren (dit kan tot 60 seconden duren)"
 page.extend.message.compatible-unstable-versions: "De hieronder opgesomde versies zijn compatibel met de Bolt-versie die je gebruikt. Aangezien het onstabiele versies zijn, raden we aan deze <strond>niet</strong> te gebruiken op productiesystemen."
 page.extend.message.confirm-remove: "Bevestig dat je deze extensie wilt verwijderen?"
 page.extend.message.copying: "Thema-bestanden kopiëren …"

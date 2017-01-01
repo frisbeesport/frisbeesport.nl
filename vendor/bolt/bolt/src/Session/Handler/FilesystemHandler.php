@@ -62,8 +62,13 @@ class FilesystemHandler implements \SessionHandlerInterface
      */
     public function gc($maxlifetime)
     {
+        if (!$this->directory->exists()) {
+            return;
+        }
+
         $files = $this->directory->find()
             ->files()
+            ->ignoreDotFiles(false)
             ->date("< now - $maxlifetime seconds")
         ;
         foreach ($files as $file) {

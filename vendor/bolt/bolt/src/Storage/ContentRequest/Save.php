@@ -140,7 +140,7 @@ class Save
     }
 
     /**
-     * Set a Contenttype record values from a HTTP POST.
+     * Set a ContentType record values from a HTTP POST.
      *
      * @param Entity\Content $content
      * @param array          $formValues
@@ -168,6 +168,8 @@ class Save
             $content->setOwnerid($user['id']);
         }
 
+        // Hack … remove soon
+        $formValues += ['status' => 'draft'];
         // Make sure we have a proper status.
         if (!in_array($formValues['status'], ['published', 'timed', 'held', 'draft'])) {
             if ($status = $content->getStatus()) {
@@ -402,7 +404,7 @@ class Save
      *
      * @param string $name          The name of the route
      * @param array  $params        An array of parameters
-     * @param bool   $referenceType The type of reference to be generated (one of the constants)
+     * @param int    $referenceType The type of reference to be generated (one of the constants)
      *
      * @return string
      */

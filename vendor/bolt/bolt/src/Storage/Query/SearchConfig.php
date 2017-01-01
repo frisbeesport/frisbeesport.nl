@@ -8,13 +8,16 @@ use Bolt\Config;
  * This class takes an overall config array as input and parses into values
  * applicable for performing searches.
  *
- * This takes into account contenttypes that aren't searchable along with
+ * This takes into account ContentTypes that aren't searchable along with
  * taxonomy and field weightings.
  */
 class SearchConfig
 {
+    /** @var array|Config */
     protected $config = [];
+    /** @var array */
     protected $searchableTypes = [];
+    /** @var array */
     protected $joins = [];
 
     public function __construct(Config $config)
@@ -26,14 +29,14 @@ class SearchConfig
     /**
      * Get the config of all fields for a given content type.
      *
-     * @param string $contenttype
+     * @param string $contentType
      *
      * @return array|false
      */
-    public function getConfig($contenttype)
+    public function getConfig($contentType)
     {
-        if (array_key_exists($contenttype, $this->searchableTypes)) {
-            return $this->searchableTypes[$contenttype];
+        if (array_key_exists($contentType, $this->searchableTypes)) {
+            return $this->searchableTypes[$contentType];
         }
 
         return false;
@@ -42,15 +45,15 @@ class SearchConfig
     /**
      * Get the config of one given field for a given content type.
      *
-     * @param string $contenttype
+     * @param string $contentType
      * @param string $field
      *
      * @return array|false
      */
-    public function getFieldConfig($contenttype, $field)
+    public function getFieldConfig($contentType, $field)
     {
-        if (isset($this->searchableTypes[$contenttype][$field])) {
-            return $this->searchableTypes[$contenttype][$field];
+        if (isset($this->searchableTypes[$contentType][$field])) {
+            return $this->searchableTypes[$contentType][$field];
         }
 
         return false;
@@ -64,9 +67,9 @@ class SearchConfig
      */
     protected function parseContenttypes()
     {
-        $contenttypes = $this->config->get('contenttypes');
+        $contentTypes = $this->config->get('contenttypes');
 
-        foreach ($contenttypes as $type => $values) {
+        foreach ($contentTypes as $type => $values) {
             if (! $this->isInvisible($type)) {
                 $this->getSearchableColumns($type);
                 if (isset($values['taxonomy'])) {
@@ -77,15 +80,15 @@ class SearchConfig
     }
 
     /**
-     * Iterates the taxonomies for a given contenttype, then assigns a
+     * Iterates the taxonomies for a given ContentType, then assigns a
      * weighting based on type.
      *
-     * @param string $contenttype
+     * @param string $contentType
      * @param array  $taxonomies
      *
      * @return void
      */
-    protected function parseTaxonomies($contenttype, $taxonomies)
+    protected function parseTaxonomies($contentType, $taxonomies)
     {
         foreach ((array) $taxonomies as $taxonomy) {
             $taxonomyConfig = $this->config->get('taxonomy/' . $taxonomy);
@@ -96,26 +99,26 @@ class SearchConfig
             } else {
                 $weight = 50;
             }
-            $this->searchableTypes[$contenttype][$taxonomy] = ['weight' => $weight];
-            $this->joins[$contenttype][] = $taxonomy;
+            $this->searchableTypes[$contentType][$taxonomy] = ['weight' => $weight];
+            $this->joins[$contentType][] = $taxonomy;
         }
     }
 
     /**
-     * Helper method to return the join search columns for a contenttype
+     * Helper method to return the join search columns for a ContentType
      * weighting based on type.
      *
-     * @param string $contenttype
+     * @param string $contentType
      *
      * @return array
      */
-    public function getJoins($contenttype)
+    public function getJoins($contentType)
     {
-        return $this->joins[$contenttype];
+        return $this->joins[$contentType];
     }
 
     /**
-     * Determine what columns are searchable for a given contenttype.
+     * Determine what columns are searchable for a given ContentType.
      *
      * @param string $type
      *
@@ -142,16 +145,16 @@ class SearchConfig
     }
 
     /**
-     * Does some checks to see whether a contenttype should appear in search results.
-     * This is based on contenttype options.
+     * Does some checks to see whether a ContentType should appear in search results.
+     * This is based on ContentType options.
      *
-     * @param string $contenttype
+     * @param string $contentType
      *
      * @return boolean
      */
-    protected function isInvisible($contenttype)
+    protected function isInvisible($contentType)
     {
-        $info = $this->config->get('contenttypes/' . $contenttype);
+        $info = $this->config->get('contenttypes/' . $contentType);
         if ($info) {
             if (array_key_exists('viewless', $info) && $info['viewless'] == true) {
                 return true;

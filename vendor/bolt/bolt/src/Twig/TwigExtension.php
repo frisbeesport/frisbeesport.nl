@@ -3,9 +3,7 @@
 namespace Bolt\Twig;
 
 use Bolt;
-use Bolt\Controller\Zone;
 use Silex;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * The class for Bolt' Twig tags, functions and filters.
@@ -49,6 +47,7 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
             new \Twig_SimpleFunction('__',                 [$this, 'trans'],       $safe),
             new \Twig_SimpleFunction('backtrace',          [$this, 'printBacktrace']),
             new \Twig_SimpleFunction('buid',               [$this, 'buid'],        $safe),
+            new \Twig_SimpleFunction('canonical',          [$this, 'canonical']),
             new \Twig_SimpleFunction('countwidgets',       [$this, 'countWidgets'],  $safe),
             new \Twig_SimpleFunction('current',            [$this, 'current']),
             new \Twig_SimpleFunction('data',               [$this, 'addData']),
@@ -73,7 +72,6 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
             new \Twig_SimpleFunction('ismobileclient',     [$this, 'isMobileClient']),
             new \Twig_SimpleFunction('last',               'twig_last',            $env + $deprecated),
             new \Twig_SimpleFunction('link',               [$this, 'link'],        $safe),
-            new \Twig_SimpleFunction('listcontent',        [$this, 'listContent']),
             new \Twig_SimpleFunction('listtemplates',      [$this, 'listTemplates']),
             new \Twig_SimpleFunction('markdown',           [$this, 'markdown'],    $safe),
             new \Twig_SimpleFunction('menu',               [$this, 'menu'],        $env + $safe),
@@ -89,6 +87,7 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
             new \Twig_SimpleFunction('thumbnail',          [$this, 'thumbnail']),
             new \Twig_SimpleFunction('token',              [$this, 'token'],       $deprecated + ['alternative' => 'csrf_token']),
             new \Twig_SimpleFunction('trimtext',           [$this, 'trim'],        $safe + $deprecated + ['alternative' => 'excerpt']),
+            new \Twig_SimpleFunction('unique',             [$this, 'unique'],      $safe),
             new \Twig_SimpleFunction('widgets',            [$this, 'widgets'],      $safe),
             // @codingStandardsIgnoreEnd
         ];
@@ -140,46 +139,27 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * As of Twig 2.x, the ability to register a global variable after runtime
+     * or the extensions have been initialized will not be possible any longer,
+     * but changing the value of an already registered global is possible.
+     */
     public function getGlobals()
     {
-        /** @var \Bolt\Config $config */
-        $config = $this->app['config'];
-        $configVal = $this->safe ? null : $config;
-        /** @var \Bolt\Users $users */
-        $users = $this->app['users'];
-        /** @var \Bolt\Configuration\ResourceManager $resources */
-        $resources = $this->app['resources'];
-
-        $zone = null;
-        /** @var RequestStack $requestStack */
-        $requestStack = $this->app['request_stack'];
-        if ($request = $requestStack->getCurrentRequest()) {
-            $zone = Zone::get($request);
-        }
-
-        // User calls can cause exceptions that block the exception handler
-        try {
-            /** @deprecated Deprecated since 3.0, to be removed in 4.0. */
-            $usersVal = $this->safe ? null : $users->getUsers();
-            $usersCur = $users->getCurrentUser();
-        } catch (\Exception $e) {
-            $usersVal = null;
-            $usersCur = null;
-        }
-
-        // Structured to allow PHPStorm's SymfonyPlugin to provide code completion
         return [
-            'bolt_name'    => Bolt\Version::name(),
-            'bolt_version' => Bolt\Version::VERSION,
-            'bolt_stable'  => Bolt\Version::isStable(),
-            'frontend'     => $zone === Zone::FRONTEND,
-            'backend'      => $zone === Zone::BACKEND,
-            'async'        => $zone === Zone::ASYNC,
-            'paths'        => $resources->getPaths(),
-            'theme'        => $config->get('theme'),
-            'user'         => $usersCur,
-            'users'        => $usersVal,
-            'config'       => $configVal,
+            'bolt_name'    => null,
+            'bolt_version' => null,
+            'bolt_stable'  => null,
+            'frontend'     => null,
+            'backend'      => null,
+            'async'        => null,
+            'paths'        => null,
+            'theme'        => null,
+            'user'         => null,
+            'users'        => null,
+            'config'       => null,
         ];
     }
 
@@ -208,6 +188,14 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
     public function buid()
     {
         return $this->handlers['admin']->buid();
+    }
+
+    /**
+     * @see \Bolt\Twig\Handler\RoutingHandler::canonical()
+     */
+    public function canonical()
+    {
+        return $this->handlers['routing']->canonical();
     }
 
     /**
@@ -253,9 +241,9 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
     /**
      * @see \Bolt\Twig\Handler\RecordHandler::fields()
      */
-    public function fields(\Twig_Environment $env, $record = null, $common = true, $extended = false, $repeaters = true, $templatefields = true, $template = '_sub_fields.twig', $exclude = null)
+    public function fields(\Twig_Environment $env, $record = null, $common = true, $extended = false, $repeaters = true, $templatefields = true, $template = '_sub_fields.twig', $exclude = null, $skip_uses = true)
     {
-        return $this->handlers['record']->fields($env, $record, $common, $extended, $repeaters, $templatefields, $template, $exclude);
+        return $this->handlers['record']->fields($env, $record, $common, $extended, $repeaters, $templatefields, $template, $exclude, $skip_uses);
     }
 
     /**
@@ -380,14 +368,6 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
     }
 
     /**
-     * @see \Bolt\Twig\Handler\RecordHandler::listContent()
-     */
-    public function listContent($contenttype, $relationoptions, $content)
-    {
-        return $this->handlers['record']->listContent($contenttype, $relationoptions, $content);
-    }
-
-    /**
      * @see \Bolt\Twig\Handler\RecordHandler::listTemplates()
      */
     public function listTemplates($filter = '')
@@ -469,7 +449,7 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
 
     /**
      * Just for safe_twig. Main twig overrides this function.
-     * 
+     *
      * @see \Bolt\Provider\TwigServiceProvider
      */
     public function printDump()
@@ -622,6 +602,14 @@ class TwigExtension extends \Twig_Extension implements \Twig_Extension_GlobalsIn
     public function twig($snippet, $extravars = [])
     {
         return $this->handlers['html']->twig($snippet, $extravars);
+    }
+
+    /**
+     * @see \Bolt\Twig\Handler\ArrayHandler::unique()
+     */
+    public function unique($array1, $array2)
+    {
+        return $this->handlers['array']->unique($array1, $array2);
     }
 
     /**

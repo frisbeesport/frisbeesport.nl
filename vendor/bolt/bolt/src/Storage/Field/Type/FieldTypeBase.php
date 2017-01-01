@@ -1,14 +1,21 @@
 <?php
+
 namespace Bolt\Storage\Field\Type;
 
+use Bolt\Storage\CaseTransformTrait;
 use Bolt\Storage\EntityManager;
 use Bolt\Storage\Field\FieldInterface;
+use Bolt\Storage\Field\Sanitiser\SanitiserAwareInterface;
+use Bolt\Storage\Field\Sanitiser\WysiwygAwareInterface;
 use Bolt\Storage\Mapping\ClassMetadata;
+use Bolt\Storage\Query\Filter;
 use Bolt\Storage\Query\QueryInterface;
 use Bolt\Storage\QuerySet;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
+use ReflectionProperty;
 
 /**
  * This is an abstract class for a field type that handles
@@ -18,6 +25,8 @@ use Doctrine\DBAL\Types\Type;
  */
 abstract class FieldTypeBase implements FieldTypeInterface, FieldInterface
 {
+    use CaseTransformTrait;
+
     public $mapping;
 
     protected $em;
@@ -71,10 +80,17 @@ abstract class FieldTypeBase implements FieldTypeInterface, FieldInterface
      */
     public function persist(QuerySet $queries, $entity)
     {
+        $attribute = $this->getMappingAttribute();
         $key = $this->mapping['fieldname'];
+
         $qb = &$queries[0];
-        $valueMethod = 'serialize' . ucfirst($key);
+        $valueMethod = 'serialize' . ucfirst($this->camelize($attribute));
         $value = $entity->$valueMethod();
+
+        if ($this instanceof SanitiserAwareInterface && is_string($value)) {
+            $isWysiwyg = $this instanceof WysiwygAwareInterface;
+            $value = $this->getSanitiser()->sanitise($value, $isWysiwyg);
+        }
 
         $type = $this->getStorageType();
 
@@ -116,10 +132,26 @@ abstract class FieldTypeBase implements FieldTypeInterface, FieldInterface
     public function set($entity, $value)
     {
         $key = $this->mapping['fieldname'];
-        if (!$value && isset($this->mapping['data']['default'])) {
+        if ($value === null && isset($this->mapping['data']['default'])) {
             $value = $this->mapping['data']['default'];
         }
         $entity->$key = $value;
+    }
+
+    /**
+     * Reads the current value of the field from an entity and returns value
+     *
+     * @param $entity
+     *
+     * @return mixed
+     */
+    public function get($entity)
+    {
+        $key = $this->mapping['fieldname'];
+        $valueMethod = 'get' . ucfirst($key);
+        $value = $entity->$valueMethod();
+
+        return $value;
     }
 
     /**
@@ -157,6 +189,20 @@ abstract class FieldTypeBase implements FieldTypeInterface, FieldInterface
     }
 
     /**
+     * Gets the entity attribute name to be used for reading / persisting
+     *
+     * @return string
+     */
+    public function getMappingAttribute()
+    {
+        if (isset($this->mapping['attribute'])) {
+            return $this->mapping['attribute'];
+        }
+
+        return $this->mapping['fieldname'];
+    }
+
+    /**
      * Provides a template that is able to render the field
      *
      * @deprecated
@@ -178,6 +224,12 @@ abstract class FieldTypeBase implements FieldTypeInterface, FieldInterface
         if (!is_string($value)) {
             return false;
         }
+        
+        // This handles an inconsistency in the result from the JSON parser across 5.x and 7.x of PHP
+        if ($value === '') {
+            return false;
+        }
+        
         json_decode($value);
 
         return json_last_error() === JSON_ERROR_NONE;
@@ -189,9 +241,9 @@ abstract class FieldTypeBase implements FieldTypeInterface, FieldInterface
 
         foreach ($data as $key => $value) {
             if (strpos($key, '_') === 0) {
-                $path = explode('_', $key);
-                if (isset($path[1]) && isset($path[2]) && $path[1] == $field) {
-                    $normalized[$path[2]] = $value;
+                if (strpos($key, $field) === 1) {
+                    $path = explode('_', str_replace('_' . $field, '', $key));
+                    $normalized[$path[1]] = $value;
                 }
             }
         }
@@ -209,5 +261,33 @@ abstract class FieldTypeBase implements FieldTypeInterface, FieldInterface
         $compiled = array_unique($compiled, SORT_REGULAR);
 
         return $compiled;
+    }
+
+    /** This method does an in-place modification of a generic contenttype.field query to the format actually used
+     * in the raw sql category. For instance a simple query might say `entries.tags = 'movies'` but now we are in the
+     * context of entries the actual SQL fragment needs to be `tags.slug = 'movies'`. We don't know this until we
+     * drill down to the individual field types so this rewrites the SQL fragment just before the query gets sent.
+     *
+     * Note, reflection is used to achieve this, it is not ideal, but the CompositeExpression shipped with DBAL chooses
+     * to keep the query parts as private and only allow access to the final computed string.
+     *
+     * @param Filter $filter
+     * @param QueryInterface $query
+     * @param $field
+     * @param $column
+     */
+    protected function rewriteQueryFilterParameters(Filter $filter, QueryInterface $query, $field, $column)
+    {
+        $originalExpression = $filter->getExpressionObject();
+
+        $reflected = new ReflectionProperty(CompositeExpression::class, 'parts');
+        $reflected->setAccessible(true);
+        $originalParts = $reflected->getValue($originalExpression);
+        foreach ($originalParts as &$part) {
+            $part = str_replace($query->getContenttype().".".$field, $field.".".$column, $part);
+        }
+        $reflected->setValue($originalExpression, $originalParts);
+
+        $filter->setExpression($originalExpression);
     }
 }

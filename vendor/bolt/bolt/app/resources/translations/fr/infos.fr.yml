@@ -50,7 +50,7 @@ info:
     ___<em><strong>les deux</strong></em>___. Vous pouvez aussi utiliser des astérisques&nbsp;: Texte en *<em>italique</em>*,
     texte en **<strong>gras</strong>**.
     <p>Créer des <a href='#'>liens</a> de cette manière&nbsp;:<br>
-    Un [site génial](http://example.org/ &amp;quot;Titre du lien&amp;quot;)</p>
+    Un [site génial](http://example.org/ &quot;Titre du lien&quot;)</p>
     <p>&nbsp; * Ceci est une liste non ordonnée<br>
     &nbsp; * Elément 2</p>
     <p>&nbsp; 1 Ceci est une liste ordonnée<br>
@@ -70,7 +70,7 @@ about:
     êtes développeur, vous êtes cordialement invité à participer au développement de Bolt.</p>
   licence: |
     <p>Le code de Bolt est publié sous licence MIT open source. Le texte complet de la licence peut être lu
-    dans le fichier <a href="%paths_root%LICENSE.md">LICENSE.md</a>.</p>
+    dans le fichier <a href="https://docs.bolt.cm/other/license">LICENSE.md</a>.</p>
 prefill:
   short_help: |
     <p>Cocher les types de contenus pour lesquels vous souhaitez générer des enregistrements avec du contenu factice de type Lorem Ipsum.</p>

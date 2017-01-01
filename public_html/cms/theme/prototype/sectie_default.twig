@@ -32,7 +32,7 @@
 
 			{% if sectie.body_advanced is not empty %}
 			
-			{{ sectie.body_advanced }}
+			{{ sectie.body_advanced.content  }}
 
 			{% endif %}
             
@@ -40,7 +40,7 @@
             
             {% if sectie.linktitle is not empty %}
 				
-				{% if sectie.selectpagina != '0' %}
+				{% if sectie.selectpagina is not empty %}
                     {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
 					<a class="btn-ghost" href="{{ paginalink.link }}">{{ sectie.linktitle }}</a> 
 				{% endif %}						

@@ -1,5 +1,5 @@
 <ul>
-    <li><h3><a href="{{ paths.rooturl }}{{ menu[0].path }}">{{ menu[0].label }}</a></h3></li>
+    <li><h3><a href="{{ menu[0].link }}">{{ menu[0].label }}</a></h3></li>
 
     {% for item in menu | slice(1) %}
         

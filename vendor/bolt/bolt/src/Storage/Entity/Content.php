@@ -239,12 +239,17 @@ class Content extends Entity
     }
 
     /**
+     * @param string|null $contentType
      * @return Collection\Relations
      */
-    public function getRelation()
+    public function getRelation($contentType = null)
     {
         if (!$this->relation instanceof Collection\Relations) {
             $this->relation = new Collection\Relations();
+        }
+
+        if ($contentType !== null) {
+            return $this->relation[$contentType];
         }
 
         return $this->relation;
@@ -316,7 +321,7 @@ class Content extends Entity
      */
     public function getTitle()
     {
-        if (isset($this->_fields['title'])) {
+        if (array_key_exists('title', $this->_fields)) {
             return $this->_fields['title'];
         }
 

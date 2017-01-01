@@ -2058,3 +2058,95 @@ paginas_veiligsporten:
     icon_many: fa:file-o
     icon_one: fa:file-o
     searchable: true
+
+
+paginaset: 
+    name: Paginaset
+    singular_name: Paginaset
+    description: Een set pagina's met informatie.
+    fields:
+        slug:
+            type: slug
+            uses: title
+            group: content
+
+        title:
+            label: Titel
+            type: text
+            class: large
+            group: Algemeen
+            variant: inline    
+        lead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: Algemeen
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas_njts
+            group: Algemeen
+        fotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: Algemeen   
+        files:
+            label: Bestanden
+            type: filelist
+            group: Algemeen 
+            upload: paginaset
+        contacttekst:
+            label: Contacttekst
+            type: textarea
+            group: Contact
+            variant: inline
+        contactwerkgroep:
+            label: Werkgroep
+            group: Contact
+            type: select
+            values: werkgroepen/title  
+        contactemail:
+            label: Contactemail
+            type: text
+            pattern: email
+            group: Contact
+            variant: inline
+
+        paginas:
+            type: repeater
+            group: Paginas
+            
+            fields:
+                pagetitle:
+                    label: Titel
+                    type: text
+                    class: large
+                    group: content
+                    variant: inline
+                pagemenutitle:
+                    type: text
+                    label: Menutitel
+                    group: content
+                    variant: inline            
+                pagelead:
+                    type: markdown
+                    label: Inleiding
+                    height: 150px
+                    group: Inhoud
+                pageimage:
+                    label: Afbeelding
+                    type: image
+                    upload: paginas_njts
+                    group: Inhoud
+                pagebody:
+                    type: markdown
+                    label: Pagina tekst
+                    height: 300px
+                    group: Inhoud
+                   
+    record_template: paginaset.twig           
+    taxonomy: [ afdelingen ]
+    recordsperpage: 100
+    icon_many: fa:file-o
+    icon_one: fa:file-o
+    searchable: true

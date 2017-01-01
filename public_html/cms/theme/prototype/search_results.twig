@@ -78,7 +78,7 @@
             {% endif %}
         {% elseif record.contenttype.slug == 'kader' %}
             <li>
-                <a href="{{ paths.rooturl }}pagina/organisatie-kader/#kaderlid{{ record.id }}">
+                <a href="../pagina/organisatie-kader/#kaderlid{{ record.id }}">
                     <div class="searchresult__title">{{ record.title }}</div></a>
                     <div class="searchresult__type">kaderlid</div>
                     <div class="searchresult__afdeling">organisatie</div>
@@ -86,7 +86,7 @@
             </li>
         {% elseif record.contenttype.slug == 'werkgroepen' %}
             <li>
-                <a href="{{ paths.rooturl }}pagina/organisatie-kader/#werkgroep{{ record.id }}">
+                <a href="../pagina/organisatie-kader/#werkgroep{{ record.id }}">
                     <div class="searchresult__title">{{ record.title }}</div></a>
                     <div class="searchresult__type">werkgroep</div>
                     <div class="searchresult__afdeling">organisatie</div>
@@ -94,7 +94,7 @@
             </li>
        {% elseif record.contenttype.slug == 'courses' %}
             <li>
-                <a href="{{ paths.rooturl }}pagina/discgolf-courses/#course{{ record.id }}">
+                <a href="../pagina/discgolf-courses/#course{{ record.id }}">
                     <div class="searchresult__title">{{ record.title }}</div></a>
                     <div class="searchresult__type">course</div>
                     <div class="searchresult__afdeling">discgolf</div>
@@ -102,7 +102,7 @@
             </li>
         {% elseif record.contenttype.slug == 'nationaleteams' %}
             <li>
-                <a href="{{ paths.rooturl }}pagina/ultimate-nationale-teams/#team{{ record.id }}">
+                <a href="../pagina/ultimate-nationale-teams/#team{{ record.id }}">
                     <div class="searchresult__title">{{ record.title }}</div></a>
                     <div class="searchresult__type">nationaal team</div>
                     <div class="searchresult__afdeling">ultimate</div>
@@ -115,7 +115,7 @@
                   'ultimate-studenten' in record.taxonomy.verenigingsaanbod %}
                 
                 <li>
-                    <a href="{{ paths.rooturl }}pagina/ultimate-verenigingen/#vereniging{{ record.id }}">
+                    <a href="../pagina/ultimate-verenigingen/#vereniging{{ record.id }}">
                         <div class="searchresult__title">{{ record.title }}</div></a>
                         <div class="searchresult__type">vereniging</div>
                         <div class="searchresult__afdeling">ultimate</div>
@@ -128,7 +128,7 @@
                   'discgolf-jeugd' in record.taxonomy.verenigingsaanbod %}
                 
             <li>
-                <a href="{{ paths.rooturl }}pagina/discgolf-verenigingen/#vereniging{{ record.id }}">
+                <a href="../pagina/discgolf-verenigingen/#vereniging{{ record.id }}">
                     <div class="searchresult__title">{{ record.title }}</div></a>
                     <div class="searchresult__type">vereniging</div>
                     <div class="searchresult__afdeling">discgolf</div>
@@ -139,7 +139,7 @@
 
         {% elseif record.contenttype.slug == 'documenten' %}
              <li>
-                <a href="{{ paths.rooturl }}pagina/organisatie-documenten/#document{{ record.id }}">
+                <a href="../pagina/organisatie-documenten/#document{{ record.id }}">
                     <div class="searchresult__title">{{ record.title }}</div></a>
                     <div class="searchresult__type">document</div>
                     <div class="searchresult__afdeling"></div>
@@ -147,7 +147,7 @@
             </li>
         {% elseif record.contenttype.slug == 'aanbod' %}
             <li>
-                <a href="{{ paths.rooturl }}pagina/organisatie-aanbod/#aanbod{{ record.id }}">
+                <a href="../pagina/organisatie-aanbod/#aanbod{{ record.id }}">
                     <div class="searchresult__title">{{ record.title }}</div></a>
                     <div class="searchresult__type">concept</div>
                     <div class="searchresult__afdeling">organisatie</div>
@@ -155,7 +155,7 @@
             </li>                
         {% else %}
             <li>
-                <a href="{{ paths.baseurl }}{{ record.link }}">
+                <a href="{{ record.link }}">
                     <div class="searchresult__title">{{ record.title }}</div></a>
                     <div class="searchresult__type">pagina</div>
                     <div class="searchresult__afdeling">{{ record.taxonomy.afdelingen.value }}</div>

@@ -9,6 +9,7 @@ use Bolt\Translation\Translator as Trans;
 use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Webmozart\PathUtil\Path;
 
 /**
  * Async controller for filesystem management async routes.
@@ -236,12 +237,16 @@ class FilesystemManager extends AsyncBase
     public function filesAutoComplete(Request $request)
     {
         $term = $request->query->get('term', '.*');
+        $dir = Path::getDirectory($term);
+        $term = Path::getFilename($term);
+        $term = preg_quote($term);
+
         $extensions = implode('|', explode(',', $request->query->get('ext', '.*')));
         $regex = sprintf('/.*(%s).*\.(%s)$/', $term, $extensions);
 
         $files = $this->filesystem()
             ->find()
-            ->in('files://')
+            ->in('files://' . $dir)
             ->name($regex)
         ;
 
@@ -295,13 +300,12 @@ class FilesystemManager extends AsyncBase
     public function removeFolder(Request $request)
     {
         $namespace = $request->request->get('namespace');
-        $parentPath = $request->request->get('parent');
         $folderName = $request->request->get('foldername');
 
         try {
-            $this->filesystem()->deleteDir("$namespace://$parentPath$folderName");
+            $this->filesystem()->deleteDir(sprintf('%s://%s', $namespace, $folderName));
 
-            return $this->json("$parentPath$folderName", Response::HTTP_OK);
+            return $this->json($folderName, Response::HTTP_OK);
         } catch (ExceptionInterface $e) {
             $msg = Trans::__('Unable to delete directory: %DIR%', ['%DIR%' => $folderName]);
 
@@ -321,7 +325,6 @@ class FilesystemManager extends AsyncBase
     public function renameFile(Request $request)
     {
         $namespace = $request->request->get('namespace');
-        $parentPath = $request->request->get('parent');
         $oldName = $request->request->get('oldname');
         $newName = $request->request->get('newname');
 
@@ -330,9 +333,9 @@ class FilesystemManager extends AsyncBase
         }
 
         try {
-            $this->filesystem()->rename("$namespace://$parentPath/$oldName", "$parentPath/$newName");
+            $this->filesystem()->rename(sprintf('%s://%s', $namespace, $oldName), $newName);
 
-            return $this->json("$parentPath/$newName", Response::HTTP_OK);
+            return $this->json($newName, Response::HTTP_OK);
         } catch (ExceptionInterface $e) {
             $msg = Trans::__('Unable to rename file: %FILE%', ['%FILE%' => $oldName]);
             $this->logException($msg, $e);
@@ -359,14 +362,13 @@ class FilesystemManager extends AsyncBase
     public function renameFolder(Request $request)
     {
         $namespace = $request->request->get('namespace');
-        $parentPath = $request->request->get('parent');
         $oldName = $request->request->get('oldname');
         $newName = $request->request->get('newname');
 
         try {
-            $this->filesystem()->rename("$namespace://$parentPath$oldName", "$parentPath$newName");
+            $this->filesystem()->rename(sprintf('%s://%s', $namespace, $oldName), $newName);
 
-            return $this->json("$parentPath$newName", Response::HTTP_OK);
+            return $this->json($newName, Response::HTTP_OK);
         } catch (ExceptionInterface $e) {
             $msg = Trans::__('Unable to rename directory: %DIR%', ['%DIR%' => $oldName]);
             $this->logException($msg, $e);

@@ -36,7 +36,7 @@ section--showcase
 
 		{% if topic1.linktitle is not empty %}
 
-			{% if topic1.selectpagina != '0' %}
+			{% if topic1.selectpagina is not empty %}
                 {% setcontent paginalink = "paginas/#{topic1.selectpagina}" %}
 				<a class="arrow-link" href="{{ topic1.link }}">{{ topic1.linktitle }}</a>
 			{% endif %}							
@@ -68,7 +68,7 @@ section--showcase
 
 			{% if topic2.linktitle is not empty %}
 
-			{% if topic2.selectpagina != '0' %}
+			{% if topic2.selectpagina is not empty %}
                 {% setcontent paginalink = "paginas/#{topic2.selectpagina}" %}
 				<a class="arrow-link" href="{{ paginalink.link }}">{{ topic2.linktitle }}</a>
 			{% endif %}							

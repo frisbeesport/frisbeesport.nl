@@ -44,7 +44,8 @@ class Repository implements ObjectRepository
     /**
      * Creates a new empty entity and passes the supplied data to the constructor.
      *
-     * @param array $params
+     * @param array         $params
+     * @param ClassMetadata $metadata
      *
      * @return Entity
      */
@@ -52,6 +53,7 @@ class Repository implements ObjectRepository
     {
         $params = new ArrayObject($params);
         $builder = $this->getEntityBuilder();
+        /** @var Entity $entity */
         $entity = $builder->getEntity();
         $preEventArgs = new HydrationEvent($params, ['entity' => $entity, 'repository' => $this]);
         $this->event()->dispatch(StorageEvents::PRE_HYDRATE, $preEventArgs);
@@ -186,7 +188,7 @@ class Repository implements ObjectRepository
     /**
      * Method to hydrate and return a QueryBuilder query.
      *
-     * @return array Entity | false
+     * @return array Entity
      **/
     public function findWith(QueryBuilder $query)
     {
@@ -196,7 +198,7 @@ class Repository implements ObjectRepository
         if ($result) {
             return $this->hydrateAll($result, $query);
         } else {
-            return false;
+            return [];
         }
     }
 
@@ -430,7 +432,7 @@ class Repository implements ObjectRepository
 
         $this->getEntityBuilder()->createFromDatabaseValues($data, $entity);
 
-        $postEventArgs = new HydrationEvent($entity, ['data' => $data, 'repository' => $this]);
+        $postEventArgs = new HydrationEvent($entity, ['entity' => $entity, 'data' => $data, 'repository' => $this]);
         $this->event()->dispatch(StorageEvents::POST_HYDRATE, $postEventArgs);
 
         return $entity;

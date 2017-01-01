@@ -1,6 +1,7 @@
 <?php
 namespace Bolt\Controller\Backend;
 
+use Bolt\Exception\InvalidRepositoryException;
 use Bolt\Storage\ContentRequest\Listing;
 use Bolt\Storage\ContentRequest\ListingOptions;
 use Bolt\Translation\Translator as Trans;
@@ -56,7 +57,7 @@ class Records extends BackendBase
         // Set the editreferrer in twig if it was not set yet.
         $this->setEditReferrer($request);
 
-        // Get the Contenttype obejct
+        // Get the ContentType object
         $contenttype = $this->getContentType($contenttypeslug);
 
         // Save the POSTed record
@@ -70,8 +71,15 @@ class Records extends BackendBase
             return $this->recordSave()->action($formValues, $contenttype, $id, $new, $returnTo, $editReferrer);
         }
 
-        // Get the record
-        $repo = $this->getRepository($contenttypeslug);
+        try {
+            // Get the record
+            $repo = $this->getRepository($contenttypeslug);
+        } catch (InvalidRepositoryException $e) {
+            $this->flashes()->error(Trans::__('contenttypes.generic.not-existing', ['%contenttype%' => $contenttypeslug]));
+
+            return $this->redirectToRoute('dashboard');
+        }
+
         if ($new) {
             $content = $repo->create(['contenttype' => $contenttypeslug, 'status' => $contenttype['default_status']]);
         } else {
@@ -86,7 +94,7 @@ class Records extends BackendBase
 
         // We're doing a GET
         $duplicate = $request->query->get('duplicate', false);
-        $context = $this->recordEdit()->action($content, $contenttype, $duplicate);
+        $context = $this->recordEdit()->action($content, $content->getContenttype(), $duplicate);
 
         return $this->render('@bolt/editcontent/editcontent.twig', $context);
     }
@@ -156,7 +164,7 @@ class Records extends BackendBase
         $contenttype = $this->getContentType($contenttypeslug);
 
         // Get relations
-        $showContenttype = null;
+        $showContentType = null;
         $relations = null;
         if (isset($contenttype['relations'])) {
             $relations = $contenttype['relations'];
@@ -173,7 +181,7 @@ class Records extends BackendBase
                 $relatedtype = $this->getContentType($relatedslug);
 
                 if ($relatedtype['slug'] == $showSlug) {
-                    $showContenttype = $relatedtype;
+                    $showContentType = $relatedtype;
                 }
 
                 $relations[$relatedslug] = [
@@ -189,8 +197,8 @@ class Records extends BackendBase
             'title'            => $content['title'],
             'contenttype'      => $contenttype,
             'relations'        => $relations,
-            'show_contenttype' => $showContenttype,
-            'related_content'  => is_null($relations) ? null : $content->related($showContenttype['slug']),
+            'show_contenttype' => $showContentType,
+            'related_content'  => is_null($relations) ? null : $content->related($showContentType['slug']),
             'permissions'      => $this->getContentTypeUserPermissions($contenttypeslug, $this->users()->getCurrentUser()),
         ];
 

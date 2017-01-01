@@ -17,7 +17,7 @@
 {% else %}
     {% set logoimage = 'images/logo_nfb_200.png' %}
     {% set bannerimage = 'images/hero-ultimate_1500.jpg' %}
-    {% set logourl = '' %}
+    {% set logourl = 'homepage' %}
 {% endif %}
 
 {% include '_header_tabs.twig' %}
@@ -29,7 +29,7 @@
      
     
 
-    <form method="get" action="{{ paths.rooturl }}search"  enctype="text/plain">
+    <form method="get" action="{{ path('search') }}"  enctype="text/plain">
                   <input type="search" value="{% if search is defined %}{{ search|escape }}{% endif %}" placeholder="{{ __("Search …") }}" name="search">
                   <input type="submit" value="Zoeken">           
     </form>-->

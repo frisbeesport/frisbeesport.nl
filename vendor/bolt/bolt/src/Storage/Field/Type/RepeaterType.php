@@ -69,7 +69,7 @@ class RepeaterType extends FieldTypeBase
             function ($query, $result, $id) use ($repo, $collection, $toDelete) {
                 foreach ($collection as $entity) {
                     $entity->content_id = $id;
-                    $repo->save($entity);
+                    $repo->save($entity, $silenceEvents = true);
                 }
 
                 foreach ($toDelete as $entity) {
@@ -82,7 +82,7 @@ class RepeaterType extends FieldTypeBase
     public function hydrate($data, $entity)
     {
         $key = $this->mapping['fieldname'];
-        if ($this->isJson($data[$key])) {
+        if (isset($data[$key]) && $this->isJson($data[$key])) {
             $originalMapping[$key]['fields'] = $this->mapping['fields'];
             $originalMapping[$key]['type'] = 'repeater';
             $mapping = $this->em->getMapper()->getRepeaterMapping($originalMapping);
@@ -98,6 +98,7 @@ class RepeaterType extends FieldTypeBase
             }
 
             $this->set($entity, $collection);
+
             return;
         }
 
@@ -197,7 +198,7 @@ class RepeaterType extends FieldTypeBase
             case 'sqlite':
                 return 'GROUP_CONCAT(DISTINCT ' . $dummy . ".name||'_'||" . $dummy . ".grouping||'_'||" . $dummy . ".id) as $alias";
             case 'postgresql':
-                return 'string_agg(DISTINCT ' . $dummy . ".name||'_'||" . $dummy . ".grouping||'_'||" . $dummy . ".id, ',') as $alias";
+                return 'string_agg(' . $dummy . ".name||'_'||" . $dummy . ".grouping||'_'||" . $dummy . ".id, ',' ORDER BY " . $dummy . ".grouping) as $alias";
         }
     }
 
@@ -240,7 +241,7 @@ class RepeaterType extends FieldTypeBase
                 function ($query, $result, $id) use ($repo, $fieldValue) {
                     if ($result === 1 && $id) {
                         $fieldValue->setContent_id($id);
-                        $repo->save($fieldValue);
+                        $repo->save($fieldValue, $silenceEvents = true);
                     }
                 }
             );
@@ -278,7 +279,7 @@ class RepeaterType extends FieldTypeBase
             $queries->onResult(
                 function ($query, $result, $id) use ($repo, $fieldValue) {
                     if ($result === 1) {
-                        $repo->save($fieldValue);
+                        $repo->save($fieldValue, $silenceEvents = true);
                     }
                 }
             );

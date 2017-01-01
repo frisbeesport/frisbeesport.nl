@@ -14,9 +14,7 @@ use Bolt\Pager;
 use Bolt\Storage\Field\Collection\RepeatingFieldCollection;
 use Bolt\Translation\Translator as Trans;
 use Doctrine\DBAL\Connection as DoctrineConn;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
 use Silex\Application;
 use utilphp\util;
@@ -226,11 +224,12 @@ class Storage
             }
         }
 
-        $content['title'] = rtrim($content['title'], '.,;:');
-        $content['slug'] = $this->app['slugify']->slugify($content['title']);
-
         $contentobject = $this->getContentObject($contenttype);
         $contentobject->setValues($content);
+
+        // After we initially filled the content object, we get the title to set the slug.
+        $slug = $this->app['slugify']->slugify($contentobject->getTitle());
+        $contentobject->setValue('slug', $slug);
 
         if (!empty($contenttype['taxonomy'])) {
             foreach ($contenttype['taxonomy'] as $taxonomy) {
@@ -690,8 +689,9 @@ class Storage
      * @param       $contenttype
      * @param       $fields
      * @param array $filter
+     * @param bool  $implode
      *
-     * @return \Bolt\Legacy\Content
+     * @return Content
      */
     private function searchSingleContentType($query, $contenttype, $fields, array $filter = null, $implode = false)
     {
@@ -1132,145 +1132,19 @@ class Storage
     }
 
     /**
-     * Check (and update) any records that need to be updated from "timed" to "published".
-     *
-     * @param array $contenttype
+     * @deprecated Deprecated since 3.0, to be removed in 4.0.
+     * @see        \Bolt\Storage\EventProcessor\TimedRecord::publishTimedRecords()
      */
-    public function publishTimedRecords($contenttype)
+    public function publishTimedRecords()
     {
-        // We need to do this only once per contenttype, max.
-        if (isset($this->checkedfortimed['publish-' . $contenttype['slug']])) {
-            return;
-        }
-
-        $this->timedHandleRecords($contenttype['slug'], 'publish');
     }
 
     /**
-     * Check (and update) any records that need to be updated from "published" to "held".
-     *
-     * @param array $contenttype
+     * @deprecated Deprecated since 3.0, to be removed in 4.0.
+     * @see        \Bolt\Storage\EventProcessor\TimedRecord::holdExpiredRecords()
      */
-    public function depublishExpiredRecords($contenttype)
+    public function depublishExpiredRecords()
     {
-        // We need to do this only once per contenttype, max.
-        if (isset($this->checkedfortimed['depublish-' . $contenttype['slug']])) {
-            return;
-        }
-
-        $this->timedHandleRecords($contenttype['slug'], 'depublish');
-    }
-
-    /**
-     * Handle scheduled publishing/de-publishing of records.
-     *
-     * @param string $contenttypeSlug
-     * @param string $type
-     */
-    private function timedHandleRecords($contenttypeSlug, $type)
-    {
-        $this->checkedfortimed[$type . '-' . $contenttypeSlug] = true;
-        $tablename = $this->getContenttypeTablename($contenttypeSlug);
-        if ($this->tableExists($tablename) === false) {
-            return;
-        }
-
-        try {
-            // Check for record that need to be published/de-published
-            $recordIds = $this->timedListRecords($contenttypeSlug, $type);
-            if (empty($recordIds)) {
-                return;
-            }
-
-            /** @var QueryBuilder $query */
-            $query = $this->app['db']->createQueryBuilder()
-                ->update($tablename)
-                ->set('status', ':newstatus')
-                ->set('datechanged', ':datechanged')
-                ->setParameter('datechanged', date('Y-m-d H:i:s'))
-            ;
-
-            $this->timedWhere($query, $type);
-
-            $query->execute();
-        } catch (DBALException $e) {
-            $message = "Timed $type of records for $contenttypeSlug failed: " . $e->getMessage();
-            $this->app['logger.system']->critical($message, ['event' => 'exception', 'exception' => $e]);
-
-            return;
-        }
-
-        // If there are no listeners for this event, we can safely return early.
-        if (! $this->app['dispatcher']->hasListeners("timed.$type")) {
-            return;
-        }
-
-        try {
-            foreach ($recordIds as $recordId) {
-                $content = $this->getContent($contenttypeSlug . '/' . $recordId['id'], ['hydrate' => false, 'returnsingle' => true]);
-
-                $event = new StorageEvent($content, ['contenttype' => $contenttypeSlug, 'create' => false]);
-                $this->app['dispatcher']->dispatch("timed.$type", $event);
-            }
-        } catch (\Exception $e) {
-            $this->app['logger.system']->critical("Dispatch handling failed for $contenttypeSlug.", ['event' => 'exception', 'exception' => $e]);
-        }
-    }
-
-    /**
-     * Set the QueryBuilder where parameters.
-     *
-     * @param QueryBuilder $query
-     * @param string       $type
-     *
-     * @return array|false
-     */
-    private function timedListRecords($contenttypeSlug, $type)
-    {
-        $tablename = $this->getContenttypeTablename($contenttypeSlug);
-
-        /** @var QueryBuilder $query */
-        $query = $this->app['db']->createQueryBuilder()
-            ->select('id')
-            ->from($tablename)
-            ->set('status', ':newstatus')
-            ->set('datechanged', ':datechanged')
-            ->setParameter('datechanged', date('Y-m-d H:i:s'))
-        ;
-
-        $this->timedWhere($query, $type);
-
-        return $query->execute()->fetchAll();
-    }
-
-    /**
-     * Set the QueryBuilder where parameters.
-     *
-     * @param QueryBuilder $query
-     * @param string       $type
-     */
-    private function timedWhere(QueryBuilder $query, $type)
-    {
-        if ($type === 'publish') {
-            $query
-                ->where('status = :oldstatus')
-                ->andWhere('datepublish < :currenttime')
-                ->setParameter('oldstatus', 'timed')
-                ->setParameter('newstatus', 'published')
-                ->setParameter('currenttime', new \DateTime(), \Doctrine\DBAL\Types\Type::DATETIME)
-            ;
-        } else {
-            $query
-                ->where('status = :oldstatus')
-                ->andWhere('datedepublish <= :currenttime')
-                ->andWhere('datedepublish > :zeroday')
-                ->andWhere('datechanged < datedepublish')
-                ->setParameter('oldstatus', 'published')
-                ->setParameter('newstatus', 'held')
-                ->setParameter('zeroday', '1900-01-01 00:00:01')
-                ->setParameter('currenttime', new \DateTime(), \Doctrine\DBAL\Types\Type::DATETIME)
-            ;
-        }
     }
 
     /**
@@ -1281,6 +1155,8 @@ class Storage
      * @param array|string|null $inParameters
      *
      * @see $this->decodeContentQuery()
+     *
+     * @return array
      */
     private function organizeQueryParameters($inParameters = null)
     {
@@ -1402,8 +1278,8 @@ class Storage
         // When using from the frontend, we assume (by default) that we only want published items,
         // unless something else is specified explicitly
         $request = $this->app['request_stack']->getCurrentRequest();
-        $isBackend = $request ? Zone::isBackend($request) : false;
-        if (!$isBackend && empty($ctypeParameters['status'])) {
+        $isFrontend = $request ? Zone::isFrontend($request) : true;
+        if ($isFrontend && empty($ctypeParameters['status'])) {
             $ctypeParameters['status'] = 'published';
         }
 
@@ -2341,6 +2217,7 @@ class Storage
                         $slugifiedContentType === $this->app['slugify']->slugify($ct['singular_name'])
                     ) {
                         $contenttype = $ct;
+                        $contenttype['key'] = $key;
                         break;
                     }
                 }
@@ -2681,7 +2558,8 @@ class Storage
         }
 
         // Get the contenttype from first $content
-        $contenttype = $content[util::array_first_key($content)]->contenttype['slug'];
+        $ct = reset($content);
+        $contenttype = isset($ct->contenttype['key']) ? $ct->contenttype['key'] : $ct->contenttype['slug'];
 
         $query = sprintf(
             "SELECT * FROM %s WHERE from_contenttype=? AND from_id IN (?) ORDER BY id",
@@ -3030,10 +2908,12 @@ class Storage
     /**
      * Setter for pager storage element.
      *
-     * @param array|Pager $pager
-     * @return $this
-     *
      * @deprecated Just for keep BC
+     *
+     * @param string      $name
+     * @param array|Pager $pager
+     *
+     * @return Storage
      */
     public function setPager($name, $pager)
     {
@@ -3049,10 +2929,11 @@ class Storage
     /**
      * Getter of a pager element. Pager can hold a paging snapshot map.
      *
-     * @param string $name Optional name of a pager element. Whole pager map returns if no name given.
-     * @return array
-     *
      * @deprecated Just for keep BC
+     *
+     * @param string $name Optional name of a pager element. Whole pager map returns if no name given.
+     *
+     * @return array
      */
     public function &getPager($name = null)
     {
@@ -3061,6 +2942,9 @@ class Storage
             ->asArray();
     }
 
+    /**
+     * @return bool
+     */
     public function isEmptyPager()
     {
         return $this->app['pager']->isEmptyPager();

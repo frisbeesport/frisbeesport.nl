@@ -1,6 +1,8 @@
 <?php
+
 namespace Bolt\Configuration;
 
+use Bolt\Configuration\Validation\ValidatorInterface;
 use Bolt\Pager\PagerManager;
 use Composer\Autoload\ClassLoader;
 use Eloquent\Pathogen\AbsolutePathInterface;
@@ -90,6 +92,7 @@ class ResourceManager
         $this->setUrl('upload', '/upload/');
         $this->setUrl('bolt', '/bolt/');
         $this->setUrl('theme', '/theme/');
+        $this->setUrl('themes', '/theme/'); // Needed for filebrowser. See #5759
 
         $this->setPath('web', '');
         $this->setPath('cache', 'app/cache');
@@ -193,7 +196,7 @@ class ResourceManager
     public function getPathObject($name)
     {
         $name = str_replace('\\', '/', $name);
-         
+
         $parts = [];
         if (strpos($name, '/') !== false) {
             $parts = explode('/', $name);
@@ -247,18 +250,23 @@ class ResourceManager
      * Get a URL path definition.
      *
      * @param string $name
+     * @param bool   $includeBasePath
      *
      * @throws \InvalidArgumentException
      *
      * @return string
      */
-    public function getUrl($name)
+    public function getUrl($name, $includeBasePath = true)
     {
         if (array_key_exists($name . 'url', $this->urls) && $name !== 'root') {
             return $this->urls[$name . 'url'];
         }
         if (! array_key_exists($name, $this->urls)) {
             throw new \InvalidArgumentException("Requested url $name is not available", 1);
+        }
+
+        if (!$includeBasePath) {
+            return $this->urls[$name];
         }
 
         return $this->urlPrefix . $this->urls[$name];
@@ -313,7 +321,8 @@ class ResourceManager
      * Takes a Request object and uses it to initialize settings that depend on
      * the request.
      *
-     * @param Request $request
+     * @param Application $app
+     * @param Request     $request
      */
     public function initializeRequest(Application $app, Request $request = null)
     {
@@ -351,13 +360,7 @@ class ResourceManager
 
         $rootUrl = rtrim($this->getUrl('root'), '/');
         if ($rootUrl !== $request->getBasePath()) {
-            $rootUrl = $request->getBasePath();
-            $this->setUrl('root', $rootUrl . $this->getUrl('root'));
-            $this->setUrl('app', $rootUrl . $this->getUrl('app'));
-            $this->setUrl('extensions', $rootUrl . $this->getUrl('extensions'));
-            $this->setUrl('files', $rootUrl . $this->getUrl('files'));
-            $this->setUrl('async', $rootUrl . $this->getUrl('async'));
-            $this->setUrl('upload', $rootUrl . $this->getUrl('upload'));
+            $this->urlPrefix = $request->getBasePath();
         }
 
         $this->setRequest('protocol', $protocol);
@@ -405,10 +408,9 @@ class ResourceManager
             $this->setPath('templatespath', $this->getPath('theme'));
         }
 
-        $branding = ltrim($this->app['config']->get('general/branding/path') . '/', '/');
-        $this->setUrl('bolt', $this->getUrl('root') . $branding);
+        $branding = '/' . trim($this->app['config']->get('general/branding/path'), '/') . '/';
+        $this->setUrl('bolt', $branding);
         $this->app['config']->setCkPath();
-        $this->verifyDb();
     }
 
     /**
@@ -422,7 +424,7 @@ class ResourceManager
     {
         $themeDir = isset($generalConfig['theme']) ? '/' . $generalConfig['theme'] : '';
         $themePath = isset($generalConfig['theme_path']) ? $generalConfig['theme_path'] : '/theme';
-        $themeUrl = isset($generalConfig['theme_path']) ? $generalConfig['theme_path'] : $this->getUrl('root') . 'theme';
+        $themeUrl = isset($generalConfig['theme_path']) ? $generalConfig['theme_path'] : '/theme';
 
         // See if the user has set a theme path otherwise use the default
         if (!isset($generalConfig['theme_path'])) {
@@ -435,30 +437,29 @@ class ResourceManager
     }
 
     /**
-     * Verifies the configuration to ensure that paths exist and are writable.
+     * @deprecated Deprecated since 3.1, to be removed in 4.0.
      */
     public function verify()
     {
-        $this->getVerifier()->doChecks();
     }
 
     /**
-     * Verify the database folder.
+     * @deprecated Deprecated since 3.1, to be removed in 4.0.
      */
     public function verifyDb()
     {
-        $this->getVerifier()->doDatabaseCheck();
     }
 
     /**
      * Get the LowlevelChecks object.
      *
-     * @return LowlevelChecks
+     * @return ValidatorInterface
      */
     public function getVerifier()
     {
         if (! $this->verifier) {
-            $this->verifier = new LowlevelChecks($this);
+            $verifier = new LowlevelChecks($this);
+            $this->verifier = $verifier;
         }
 
         return $this->verifier;
@@ -467,7 +468,7 @@ class ResourceManager
     /**
      * Set the LowlevelChecks object.
      *
-     * @param \Bolt\Configuration\LowlevelChecks|null $verifier
+     * @param ValidatorInterface|null $verifier
      */
     public function setVerifier($verifier)
     {

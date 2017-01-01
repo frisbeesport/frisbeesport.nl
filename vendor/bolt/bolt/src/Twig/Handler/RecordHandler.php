@@ -40,7 +40,7 @@ class RecordHandler
     {
         /** @var Request $request */
         $request = $this->app['request'];
-        $requestUri = $request->getPathInfo();
+        $requestUri = $request->getRequestUri();
         $routeParams = $request->get('_route_params');
 
         // If passed a string, and it is in the route.
@@ -71,12 +71,12 @@ class RecordHandler
             return true;
         }
 
-        if (!isset($content['contenttype'])) {
+        if (!$content instanceof \Bolt\Legacy\Content || !property_exists($content, 'contenttype')) {
             return false;
         }
 
         // if the current requested page is for the same slug or singularslug.
-        $ct = $content['contenttype'];
+        $ct = $content->contenttype;
         if ($routeParams['contenttypeslug'] === $ct['slug'] || $routeParams['contenttypeslug'] === $ct['singular_slug']) {
             // …and the slugs should match.
             return $routeParams['slug'] === $content['slug'];
@@ -112,14 +112,24 @@ class RecordHandler
      * @param bool                 $common
      * @param bool                 $extended
      * @param bool                 $repeaters
-     * @param bool                 $templatefields
+     * @param bool                 $templateFields
      * @param string               $template
      * @param string|array         $exclude
+     * @param bool                 $skip_uses
      *
      * @return string
      */
-    public function fields(\Twig_Environment $env, $record = null, $common = true, $extended = false, $repeaters = true, $templatefields = true, $template = '_sub_fields.twig', $exclude = null)
-    {
+    public function fields(
+        \Twig_Environment $env,
+        $record = null,
+        $common = true,
+        $extended = false,
+        $repeaters = true,
+        $templateFields = true,
+        $template = '_sub_fields.twig',
+        $exclude = null,
+        $skip_uses = true
+    ) {
         // If $record is empty, we must get it from the global scope in Twig.
         if (!$record instanceof \Bolt\Legacy\Content) {
             $globals = $env->getGlobals();
@@ -128,7 +138,7 @@ class RecordHandler
 
         // Still no record? Nothing to do here, then.
         if (!$record instanceof \Bolt\Legacy\Content) {
-            return;
+            return null;
         }
 
         if (!is_array($exclude)) {
@@ -140,8 +150,9 @@ class RecordHandler
             'common'         => $common,
             'extended'       => $extended,
             'repeaters'      => $repeaters,
-            'templatefields' => $templatefields,
+            'templatefields' => $templateFields,
             'exclude'        => $exclude,
+            'skip_uses'      => $skip_uses,
         ];
 
         return new \Twig_Markup($env->render($template, $context), 'utf-8');
@@ -184,7 +195,7 @@ class RecordHandler
         $finder = new Finder();
         $finder->files()
             ->in($this->app['resources']->getPath('templatespath'))
-            ->notname('/^_/')
+            ->notName('/^_/')
             ->notPath('node_modules')
             ->notPath('bower_components')
             ->notPath('.sass-cache')

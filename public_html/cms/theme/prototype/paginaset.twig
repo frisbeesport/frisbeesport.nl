@@ -1,0 +1,160 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+
+{% set afdeling = "" %}
+{% set style = "" %}
+
+{% for tag in record.taxonomy.afdelingen %}
+	{% set afdeling = tag %}
+{% endfor %}
+
+{% if afdeling == "ultimate" %}
+	{% set style = 'ultimate' %}
+{% elseif afdeling == "discgolf" %}
+	{% set style = 'discgolf' %}
+{% else %}
+	{% set style = 'organisatie' %}
+{% endif %}
+
+{% setcontent children = record.contenttype.name where { 'grouptype': 'Inhoud' } orderby 'volgnummer' %}
+
+{% include '_head.twig' with { 'title': record.grouptitle, 'description': record.grouplead, 'image': record.groupimage, 'url': record.link } %}
+
+<body class="background afdeling--{{ style }} ">
+<div class="sheet">
+        
+    {% include '_browser-upgrade.twig' %}    
+ 
+    <article>
+    
+    {% include '_header.twig' with { 'afdeling': afdeling, 'image': record.groupimage, 'title': record.grouptitle, 'header': record.grouplead, 'buttons': '', 'fotograaf': record.groupfotograaf } %}
+
+        <section>
+            <div class="container">
+		        <div class="grid">
+             
+                <div class="sidebar">
+          
+                    {% if record.paginas|length > 1 %}
+
+                    <div class="forwards">
+                      {% set pageid = 0 %}
+                    {% for pagina in record.paginas %}       
+                 
+                        <a href="#pageid{{ pageid }}" class="forward">{{ pagina.pagemenutitle }}</a>
+     {% set pageid = pageid + 1 %}
+          
+                    {% endfor %}  
+                
+                    </div>    
+            
+                    {% endif %}  
+            
+                
+                    <div class="groupinfo">
+              
+                        <h3>Contact</h3>
+                
+                        {% if record.contacttekst is not empty %}
+                        <p>{{ record.contacttekst  }}</p>
+                        {% endif %}
+            
+
+                        {% if record.contactwerkgroep is not empty %}
+                
+                        {% setcontent werkgroep = 'werkgroepen' where {'id':  record.contactwerkgroep } %}
+                        <p><a href="../pagina/organisatie-kader/#werkgroep{{  werkgroep.id }}">{{  werkgroep.title }}</a></p>
+                                     
+                        {% endif %}
+
+
+                        {% if record.contactemail is not empty %}
+                        
+                        <p><a href="mailto:{{ record.contactemail  }}">{{ record.contactemail  }}</a></p>
+                        
+                        {% endif %}
+            
+                        {% if record.files is not empty %}
+  
+                        <h3>Documenten</h3>
+            
+                        <ul class="documenten">
+
+                            {% for bestand in record.files %}      
+                            
+                            <li id="document{{ document.id }}" class="document" style="font-style: none">
+                                <a class="pdf-link" href="{{ asset(bestand.filename, 'files') }}">{{ bestand.title }}</a>
+                            </li>
+                            
+                            {% endfor %} 
+                        
+                        </ul>
+
+                        {% endif %}
+                    </div><!-- groupinfo -->
+                </div><!-- sidebar -->
+
+
+                
+                    <div class="pagina section--text afdeling--text">
+
+            {% set pageid = 0 %}
+            
+            {% for pagina in record.paginas %}
+
+                    {% if pagina.get('pagetitle') is not empty %}  
+
+                    <h2 id="pageid{{ pageid }}">{{ pagina.get('pagetitle') }}</h2>
+                    {% endif %}  
+
+ 
+                    {% if pagina.get('pagelead') is not empty %}  
+
+                    {{ pagina.get('pagelead')|markdown }}
+            
+                    {% endif %}  
+    
+                    {% if pagina.get('pageimage') is not empty %}  
+ 
+                    <img src="{{ pagina.get('pageimage')|image(800, 450, "c") }}">
+            
+                    {% endif %}  
+
+
+                    {% if pagina.get('pagebody') is not empty %}  
+
+                    {{ pagina.get('pagebody')|markdown }}
+            
+                    {% endif %}
+
+                    {% set pageid = pageid + 1 %}
+                         
+            {% endfor %}
+   
+                </div>
+
+              
+                
+            
+    	    </div> 
+
+	    </div>
+    </section>
+
+  
+    {% block extended_content %}
+    {% endblock %}
+
+    </article>
+   
+    {% include '_footer.twig' %}
+	{% include '_scripts.twig' %}
+
+    </div>
+
+    {% include '_piwik.twig' %}
+</body>
+</html>

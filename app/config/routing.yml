@@ -49,6 +49,38 @@ spelers:
     slug: spelers
   recordslug: pagina/spelers
 
+ultimate-nieuws:
+  path: /ultimate-nieuws
+  defaults:
+    _controller: controller.frontend:record
+    contenttypeslug: pagina
+    slug: ultimate-nieuws
+  recordslug: pagina/ultimate-nieuws
+
+discgolf-nieuws:
+  path: /discgolf-nieuws
+  defaults:
+    _controller: controller.frontend:record
+    contenttypeslug: pagina
+    slug: discgolf-nieuws
+  recordslug: pagina/discgolf-nieuws
+  
+organisatie-nieuws:
+  path: /organisatie-nieuws
+  defaults:
+    _controller: controller.frontend:record
+    contenttypeslug: pagina
+    slug: organisatie-nieuws
+  recordslug: pagina/organisatie-nieuws
+
+spelers-nieuws:
+  path: /spelers-nieuws
+  defaults:
+    _controller: controller.frontend:record
+    contenttypeslug: pagina
+    slug: spelers-nieuws
+  recordslug: pagina/spelers-nieuws
+
 pers:
   path: /pers
   defaults:

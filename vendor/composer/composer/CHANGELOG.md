@@ -1,3 +1,28 @@
+### [1.2.4] - 2016-12-06
+
+  * Fixed regression in output handling of scripts from 1.2.3
+  * Fixed support for LibreSSL detection as lib-openssl
+  * Fixed issue with Zend Guard in the autoloader bootstrapping
+  * Fixed support for loading partial provider repositories
+
+### [1.2.3] - 2016-12-01
+
+  * Fixed bug in HgDriver failing to identify BitBucket repositories
+  * Fixed support for loading partial provider repositories
+
+### [1.2.2] - 2016-11-03
+
+  * Fixed selection of packages based on stability to be independent from package repository order
+  * Fixed POST_DEPENDENCIES_SOLVING not containing some operations in edge cases
+  * Fixed issue handling GitLab URLs containing dots and other special characters
+  * Fixed issue on Windows when running composer at the root of a drive
+  * Minor fixes
+
+### [1.2.1] - 2016-09-12
+
+  * Fixed edge case issues with the static autoloader
+  * Minor fixes
+
 ### [1.2.0] - 2016-07-19
 
   * Security: Fixed [httpoxy](https://httpoxy.org/) vulnerability
@@ -428,6 +453,10 @@
 
   * Initial release
 
+[1.2.4]: https://github.com/composer/composer/compare/1.2.3...1.2.4
+[1.2.3]: https://github.com/composer/composer/compare/1.2.2...1.2.3
+[1.2.2]: https://github.com/composer/composer/compare/1.2.1...1.2.2
+[1.2.1]: https://github.com/composer/composer/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/composer/composer/compare/1.2.0-RC...1.2.0
 [1.2.0-RC]: https://github.com/composer/composer/compare/1.1.3...1.2.0-RC
 [1.1.3]: https://github.com/composer/composer/compare/1.1.2...1.1.3

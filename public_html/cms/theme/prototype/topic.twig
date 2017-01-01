@@ -32,7 +32,7 @@
 
         {% if topic.linktitle is not empty %}
 
-			{% if topic.selectpagina != '0' %}
+			{% if topic.selectpagina is not empty %}
 	            {% setcontent paginalink = "paginas/#{topic.selectpagina}" %}
 	            <a class="arrow-link" href="{{ paginalink.link }}">{{ topic.linktitle }}</a>
 			{% endif %}					

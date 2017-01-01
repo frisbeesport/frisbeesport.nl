@@ -2,14 +2,17 @@
 
 namespace Bolt\Thumbs\Tests;
 
+use Bolt\Filesystem\Adapter\Local;
+use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\Handler\Image;
 use Bolt\Filesystem\Handler\Image\Dimensions;
-use Bolt\Thumbs\Thumbnail;
 use Bolt\Thumbs\Controller;
+use Bolt\Thumbs\Thumbnail;
 use Bolt\Thumbs\Transaction;
 use Silex\Application;
 use Silex\Provider\ServiceControllerServiceProvider;
 use Silex\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class ControllerTest extends WebTestCase
 {
@@ -41,6 +44,47 @@ class ControllerTest extends WebTestCase
     }
 
     /**
+     * Test alias restriction functionality
+     */
+    public function testIsRestricted()
+    {
+        $app = $this->createApplication();
+        $app['thumbnails.only_aliases'] = false;
+        $controller = new Controller();
+        $request = Request::create('/thumbs/123x456c/herp/derp.png');
+        $this->assertInstanceOf('Bolt\Thumbs\Response', $controller->thumbnail($app, $request, 'herp/derp.png', 'c', 123, 456));
+
+        $app['thumbnails.only_aliases'] = true;
+        $this->setExpectedException('Symfony\Component\HttpKernel\Exception\HttpException');
+        $controller->thumbnail($app, $request, 'herp/derp.png', 'c', 123, 456);
+    }
+
+    public function testNotIsRestrictedWhenLoggedIn()
+    {
+        $app = $this->createApplication();
+        $controller = new Controller();
+        $request = Request::create('/thumbs/123x456c/herp/derp.png');
+
+        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\Session');
+        $user = $this->getMock('stdClass', ['getEnabled']);
+        $user->expects($this->any())
+            ->method('getEnabled')
+            ->willReturn(true);
+        $auth = $this->getMock('stdClass', ['getUser']);
+        $auth->expects($this->any())
+            ->method('getUser')
+            ->willReturn($user);
+        $session->expects($this->any())
+            ->method('get')
+            ->with('authentication')
+            ->willReturn($auth);
+        $request->setSession($session);
+
+        $app['thumbnails.only_aliases'] = true;
+        $this->assertInstanceOf('Bolt\Thumbs\Response', $controller->thumbnail($app, $request, 'herp/derp.png', 'c', 123, 456));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function createApplication()
@@ -51,6 +95,11 @@ class ControllerTest extends WebTestCase
         $app->register(new ServiceControllerServiceProvider());
 
         $mock = $this->getMock('Bolt\Thumbs\ThumbnailResponder', ['respond'], [], '', false);
+        $mock
+            ->expects($this->any())
+            ->method('respond')
+            ->willReturn(new Thumbnail(new Image(new Filesystem(new Local(__DIR__))), ''))
+        ;
         $app['thumbnails'] = $mock;
 
         return $app;
