@@ -1,0 +1,36 @@
+<div id="kaderlid{{ id }}" class="werkgroep--lid">
+    
+    {% if kaderlid.photo is not empty %}
+    	<img class="werkgroep--lid--image" src="{{ kaderlid.get('photo')|image(500, 500, "c") }}">
+    {% else %}
+    	<img class="werkgroep--lid--image" src="{{ 'kader/frisbeesport.jpg'|image(500, 500, "c") }}">
+    {% endif %}
+
+ 	{% if kaderlid.get('title') is not empty %}
+    
+    <h3 class="werkgroep--lid--name">{{ kaderlid.get('title') }}</h3>
+
+	{% endif %}    
+
+
+ 	{% if kaderlid.get('function') is not empty %}
+
+    <div class="werkgroep--lid--functie">{{ kaderlid.get('function') }}</div>
+
+	{% endif %}     
+	
+
+	{% if kaderlid.get('description') is not empty %}
+  
+    <p class="werkgroep--lid--omschrijving">{{ kaderlid.get('description') }}</p>
+
+    {% endif %}     
+	
+
+	{% if kaderlid.get('email') is not empty %}
+
+    <p class="werkgroep--lid--contact">{{ kaderlid.get('email') }}</p>
+
+    {% endif %}     
+    
+</div>    
