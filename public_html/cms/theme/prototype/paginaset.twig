@@ -19,9 +19,8 @@
 	{% set style = 'organisatie' %}
 {% endif %}
 
-{% setcontent children = record.contenttype.name where { 'grouptype': 'Inhoud' } orderby 'volgnummer' %}
-
-{% include '_head.twig' with { 'title': record.grouptitle, 'description': record.grouplead, 'image': record.groupimage, 'url': record.link } %}
+ 
+{% include '_head.twig' with { 'title': record.title, 'description': record.lead, 'image': record.image, 'url': record.link } %}
 
 <body class="background afdeling--{{ style }} ">
 <div class="sheet">
@@ -30,7 +29,7 @@
  
     <article>
     
-    {% include '_header.twig' with { 'afdeling': afdeling, 'image': record.groupimage, 'title': record.grouptitle, 'header': record.grouplead, 'buttons': '', 'fotograaf': record.groupfotograaf } %}
+    {% include '_header.twig' with { 'afdeling': afdeling, 'image': record.image, 'title': record.title, 'header': record.lead, 'buttons': '', 'fotograaf': record.fotograaf } %}
 
         <section>
             <div class="container">
