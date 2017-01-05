@@ -50,42 +50,9 @@ roles:
     kader:
         description: Toegang tot kader en werkgroepen.
         label: Kader en werkgroepen    
-    trainerft2:
-        description: Toegang tot Trainersopleiding pagina's.
-        label: Trainersopleiding
     paginaset:
         description: Toegang tot paginasets.
-        label: Paginaset
-    paginas_vacatures:
-        description: Toegang tot Vacature pagina's.
-        label: Vacatures
-    paginas_njts:
-        description: Toegang tot NJT info pagina's.
-        label: NJT Info
-    paginas_beleid:
-        description: Toegang tot beleidsthema pagina's.
-        label: Beleidsthemas
-    paginas_discgolfcompetitie:
-        description: Toegang tot discgolf competitie pagina's.
-        label: Discgolfcompetitie
-    paginas_ultimatecompetitie:
-        description: Toegang tot ultimate pagina's.
-        label: Ultimatecompetitie
-    paginas_cup:
-        description: Toegang tot NJT info pagina's.
-        label: CUP
-    paginas_cityleague:
-        description: Toegang tot beleidsthema pagina's.
-        label: Cityleague
-    paginas_beginnerscursus:
-        description: Toegang tot beginnerscursus pagina's.
-        label: Beginnerscursus
-    paginas_ultimatejeugdcompetitie:
-        description: Toegang tot ultimate jeugdcompetitie pagina's.
-        label: Ultimate jeugdcompetitie
-    paginas_veiligsporten:
-        description: Toegang tot veilig sporten pagina's.
-        label: Veilig sporten        
+        label: Paginaset         
     paginas:
         description: Toegang tot paginas.
         label: Pagina's
@@ -215,20 +182,6 @@ contenttypes:
         depublish: [ hoofdredacteur, paginaset ]
         delete: [ hoofdredacteur, paginaset ]
         view: [ hoofdredacteur, paginaset ]
-    paginas-trainerft2:
-        edit: [ hoofdredacteur, trainerft2 ]
-        create: [ hoofdredacteur, trainerft2 ]
-        publish: [ hoofdredacteur, trainerft2 ]
-        depublish: [ hoofdredacteur, trainerft2 ]
-        delete: [ hoofdredacteur, trainerft2 ]
-        view: [ hoofdredacteur, trainerft2 ]
-    paginas_trainerft2:
-        edit: [ hoofdredacteur, trainerft2 ]
-        create: [ hoofdredacteur, trainerft2 ]
-        publish: [ hoofdredacteur, trainerft2 ]
-        depublish: [ hoofdredacteur, trainerft2 ]
-        delete: [ hoofdredacteur, trainerft2 ]
-        view: [ hoofdredacteur, trainerft2 ]
     ultimateuitslagen:
         edit: [ hoofdredacteur, competitie ]
         create: [ hoofdredacteur, competitie ]
@@ -271,13 +224,6 @@ contenttypes:
         depublish: [ hoofdredacteur, kader ]
         delete: [ hoofdredacteur, kader ]
         view: [ hoofdredacteur, kader ]  
-    kader:
-        edit: [ hoofdredacteur, kader ]
-        create: [ hoofdredacteur, kader ]
-        publish: [ hoofdredacteur, kader ]
-        depublish: [ hoofdredacteur, kader ]
-        delete: [ hoofdredacteur, kader ]
-        view: [ hoofdredacteur, kader ]  
     verenigingen:
         edit: [ hoofdredacteur ]
         create: [ hoofdredacteur ]
@@ -314,77 +260,6 @@ contenttypes:
         depublish: [ hoofdredacteur, paginas ]
         delete: [ hoofdredacteur, paginas ]
         view: [ hoofdredacteur, paginas ]
-
-    paginas-vacatures:
-        edit: [ hoofdredacteur, paginas_vacatures ]
-        create: [ hoofdredacteur, paginas_vacatures ]
-        publish: [ hoofdredacteur, paginas_vacatures ]
-        depublish: [ hoofdredacteur, paginas_vacatures ]
-        delete: [ hoofdredacteur, paginas_vacatures ]
-        view: [ hoofdredacteur, paginas_vacatures ]
-    paginas-njts:
-        edit: [ hoofdredacteur, paginas_njts ]
-        create: [ hoofdredacteur, paginas_njts ]
-        publish: [ hoofdredacteur, paginas_njts ]
-        depublish: [ hoofdredacteur, paginas_njts ]
-        delete: [ hoofdredacteur, paginas_njts ]
-        view: [ hoofdredacteur, paginas_njts ]
-    paginas-beleid:
-        edit: [ hoofdredacteur, paginas_beleid ]
-        create: [ hoofdredacteur, paginas_beleid ]
-        publish: [ hoofdredacteur, paginas_beleid ]
-        depublish: [ hoofdredacteur, paginas_beleid ]
-        delete: [ hoofdredacteur, paginas_beleid ]
-        view: [ hoofdredacteur, paginas_beleid ]
-    paginas-discgolfcompetitie:
-        edit: [ hoofdredacteur, paginas_discgolfcompetitie ]
-        create: [ hoofdredacteur, paginas_discgolfcompetitie ]
-        publish: [ hoofdredacteur, paginas_discgolfcompetitie ]
-        depublish: [ hoofdredacteur, paginas_discgolfcompetitie ]
-        delete: [ hoofdredacteur, paginas_discgolfcompetitie ]
-        view: [ hoofdredacteur, paginas_discgolfcompetitie ]
-    paginas-ultimatecompetitie:
-        edit: [ hoofdredacteur, paginas_ultimatecompetitie ]
-        create: [ hoofdredacteur, paginas_ultimatecompetitie ]
-        publish: [ hoofdredacteur, paginas_ultimatecompetitie ]
-        depublish: [ hoofdredacteur, paginas_ultimatecompetitie ]
-        delete: [ hoofdredacteur, paginas_ultimatecompetitie ]
-        view: [ hoofdredacteur, paginas_ultimatecompetitie ]
-    paginas-cup:
-        edit: [ hoofdredacteur, paginas_cup ]
-        create: [ hoofdredacteur, paginas_cup ]
-        publish: [ hoofdredacteur, paginas_cup ]
-        depublish: [ hoofdredacteur, paginas_cup ]
-        delete: [ hoofdredacteur, paginas_cup ]
-        view: [ hoofdredacteur, paginas_cup ]
-    paginas-cityleague:
-        edit: [ hoofdredacteur, paginas_cityleague ]
-        create: [ hoofdredacteur, paginas_cityleague ]
-        publish: [ hoofdredacteur, paginas_cityleague ]
-        depublish: [ hoofdredacteur, paginas_cityleague ]
-        delete: [ hoofdredacteur, paginas_cityleague ]
-        view: [ hoofdredacteur, paginas_cityleague ]
-    paginas-ultimatejeugdcompetitie:
-        edit: [ hoofdredacteur, paginas_ultimatejeugdcompetitie ]
-        create: [ hoofdredacteur, paginas_ultimatejeugdcompetitie ]
-        publish: [ hoofdredacteur, paginas_ultimatejeugdcompetitie ]
-        depublish: [ hoofdredacteur, paginas_ultimatejeugdcompetitie ]
-        delete: [ hoofdredacteur, paginas_ultimatejeugdcompetitie ]
-        view: [ hoofdredacteur, paginas_ultimatejeugdcompetitie ]
-    paginas-beginnerscursus:
-        edit: [ hoofdredacteur, paginas_beginnerscursus ]
-        create: [ hoofdredacteur, paginas_beginnerscursus ]
-        publish: [ hoofdredacteur, paginas_beginnerscursus ]
-        depublish: [ hoofdredacteur, paginas_beginnerscursus ]
-        delete: [ hoofdredacteur, paginas_beginnerscursus ]
-        view: [ hoofdredacteur, paginas_beginnerscursus ]
-    paginas-veiligsporten:
-        edit: [ hoofdredacteur, paginas_veiligsporten ]
-        create: [ hoofdredacteur, paginas_veiligsporten ]
-        publish: [ hoofdredacteur, paginas_veiligsporten ]
-        depublish: [ hoofdredacteur, paginas_veiligsporten ]
-        delete: [ hoofdredacteur, paginas_veiligsporten ]
-        view: [ hoofdredacteur, paginas_veiligsporten ]
 
     secties:
         edit: [ hoofdredacteur ]

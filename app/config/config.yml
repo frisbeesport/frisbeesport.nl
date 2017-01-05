@@ -117,6 +117,8 @@ caching:
   request: false
   duration: 10
   authenticated: false
+  thumbnails: true
+  translations: true
 
 # Set 'enabled' to 'true' to log all content changes in the database.
 # Unless you need to rigorously monitor every change to your site's content, it
@@ -140,9 +142,18 @@ thumbnails:
   notfound_image: view/img/default_notfound.png
   error_image: view/img/default_error.png
   save_files: false
-  allow_upscale: false
+  allow_upscale: true
   exif_orientation: true
+  only_aliases: false
 #  browser_cache_time: 2592000
+
+# Define the HTML tags and attributes that are allowed in 'cleaned' HTML. This
+# is used for sanitizing HTML, to make sure there are no undesirable elements
+# left in the content that is shown to users. For example, tags like `<script>`
+# or `onclick`-attributes.
+htmlcleaner:
+    allowed_tags: [ div, span, p, br, hr, s, u, strong, em, i, b, li, ul, ol, mark, blockquote, pre, code, tt, h1, h2, h3, h4, h5, h6, dd, dl, dh, table, tbody, thead, tfoot, th, td, tr, a, img, address, abbr, iframe, caption ]
+    allowed_attributes: [ id, class, style, name, value, href, src, alt, title, width, height, frameborder, allowfullscreen, scrolling, target, colspan, rowspan ]
 
 # File types that are acceptable for upload in either 'file' fields or through the 'files' screen.
 
@@ -315,8 +326,8 @@ extensions:
 #  livereloadport: 35729
 
 # Options for backend user interface
-#backend:
-#  news:
-#    disable: true   # Disable news panel. Defaults to false
-#  stack:
-#    disable: true   # Disable stack usage. Defaults to false
+backend:
+  news:
+    disable: true   # Disable news panel. Defaults to false
+  stack:
+    disable: true   # Disable stack usage. Defaults to false
