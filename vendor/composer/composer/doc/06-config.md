@@ -67,6 +67,12 @@ A list of domain names and oauth keys. For example using `{"gitlab.com":
 "oauthtoken"}` as the value of this option will use `oauthtoken` to access
 private repositories on gitlab.
 
+## gitlab-token
+
+A list of domain names and private tokens. For example using `{"gitlab.com":
+"privatetoken"}` as the value of this option will use `privatetoken` to access
+private repositories on gitlab.
+
 ## disable-tls
 
 Defaults to `false`. If set to true all HTTPS URLs will be tried with HTTP
@@ -203,6 +209,11 @@ by name in `composer.json` when adding a new package.
 
 Defaults to `false`. If `true`, the Composer autoloader will only load classes
 from the classmap. Implies `optimize-autoloader`.
+
+## apcu-autoloader
+
+Defaults to `false`. If `true`, the Composer autoloader will check for APCu and
+use it to cache found/not-found classes when the extension is enabled.
 
 ## github-domains
 

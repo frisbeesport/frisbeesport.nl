@@ -19,6 +19,7 @@ use Composer\Downloader\TransportException;
 use Composer\Plugin\CommandEvent;
 use Composer\Plugin\PluginEvents;
 use Composer\Util\ConfigValidator;
+use Composer\Util\IniHelper;
 use Composer\Util\ProcessExecutor;
 use Composer\Util\RemoteFilesystem;
 use Composer\Util\StreamContextFactory;
@@ -436,14 +437,9 @@ EOT
         // code below taken from getcomposer.org/installer, any changes should be made there and replicated here
         $errors = array();
         $warnings = array();
-
-        $iniPath = php_ini_loaded_file();
         $displayIniMessage = false;
-        if ($iniPath) {
-            $iniMessage = PHP_EOL.PHP_EOL.'The php.ini used by your command-line PHP is: ' . $iniPath;
-        } else {
-            $iniMessage = PHP_EOL.PHP_EOL.'A php.ini file does not exist. You will have to create one.';
-        }
+
+        $iniMessage = PHP_EOL.PHP_EOL.IniHelper::getMessage();
         $iniMessage .= PHP_EOL.'If you can not modify the ini file, you can also run `php -d option=value` to modify ini values on the fly. You can use -d multiple times.';
 
         if (!function_exists('json_decode')) {
@@ -492,6 +488,10 @@ EOT
 
         if (!defined('HHVM_VERSION') && !extension_loaded('apcu') && ini_get('apc.enable_cli')) {
             $warnings['apc_cli'] = true;
+        }
+
+        if (!extension_loaded('zlib')) {
+            $warnings['zlib'] = true;
         }
 
         ob_start();
@@ -593,6 +593,12 @@ EOT
                         $text  = "The apc.enable_cli setting is incorrect.".PHP_EOL;
                         $text .= "Add the following to the end of your `php.ini`:".PHP_EOL;
                         $text .= "  apc.enable_cli = Off";
+                        $displayIniMessage = true;
+                        break;
+
+                    case 'zlib':
+                        $text  = 'The zlib extension is not loaded, this can slow down Composer a lot.'.PHP_EOL;
+                        $text .= 'If possible, enable it or recompile php with --with-zlib'.PHP_EOL;
                         $displayIniMessage = true;
                         break;
 

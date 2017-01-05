@@ -171,7 +171,7 @@ EOT
         }
         if ($input->getOption('global') && !$this->authConfigFile->exists()) {
             touch($this->authConfigFile->getPath());
-            $this->authConfigFile->write(array('bitbucket-oauth' => new \ArrayObject, 'github-oauth' => new \ArrayObject, 'gitlab-oauth' => new \ArrayObject, 'http-basic' => new \ArrayObject));
+            $this->authConfigFile->write(array('bitbucket-oauth' => new \ArrayObject, 'github-oauth' => new \ArrayObject, 'gitlab-oauth' => new \ArrayObject, 'gitlab-token' => new \ArrayObject, 'http-basic' => new \ArrayObject));
             Silencer::call('chmod', $this->authConfigFile->getPath(), 0600);
         }
 
@@ -341,6 +341,7 @@ EOT
             'sort-packages' => array($booleanValidator, $booleanNormalizer),
             'optimize-autoloader' => array($booleanValidator, $booleanNormalizer),
             'classmap-authoritative' => array($booleanValidator, $booleanNormalizer),
+            'apcu-autoloader' => array($booleanValidator, $booleanNormalizer),
             'prepend-autoloader' => array($booleanValidator, $booleanNormalizer),
             'disable-tls' => array($booleanValidator, $booleanNormalizer),
             'secure-http' => array($booleanValidator, $booleanNormalizer),
@@ -510,7 +511,7 @@ EOT
         }
 
         // handle auth
-        if (preg_match('/^(bitbucket-oauth|github-oauth|gitlab-oauth|http-basic)\.(.+)/', $settingKey, $matches)) {
+        if (preg_match('/^(bitbucket-oauth|github-oauth|gitlab-oauth|gitlab-token|http-basic)\.(.+)/', $settingKey, $matches)) {
             if ($input->getOption('unset')) {
                 $this->authConfigSource->removeConfigSetting($matches[1].'.'.$matches[2]);
                 $this->configSource->removeConfigSetting($matches[1].'.'.$matches[2]);
@@ -524,7 +525,7 @@ EOT
                 }
                 $this->configSource->removeConfigSetting($matches[1].'.'.$matches[2]);
                 $this->authConfigSource->addConfigSetting($matches[1].'.'.$matches[2], array('consumer-key' => $values[0], 'consumer-secret' => $values[1]));
-            } elseif ($matches[1] === 'github-oauth' || $matches[1] === 'gitlab-oauth') {
+            } elseif (in_array($matches[1], array('github-oauth', 'gitlab-oauth', 'gitlab-token'), true)) {
                 if (1 !== count($values)) {
                     throw new \RuntimeException('Too many arguments, expected only one token');
                 }

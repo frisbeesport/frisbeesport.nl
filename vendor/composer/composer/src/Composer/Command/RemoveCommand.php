@@ -46,6 +46,7 @@ class RemoveCommand extends BaseCommand
                 new InputOption('ignore-platform-reqs', null, InputOption::VALUE_NONE, 'Ignore platform requirements (php & ext- packages).'),
                 new InputOption('optimize-autoloader', 'o', InputOption::VALUE_NONE, 'Optimize autoloader during autoloader dump'),
                 new InputOption('classmap-authoritative', 'a', InputOption::VALUE_NONE, 'Autoload classes from the classmap only. Implicitly enables `--optimize-autoloader`.'),
+                new InputOption('apcu-autoloader', null, InputOption::VALUE_NONE, 'Use APCu to cache found/not-found classes.'),
             ))
             ->setHelp(<<<EOT
 The <info>remove</info> command removes a package from the current
@@ -83,19 +84,19 @@ EOT
         foreach (array('require', 'require-dev') as $linkType) {
             if (isset($composer[$linkType])) {
                 foreach ($composer[$linkType] as $name => $version) {
-                    $composer[$linkType][strtolower($name)] = $version;
+                    $composer[$linkType][strtolower($name)] = $name;
                 }
             }
         }
 
         foreach ($packages as $package) {
             if (isset($composer[$type][$package])) {
-                $json->removeLink($type, $package);
+                $json->removeLink($type, $composer[$type][$package]);
             } elseif (isset($composer[$altType][$package])) {
-                $io->writeError('<warning>'.$package.' could not be found in '.$type.' but it is present in '.$altType.'</warning>');
+                $io->writeError('<warning>'.$composer[$altType][$package].' could not be found in '.$type.' but it is present in '.$altType.'</warning>');
                 if ($io->isInteractive()) {
                     if ($io->askConfirmation('Do you want to remove it from '.$altType.' [<comment>yes</comment>]? ', true)) {
-                        $json->removeLink($altType, $package);
+                        $json->removeLink($altType, $composer[$altType][$package]);
                     }
                 }
             } else {
@@ -120,12 +121,14 @@ EOT
         $updateDevMode = !$input->getOption('update-no-dev');
         $optimize = $input->getOption('optimize-autoloader') || $composer->getConfig()->get('optimize-autoloader');
         $authoritative = $input->getOption('classmap-authoritative') || $composer->getConfig()->get('classmap-authoritative');
+        $apcu = $input->getOption('apcu-autoloader') || $composer->getConfig()->get('apcu-autoloader');
 
         $install
             ->setVerbose($input->getOption('verbose'))
             ->setDevMode($updateDevMode)
             ->setOptimizeAutoloader($optimize)
             ->setClassMapAuthoritative($authoritative)
+            ->setApcuAutoloader($apcu)
             ->setUpdate(true)
             ->setUpdateWhitelist($packages)
             ->setWhitelistDependencies(!$input->getOption('no-update-with-dependencies'))

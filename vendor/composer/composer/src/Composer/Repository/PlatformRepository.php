@@ -12,6 +12,7 @@
 
 namespace Composer\Repository;
 
+use Composer\XdebugHandler;
 use Composer\Package\CompletePackage;
 use Composer\Package\PackageInterface;
 use Composer\Package\Version\VersionParser;
@@ -23,7 +24,7 @@ use Composer\Util\Silencer;
  */
 class PlatformRepository extends ArrayRepository
 {
-    const PLATFORM_PACKAGE_REGEX = '{^(?:php(?:-64bit|-ipv6)?|hhvm|(?:ext|lib)-[^/]+)$}i';
+    const PLATFORM_PACKAGE_REGEX = '{^(?:php(?:-64bit|-ipv6|-zts|-debug)?|hhvm|(?:ext|lib)-[^/]+)$}i';
 
     /**
      * Defines overrides so that the platform can be mocked
@@ -81,6 +82,18 @@ class PlatformRepository extends ArrayRepository
         $php->setDescription('The PHP interpreter');
         $this->addPackage($php);
 
+        if (PHP_DEBUG) {
+            $phpdebug = new CompletePackage('php-debug', $version, $prettyVersion);
+            $phpdebug->setDescription('The PHP interpreter, with debugging symbols');
+            $this->addPackage($phpdebug);
+        }
+
+        if (defined('PHP_ZTS') && PHP_ZTS) {
+            $phpzts = new CompletePackage('php-zts', $version, $prettyVersion);
+            $phpzts->setDescription('The PHP interpreter, with Zend Thread Safety');
+            $this->addPackage($phpzts);
+        }
+
         if (PHP_INT_SIZE === 8) {
             $php64 = new CompletePackage('php-64bit', $version, $prettyVersion);
             $php64->setDescription('The PHP interpreter, 64bit');
@@ -91,7 +104,7 @@ class PlatformRepository extends ArrayRepository
         // IPv6 support might still be available.
         if (defined('AF_INET6') || Silencer::call('inet_pton', '::') !== false) {
             $phpIpv6 = new CompletePackage('php-ipv6', $version, $prettyVersion);
-            $phpIpv6->setDescription('The PHP interpreter with IPv6 support');
+            $phpIpv6->setDescription('The PHP interpreter, with IPv6 support');
             $this->addPackage($phpIpv6);
         }
 
@@ -102,26 +115,15 @@ class PlatformRepository extends ArrayRepository
             if (in_array($name, array('standard', 'Core'))) {
                 continue;
             }
-            $extraDescription = null;
 
             $reflExt = new \ReflectionExtension($name);
-            try {
-                $prettyVersion = $reflExt->getVersion();
-                $version = $versionParser->normalize($prettyVersion);
-            } catch (\UnexpectedValueException $e) {
-                $extraDescription = ' (actual version: '.$prettyVersion.')';
-                if (preg_match('{^(\d+\.\d+\.\d+(?:\.\d+)?)}', $prettyVersion, $match)) {
-                    $prettyVersion = $match[1];
-                } else {
-                    $prettyVersion = '0';
-                }
-                $version = $versionParser->normalize($prettyVersion);
-            }
+            $prettyVersion = $reflExt->getVersion();
+            $this->addExtension($versionParser, $name, $prettyVersion);
+        }
 
-            $packageName = $this->buildPackageName($name);
-            $ext = new CompletePackage($packageName, $version, $prettyVersion);
-            $ext->setDescription('The '.$name.' PHP extension' . $extraDescription);
-            $this->addPackage($ext);
+        // Check for xdebug in a restarted process
+        if ($prettyVersion = strval(getenv(XdebugHandler::ENV_VERSION))) {
+            $this->addExtension($versionParser, 'xdebug', $prettyVersion);
         }
 
         // Another quick loop, just for possible libraries
@@ -241,6 +243,35 @@ class PlatformRepository extends ArrayRepository
             return;
         }
         parent::addPackage($package);
+    }
+
+    /**
+     * Parses the version and adds a new package to the repository
+     *
+     * @param VersionParser $versionParser
+     * @param string $name
+     * @param null|string $prettyVersion
+     */
+    private function addExtension(VersionParser $versionParser, $name, $prettyVersion)
+    {
+        $extraDescription = null;
+
+        try {
+            $version = $versionParser->normalize($prettyVersion);
+        } catch (\UnexpectedValueException $e) {
+            $extraDescription = ' (actual version: '.$prettyVersion.')';
+            if (preg_match('{^(\d+\.\d+\.\d+(?:\.\d+)?)}', $prettyVersion, $match)) {
+                $prettyVersion = $match[1];
+            } else {
+                $prettyVersion = '0';
+            }
+            $version = $versionParser->normalize($prettyVersion);
+        }
+
+        $packageName = $this->buildPackageName($name);
+        $ext = new CompletePackage($packageName, $version, $prettyVersion);
+        $ext->setDescription('The '.$name.' PHP extension'.$extraDescription);
+        $this->addPackage($ext);
     }
 
     private function buildPackageName($name)

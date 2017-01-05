@@ -8,6 +8,7 @@
  */
 
 namespace JsonSchema\Constraints;
+use JsonSchema\Entity\JsonPointer;
 
 /**
  * The EnumConstraint Constraints, validates an element against a given set of possibilities
@@ -20,23 +21,29 @@ class EnumConstraint extends Constraint
     /**
      * {@inheritDoc}
      */
-    public function check($element, $schema = null, $path = null, $i = null)
+    public function check($element, $schema = null, JsonPointer $path = null, $i = null)
     {
         // Only validate enum if the attribute exists
         if ($element instanceof UndefinedConstraint && (!isset($schema->required) || !$schema->required)) {
             return;
         }
+        $type = gettype($element);
 
         foreach ($schema->enum as $enum) {
-            $type = gettype($element);
+            $enumType = gettype($enum);
+            if (($this->factory->getCheckMode() & self::CHECK_MODE_TYPE_CAST) && $type == "array" && $enumType == "object") {
+                if ((object)$element == $enum) {
+                    return;
+                }
+            }
+
             if ($type === gettype($enum)) {
                 if ($type == "object") {
-                    if ($element == $enum)
+                    if ($element == $enum) {
                         return;
-                } else {
-                    if ($element === $enum)
-                        return;
-
+                    }
+                } elseif ($element === $enum) {
+                    return;
                 }
             }
         }

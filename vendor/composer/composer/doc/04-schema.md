@@ -79,8 +79,8 @@ The type of the package. It defaults to `library`.
 
 Package types are used for custom installation logic. If you have a package
 that needs some special logic, you can define a custom type. This could be a
-`symfony-bundle`, a `wordpress-plugin` or a `typo3-module`. These types will
-all be specific to certain projects, and they will need to provide an
+`symfony-bundle`, a `wordpress-plugin` or a `typo3-cms-extension`. These types
+will all be specific to certain projects, and they will need to provide an
 installer capable of installing packages of that type.
 
 Out of the box, Composer supports four types:
@@ -341,6 +341,18 @@ Example:
 }
 ```
 
+> **Note:** It is important to list PHP extensions your project requires.
+> Not all PHP installations are created equal: some may miss extensions you
+> may consider as standard (such as `ext-mysqli` which is not installed by
+> default in Fedora/CentOS minimal installation systems). Failure to list
+> required PHP extensions may lead to a bad user experience: Composer will
+> install your package without any errors but it will then fail at run-time.
+> The `composer show --platform` command lists all PHP extensions available on
+> your system. You may use it to help you compile the list of extensions you
+> use and require. Alternatively you may use third party tools to analyze
+> your project for the list of extensions used.
+
+
 #### require
 
 Lists packages required by this package. The package will not be installed
@@ -403,7 +415,8 @@ Example:
 ```json
 {
     "suggest": {
-        "monolog/monolog": "Allows more advanced logging of the application flow"
+        "monolog/monolog": "Allows more advanced logging of the application flow",
+        "ext-xml": "Needed to support XML format in class Foo"
     }
 }
 ```
@@ -761,6 +774,20 @@ Example:
 will look from the first to the last repository, and pick the first match.
 By default Packagist is added last which means that custom repositories can
 override packages from it.
+
+Using JSON object notation is also possible. However, JSON key/value pairs
+are to be considered unordered so consistent behaviour cannot be guaranteed.
+
+ ```json
+{
+    "repositories": {
+         "foo": {
+             "type": "composer",
+             "url": "http://packages.foo.com"
+         }
+    }
+}
+ ```
 
 ### config <span>([root-only](04-schema.md#root-package))</span>
 

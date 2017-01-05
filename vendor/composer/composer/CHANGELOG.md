@@ -1,3 +1,27 @@
+### [1.3.0] - 2016-12-24
+
+  * Fixed handling of annotated git tags vs lightweight tags leading to useless updates sometimes
+  * Fixed ext-xdebug not being require-able anymore due to automatic xdebug disabling
+  * Fixed case insensitivity of remove command
+
+### [1.3.0-RC] - 2016-12-11
+
+  * Added workaround for xdebug performance impact by restarting PHP without xdebug automatically in case it is enabled
+  * Added `--minor-only` to the `outdated` command to only show updates to minor versions and ignore new major versions
+  * Added `--apcu-autoloader` to the `update`/`install` commands and `--apcu` to `dump-autoload` to enable an APCu-caching autoloader, which can be more efficient than --classmap-authoritative if you attempt to autoload many classes that do not exist, or if you can not use authoritative classmaps for some reason
+  * Added summary of operations to be executed before they run, and made execution output more compact
+  * Added `php-debug` and `php-zts` virtual platform packages
+  * Added `gitlab-token` auth config for GitLab private tokens
+  * Added `--strict` to the `outdated` command to return a non-zero exit code when there are outdated packages
+  * Added ability to call php scripts using the current php interpreter (instead of finding php in PATH by default) in script handlers via `@php ...`
+  * Added `COMPOSER_ALLOW_XDEBUG` env var to circumvent the xdebug-disabling behavior
+  * Added `COMPOSER_MIRROR_PATH_REPOS` env var to force mirroring of path repositories vs symlinking
+  * Added `COMPOSER_DEV_MODE` env var that is set by Composer to forward the dev mode to script handlers
+  * Fixed support for git 2.11
+  * Fixed output from zip and rar leaking out when an error occured
+  * Removed `hash` from composer.lock, only `content-hash` is now used which should reduce conflicts
+  * Minor fixes and performance improvements
+
 ### [1.2.4] - 2016-12-06
 
   * Fixed regression in output handling of scripts from 1.2.3
@@ -453,6 +477,8 @@
 
   * Initial release
 
+[1.3.0]: https://github.com/composer/composer/compare/1.3.0-RC...1.3.0
+[1.3.0-RC]: https://github.com/composer/composer/compare/1.2.4...1.3.0-RC
 [1.2.4]: https://github.com/composer/composer/compare/1.2.3...1.2.4
 [1.2.3]: https://github.com/composer/composer/compare/1.2.2...1.2.3
 [1.2.2]: https://github.com/composer/composer/compare/1.2.1...1.2.2

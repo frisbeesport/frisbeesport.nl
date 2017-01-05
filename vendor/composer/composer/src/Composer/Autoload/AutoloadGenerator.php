@@ -51,6 +51,11 @@ class AutoloadGenerator
     /**
      * @var bool
      */
+    private $apcu = false;
+
+    /**
+     * @var bool
+     */
     private $runScripts = false;
 
     public function __construct(EventDispatcher $eventDispatcher, IOInterface $io = null)
@@ -73,6 +78,16 @@ class AutoloadGenerator
     public function setClassMapAuthoritative($classMapAuthoritative)
     {
         $this->classMapAuthoritative = (boolean) $classMapAuthoritative;
+    }
+
+    /**
+     * Whether or not generated autoloader considers APCu caching.
+     *
+     * @param bool $apcu
+     */
+    public function setApcu($apcu)
+    {
+        $this->apcu = (boolean) $apcu;
     }
 
     /**
@@ -234,7 +249,6 @@ EOF;
 
             foreach ($namespacesToScan as $namespace => $groups) {
                 foreach ($groups as $group) {
-                    $psrType = $group['type'];
                     foreach ($group['paths'] as $dir) {
                         $dir = $filesystem->normalizePath($filesystem->isAbsolutePath($dir) ? $dir : $basePath.'/'.$dir);
                         if (!is_dir($dir)) {
@@ -583,7 +597,7 @@ HEADER;
             $file .= <<<'INCLUDE_PATH'
         $includePaths = require __DIR__ . '/include_paths.php';
         array_push($includePaths, get_include_path());
-        set_include_path(join(PATH_SEPARATOR, $includePaths));
+        set_include_path(implode(PATH_SEPARATOR, $includePaths));
 
 
 INCLUDE_PATH;
@@ -632,6 +646,14 @@ CLASSMAP;
         $loader->setClassMapAuthoritative(true);
 
 CLASSMAPAUTHORITATIVE;
+        }
+
+        if ($this->apcu) {
+            $apcuPrefix = substr(base64_encode(md5(uniqid('', true), true)), 0, -3);
+            $file .= <<<APCU
+        \$loader->setApcuPrefix('$apcuPrefix');
+
+APCU;
         }
 
         if ($useGlobalIncludePath) {

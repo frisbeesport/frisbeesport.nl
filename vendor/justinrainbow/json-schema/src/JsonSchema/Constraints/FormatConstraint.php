@@ -8,7 +8,9 @@
  */
 
 namespace JsonSchema\Constraints;
+
 use JsonSchema\Rfc3339;
+use JsonSchema\Entity\JsonPointer;
 
 /**
  * Validates against the "format" property
@@ -21,7 +23,7 @@ class FormatConstraint extends Constraint
     /**
      * {@inheritDoc}
      */
-    public function check($element, $schema = null, $path = null, $i = null)
+    public function check($element, $schema = null, JsonPointer $path = null, $i = null)
     {
         if (!isset($schema->format)) {
             return;
@@ -127,12 +129,24 @@ class FormatConstraint extends Constraint
             return false;
         }
 
-        return $datetime === $dt->format($format);
+        if ($datetime === $dt->format($format)) {
+            return true;
+        }
+
+        // handles the case where a non-6 digit microsecond datetime is passed
+        // which will fail the above string comparison because the passed
+        // $datetime may be '2000-05-01T12:12:12.123Z' but format() will return
+        // '2000-05-01T12:12:12.123000Z'
+        if ((strpos('u', $format) !== -1) && (preg_match('/\.\d+Z$/', $datetime))) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function validateRegex($regex)
     {
-        return false !== @preg_match('/' . $regex . '/', '');
+        return false !== @preg_match('/' . $regex . '/u', '');
     }
 
     protected function validateColor($color)
@@ -161,6 +175,7 @@ class FormatConstraint extends Constraint
 
     protected function validateHostname($host)
     {
-        return preg_match('/^[_a-z]+\.([_a-z]+\.?)+$/i', $host);
+        $hostnameRegex = '/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/i';
+        return preg_match($hostnameRegex, $host);
     }
 }

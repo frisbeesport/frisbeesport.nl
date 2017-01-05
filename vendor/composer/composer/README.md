@@ -14,6 +14,8 @@ Installation / Usage
 
 Download and install Composer by following the [official instructions](https://getcomposer.org/download/).
 
+For usage, see [the documentation](https://getcomposer.org/doc/).
+
 Packages
 --------
 
@@ -44,6 +46,11 @@ Authors
 - Jordi Boggiano | [GitHub](https://github.com/Seldaek) | [Twitter](https://twitter.com/seldaek) | <j.boggiano@seld.be> | [seld.be](http://seld.be)
 
 See also the list of [contributors](https://github.com/composer/composer/contributors) who participated in this project.
+
+Security Reports
+----------------
+
+Please send any sensitive issue to [security@packagist.org](mailto:security@packagist.org). Thanks!
 
 License
 -------

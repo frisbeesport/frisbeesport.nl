@@ -46,6 +46,7 @@ class Config
         'sort-packages' => false,
         'optimize-autoloader' => false,
         'classmap-authoritative' => false,
+        'apcu-autoloader' => false,
         'prepend-autoloader' => true,
         'github-domains' => array('github.com'),
         'bitbucket-expose-hostname' => true,
@@ -63,6 +64,7 @@ class Config
         // bitbucket-oauth
         // github-oauth
         // gitlab-oauth
+        // gitlab-token
         // http-basic
     );
 
@@ -125,7 +127,7 @@ class Config
         // override defaults with given config
         if (!empty($config['config']) && is_array($config['config'])) {
             foreach ($config['config'] as $key => $val) {
-                if (in_array($key, array('bitbucket-oauth', 'github-oauth', 'gitlab-oauth', 'http-basic')) && isset($this->config[$key])) {
+                if (in_array($key, array('bitbucket-oauth', 'github-oauth', 'gitlab-oauth', 'gitlab-token', 'http-basic')) && isset($this->config[$key])) {
                     $this->config[$key] = array_merge($this->config[$key], $val);
                 } elseif ('preferred-install' === $key && isset($this->config[$key])) {
                     if (is_array($val) || is_array($this->config[$key])) {
@@ -215,7 +217,7 @@ class Config
                 $env = 'COMPOSER_' . strtoupper(strtr($key, '-', '_'));
 
                 $val = $this->getComposerEnv($env);
-                $val = rtrim($this->process(false !== $val ? $val : $this->config[$key], $flags), '/\\');
+                $val = rtrim((string) $this->process(false !== $val ? $val : $this->config[$key], $flags), '/\\');
                 $val = Platform::expandPath($val);
 
                 if (substr($key, -4) !== '-dir') {
@@ -356,9 +358,9 @@ class Config
     /**
      * Replaces {$refs} inside a config string
      *
-     * @param  string $value a config string that can contain {$refs-to-other-config}
-     * @param  int    $flags Options (see class constants)
-     * @return string
+     * @param  string|int|null $value a config string that can contain {$refs-to-other-config}
+     * @param  int             $flags Options (see class constants)
+     * @return string|int|null
      */
     private function process($value, $flags)
     {
