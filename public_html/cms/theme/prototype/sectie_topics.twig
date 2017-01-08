@@ -33,18 +33,22 @@ section--topics
 
 		{% endif %}
 
-		<div class="topics">{% if sectie.topic1 != '0' %}{% include 'topic.twig' with { 'topicid': sectie.topic1 } %}{% endif %}{% if sectie.topic2 != '0' %}{% include 'topic.twig' with { 'topicid': sectie.topic2 } %}{% endif %}{% if sectie.topic3 != '0' %}{% include 'topic.twig' with { 'topicid': sectie.topic3 } %}{% endif %}{% if sectie.topic4 != '0' %}
+		<div class="topics">{% if sectie.topic1 is not empty %}{% include 'topic.twig' with { 'topicid': sectie.topic1 } %}{% endif %}{% if sectie.topic2 is not empty %}{% include 'topic.twig' with { 'topicid': sectie.topic2 } %}{% endif %}{% if sectie.topic3 is not empty %}{% include 'topic.twig' with { 'topicid': sectie.topic3 } %}{% endif %}{% if sectie.topic4 is not empty %}
 			{% include 'topic.twig' with { 'topicid': sectie.topic4 } %}
-		{% endif %}{% if sectie.topic5  != '0' %}
+		{% endif %}{% if sectie.topic5  is not empty %}
 			{% include 'topic.twig' with { 'topicid': sectie.topic5 } %}
-		{% endif %}{% if sectie.topic6  != '0' %}
+		{% endif %}{% if sectie.topic6  is not empty %}
 			{% include 'topic.twig' with { 'topicid': sectie.topic6 } %}
-		{% endif %}{% if sectie.topic7 != '0' %}
+		{% endif %}{% if sectie.topic7 is not empty %}
 			{% include 'topic.twig' with { 'topicid': sectie.topic7 } %}
-		{% endif %}{% if sectie.topic8 != '0' %}
+		{% endif %}{% if sectie.topic8 is not empty %}
 			{% include 'topic.twig' with { 'topicid': sectie.topic8 } %}
-		{% endif %}</div>
+		{% endif %}
 		
+		{% for topic in sectie.templatefields.topics %}
+			{% include 'sectie_topics_part_topic.twig' with { 'topic': topic } %}
+		{% endfor %}</div>
+
 		{% if sectie.linktitle is not empty %}
 
 			{% if sectie.selectpagina  is not empty %}

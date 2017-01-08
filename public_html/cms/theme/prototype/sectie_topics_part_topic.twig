@@ -1,0 +1,46 @@
+<div id="topic" class="topic">
+
+    <div class="topic-image">   
+        
+        {% if topic.get('image') is not empty %}
+        
+        <img class="topic__image" src="{{ topic.get('image')|image(500,300,"c") }}">
+        
+        {% endif %}
+
+    </div>
+
+    <div class="topic-header">
+    
+        {% if topic.get('caption') is not empty %}
+		
+        <h3 class="topic__title">{{ topic.get('caption') }}</h3>
+
+        {% endif %}
+        
+    </div>
+
+    <div class="topic-copy">
+    
+        {% if topic.get('description') is not empty %}
+        
+        <p>{{ topic.get('description') }}</p>
+        
+        {% endif %} 
+
+        {% if topic.get('linktitle') is not empty %}
+
+			{% if topic.get('selectpagina') is not empty %}
+	            {% setcontent paginalink = "paginas/#{topic.get('selectpagina')}" %}
+	            <a class="arrow-link" href="{{ paginalink.link }}">{{ topic.get('linktitle') }}</a>
+			{% endif %}					
+
+			{% if topic.get('url') is not empty %}
+				<a class="arrow-link" href="{{ topic.get('url') }}">{{ topic.get('linktitle') }}</a>
+			{% endif %}					
+			
+		{% endif %}	
+        
+    </div>
+    
+</div>
