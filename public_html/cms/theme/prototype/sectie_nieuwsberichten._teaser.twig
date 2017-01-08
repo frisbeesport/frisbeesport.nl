@@ -1,0 +1,39 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+section--cards--small section--nieuws
+
+{% endblock %}
+
+{% block sectie_content %}
+    
+    {% setcontent nieuwsberichten = 'nieuws/latest/6' where { afdelingen: afdeling } %}
+     
+    <div class="container">
+        <div class="section__content">
+
+            {% if sectie.caption is not empty %}
+
+			<div class="section__header">
+		        <div class="section__title section__title--centered"><h2>{{ sectie.caption }}</h2></div>
+           	</div>
+
+			{% endif %}
+
+            <div class="smallcards">
+                {% for nieuwsbericht in nieuwsberichten %}      
+
+                {% include 'nieuwsbericht_card.twig' with { 'nieuwsbericht': nieuwsbericht } %} 
+                
+                {% endfor %}          
+            </div>
+
+            <div class="grid">
+               <div class="btn-landing section__button"><a href="{{ path(afdeling ~ '-nieuws') }}">Meer nieuws...</a></div>
+            </div>
+            
+        </div>
+    </div>
+    
+{% endblock %}
