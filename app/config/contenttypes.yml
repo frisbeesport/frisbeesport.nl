@@ -612,18 +612,6 @@ paginas:
             values: paginas/slug
             group: header   
 
-        parent:
-            info: Selecteer een hoofdpagina
-            type: select
-            values: paginas/title  
-            group: groepering
-            variant: inline
-        volgnummer:
-            label: Volgnummer
-            type: integer
-            group: groepering
-            variant: inline
-            
         sectie1:
             label: Sectie 1
             type: select
