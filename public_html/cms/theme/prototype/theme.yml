@@ -6,6 +6,52 @@ templatefields:
             height: 600px
             allowtwig: true       
 
+    pagina_landing.twig:
+        image:
+            label: Afbeelding
+            type: image
+            upload: paginas
+            group: header
+        fotograaf:
+            label: Fotograaf afbeelding
+            type: text
+            group: header
+        lead:
+            label: Inleiding
+            type: textarea
+            height: 150px
+            group: header
+        linktitle1:
+            label: Tekst button 1
+            type: text
+            group: header
+            variant: inline
+        selectpagina1:
+            label: Pagina button 1
+            type: select
+            values: paginas/slug
+            group: header   
+        linktitle2:
+            label: Tekst button 2
+            type: text
+            group: header
+            variant: inline
+        selectpagina2:
+            label: Pagina button 2
+            type: select
+            values: paginas/slug
+            group: header
+        linktitle3:
+            label: Tekst button 3
+            type: text
+            group: header
+            variant: inline            
+        selectpagina3:
+            label: Pagina button 3
+            type: select
+            values: paginas/slug
+            group: header   
+            
     pagina_html.twig:     
         html:
             label: Html
@@ -13,6 +59,25 @@ templatefields:
             height: 600px
             allowtwig: true      
 
+    sectie_calltoaction.twig:
+        linktitle:
+            label: Link tekst
+            type: text
+            group: link
+            variant: inline
+        url:
+            label: Externe link
+            type: text
+            filter: url
+            group: link
+            variant: inline
+        selectpagina:
+            label: Interne link
+            type: select
+            values: paginas/slug
+            group: link      
+    
+    
     sectie_topics.twig: 
         topics:
             type: repeater 

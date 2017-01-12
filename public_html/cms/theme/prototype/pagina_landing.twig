@@ -1,0 +1,77 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+
+
+{% set afdeling = "" %}
+{% set style = "" %}
+
+{% for tag in pagina.taxonomy.afdelingen %}
+	{% set afdeling = tag %}
+{% endfor %}
+
+{% if afdeling == "ultimate" %}
+	{% set style = 'ultimate' %}
+{% elseif afdeling == "discgolf" %}
+	{% set style = 'discgolf' %}
+{% else %}
+	{% set style = 'organisatie' %}
+{% endif %}
+ 
+ 
+
+{% include '_head.twig' with { 'title': pagina.title, 'description': pagina.lead, 'image': pagina.image, 'url': pagina.link } %}
+
+<body class="background afdeling--{{ style }} ">
+
+    <div class="sheet">
+        
+    {% include '_browser-upgrade.twig' %}    
+    
+    <article>
+
+    {% include '_header.twig' with { 'afdeling': afdeling, 'image': pagina.image, 'title': pagina.title, 'header': pagina.lead, 'buttons': pagina, 'fotograaf': pagina.fotograaf } %}   
+        
+	{% if pagina.body is not empty or pagina.body_advanced is not empty %}  
+
+        
+    <section class="section--text afdeling--text">
+      <div class="container">
+		<div class="grid">
+                   
+            <div class="pagina">
+             
+            {% if pagina.body is not empty %}  
+
+            {{ pagina.body }}
+            
+            {% endif %}    
+             
+            
+            </div>
+            
+    	</div> 
+	  </div>
+    </section>
+
+	{% endif %}    
+
+    {% block extended_content %}
+    {% endblock %}
+
+    % for sectie in pagina.templatefields.secties %} 
+        {% include 'sectie.twig' with { 'sectieid': sectie.id } %}
+    {% endfor %}    
+ 
+    </article>
+       
+    {% include '_footer.twig' %}
+	{% include '_scripts.twig' %}
+
+    </div>
+
+    {% include '_piwik.twig' %}
+</body>
+</html>

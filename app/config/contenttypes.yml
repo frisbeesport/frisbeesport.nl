@@ -663,7 +663,17 @@ paginas:
             values: secties/title
             group: secties     
         
-               
+        secties:
+            type: repeater
+            group: Secties
+            
+            fields:
+                sectie:
+                    label: Sectie
+                    type: select
+                    values: secties/title
+                    group: secties 
+ 
         body_advanced:
             label: Geavanceerde inhoud
             type: html

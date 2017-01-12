@@ -26,24 +26,16 @@ section--call-to-action
 
 			{% endif %}
 
+			{% if sectie.templatefields.linktitle is not empty %}
 
-			{% if sectie.body_advanced is not empty %}
-			
-			{{ sectie.body_advanced }}
-
-			{% endif %}
-
-
-			{% if sectie.linktitle is not empty %}
-
-                {% if sectie.selectpagina is not empty %}
-                    {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
-            		<div class="btn-ghost"><a href="{{ paginalink.link }}">{{ sectie.linktitle }}</a> </div>
+                {% if sectie.templatefields.selectpagina is not empty %}
+                    {% setcontent paginalink = "paginas/#{sectie.templatefields.selectpagina}" %}
+            		<div class="btn-ghost"><a href="{{ paginalink.link }}">{{ sectie.templatefields.linktitle }}</a> </div>
 				{% endif %}		
             
 				 
-				{% if sectie.url is not empty %}
-            		<div class="btn-ghost"><a  href="{{ sectie.url }}">{{ sectie.linktitle }}</a></div>
+				{% if sectie.templatefields.url is not empty %}
+            		<div class="btn-ghost"><a  href="{{ sectie.templatefields.url }}">{{ sectie.templatefields.linktitle }}</a></div>
 				{% endif %}					
 				
 			{% endif %}	
