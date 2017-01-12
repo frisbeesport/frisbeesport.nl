@@ -1,0 +1,24 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+section--cards--small
+
+{% endblock %}
+
+{% block sectie_content %}
+ 
+    <div class="container">        
+        <div class="section__content">
+                <div class="section__header"></div>
+            {% setcontent aangeboden = 'aanbod' %}
+			<div class="smallcards">
+            {% for aanbod in aangeboden %}
+                {% include 'aanbod_card.twig' with { 'aanbod': aanbod } %}               
+            {% endfor %}
+            </div>
+        </div>
+    </div>   
+    
+{% endblock %}
+

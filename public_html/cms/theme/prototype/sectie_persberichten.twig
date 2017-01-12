@@ -1,0 +1,31 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+section--cards--wide
+
+{% endblock %}
+
+{% block sectie_content %}
+
+ {% setcontent persberichten = 'persberichten/latest/10' allowpaging %}
+ 
+    <div class="container">
+        <div class="section__content">
+            <div class="section__header"></div>
+            
+                <div class="smallcards">
+                {% for persbericht in persberichten %}         
+
+                {% include 'persbericht_card.twig' with { 'persbericht': persbericht } %} 
+                
+                {% endfor %}          
+            </div>
+
+            {{ pager() }}
+            
+        </div>
+    </div> 
+    
+{% endblock %}
+

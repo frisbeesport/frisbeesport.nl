@@ -1,0 +1,34 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+section--cards--small section--verenigingen
+
+{% endblock %}
+
+{% block sectie_content %}
+
+{% set verenigingen = "" %}
+    {% if afdeling == 'ultimate' %}
+        {% setcontent verenigingen = 'verenigingen' where { verenigingsaanbod: 'ultimate-volwassenen || ultimate-jeugd || ultimate-studenten' } orderby 'title' %}
+    {% elseif afdeling == 'discgolf' %}
+        {% setcontent verenigingen = 'verenigingen' where { verenigingsaanbod: 'discgolf-volwassenen || discgolf-jeugd'  } orderby 'title' %}
+    {% else %}
+        {% setcontent verenigingen = 'verenigingen' orderby 'title' %}
+    {% endif %}
+
+
+ 
+        <div class="container">
+            <div class="section__content">
+                <div class="section__header"></div>
+                <div class="smallcards">
+                {% for vereniging in verenigingen %}       
+                    {% include 'vereniging_card.twig' with { 'vereniging': vereniging } %} 
+                {% endfor %}
+                </div>
+            </div>
+        </div> 
+    
+{% endblock %}
+

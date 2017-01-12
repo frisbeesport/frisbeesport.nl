@@ -1,0 +1,40 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+section--forwards
+
+{% endblock %}
+
+{% block sectie_content %}
+
+    <div class="container">
+        <div class="grid section__content">
+        <div class="forwards--linkerkolom">
+            {% setcontent nationaleteams = 'nationaleteams' where { 'jeugd': 0 } %}
+            
+            <div class="section__header">
+            <h3>Volwassenen</h3></div>
+            <ul>
+            {% for team in nationaleteams %}       
+                <li><a href="#team{{team.id}}">{{ team.title }}</a></li>
+            {% endfor %}    
+            </ul>
+            
+        </div>
+        <div class="forwards--rechterkolom">
+            {% setcontent nationaleteams = 'nationaleteams' where { 'jeugd': 1 } %}
+            <div class="section__header">
+            
+                <h3>Jeugd</h3></div>
+            <ul>
+            {% for team in nationaleteams %}       
+                <li><a href="#team{{team.id}}">{{ team.title }}</a></li>
+            {% endfor %}    
+            </ul>
+        </div>
+        </div>
+    </div>
+    
+{% endblock %}
+

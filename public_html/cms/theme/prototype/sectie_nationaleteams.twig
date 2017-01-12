@@ -1,0 +1,28 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+section--cards--wide
+
+{% endblock %}
+
+{% block sectie_content %}
+    
+    <div class="container">
+        <div class="grid section__content">
+            <div class="section__header"></div>
+            <div class="widecards">
+
+            {% setcontent nationaleteams = 'nationaleteams'  %}
+
+            {% for team in nationaleteams %}       
+                {% include 'nationaalteam_cardwide.twig' with { 'team': team } %} 
+            {% endfor %}
+            
+            <div>
+
+        </div>
+    </div> 
+
+{% endblock %}
+
