@@ -13,7 +13,7 @@ section--topics
 
 		{% if sectie.caption is not empty %}
 		
-		<div class="section__title  section__title--centered">
+		<div class="section__title section__title--centered">
 			<h2>{{ sectie.caption }}</h2>
 		</div>
 		
@@ -30,7 +30,7 @@ section--topics
 		{% if sectie.body_advanced is not empty %}
 		
 		{{ sectie.body_advanced }}
-
+		
 		{% endif %}
 
 		<div class="topics">{% if sectie.topic1 is not empty %}{% include 'topic.twig' with { 'topicid': sectie.topic1 } %}{% endif %}{% if sectie.topic2 is not empty %}{% include 'topic.twig' with { 'topicid': sectie.topic2 } %}{% endif %}{% if sectie.topic3 is not empty %}{% include 'topic.twig' with { 'topicid': sectie.topic3 } %}{% endif %}{% if sectie.topic4 is not empty %}
@@ -46,7 +46,7 @@ section--topics
 		{% endif %}
 		
 		{% for topic in sectie.templatefields.topics %}
-			{% include 'sectie_topics_part_topic.twig' with { 'topic': topic } %}
+			{% include 'part_sectie_topics_topic.twig' with { 'topic': topic } %}
 		{% endfor %}</div>
 
 		{% if sectie.linktitle is not empty %}

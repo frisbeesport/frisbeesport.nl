@@ -1,7 +1,19 @@
-templatefields:     
-           
+templatefields:
+    sectie_html.twig:     
+        html:
+            label: Html
+            type: html
+            height: 600px
+            allowtwig: true       
+
+    pagina_html.twig:     
+        html:
+            label: Html
+            type: html
+            height: 600px
+            allowtwig: true      
+
     sectie_topics.twig: 
-       
         topics:
             type: repeater 
             label: Topics 
@@ -21,8 +33,7 @@ templatefields:
                     label: Omschrijving
                     type: textarea
                     height: 150px
-                    group: content
-                    
+                    group: content   
                 linktitle:
                     label: Link tekst
                     type: text
