@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>{{ app.config.get('general/sitename') }} - {{ record.afdeling | title }}</title>
+        <atom:link href="{{ paths.currenturl }}" rel="self" type="application/rss+xml"/>
+        <link>{{ url('homepage') }}</link> 
+        <description></description>
+ {% if record.afdeling == "spelers" %}
+
+        
+        {% setcontent berichten = 'berichten' where { status: 'published', datepublish: '>2015-01-01' } %}
+        {% setcontent ultimatenieuws = 'nieuws' where { afdelingen: 'ultimate', datepublish: '>2015-01-01' } %}
+        {% setcontent discgolfnieuws = 'nieuws' where { afdelingen: 'discgolf', datepublish: '>2015-01-01' } %}
+        {% setcontent organisatienieuws = 'nieuws' where { afdelingen: 'organisatie', datepublish: '>2015-01-01' } %}
+        
+        {% set records = berichten|merge(ultimatenieuws) %}
+        {% set records = records|merge(discgolfnieuws) %}
+        {% set records = records|merge(organisatienieuws) %}
+        {% set records = records|order('-datepublish') %}
+        {% set records = records[:24] %}
+        {% elseif record.afdeling == "pers" %}
+{% setcontent records = 'persberichten/latest/24'   %}
+
+ {% elseif record.afdeling == "nieuws" %}
+ {% setcontent records = 'nieuws/latest/24'  %}
+
+ {% else %}
+ {% setcontent records = 'nieuws/latest/24' where { afdelingen: record.afdeling } %}
+
+{% endif %}
+        <language>{{ app.config.get('general/locale')|lower }}</language>
+        <generator>Bolt</generator>
+
+{% for record in records %} 
+
+{% setcontent author = "auteurs/#{record.selectauteurs}" %}
+ 
+            <item>
+                <title>{{ record.title }}</title>
+                <link>http://www.frisbeesport.nl{{ record.link }}</link>
+                <pubDate>{{ record.datepublish|date("r") }}</pubDate>
+                <author>{{ author.title|default('unknown') }}</author>
+                <guid isPermaLink="false">{{ record.contenttype.singular_slug }}/{{ record.id }}</guid>
+{% if record.taxonomy is iterable %}
+    {%- for taxonomyname, taxonomy in record.taxonomy %}
+        {%- for taxonomyvalue in taxonomy %}
+                <category domain="{{ taxonomyname }}"><![CDATA[ {{ taxonomyvalue }} ]]></category>
+        {%- endfor %}
+    {%- endfor %}
+{%- endif %}
+                <description>
+
+                {% if record.teaser is not empty %}
+                    {{ record.teaser }}
+                {% else %}
+                    {{ record.lead }}
+                {% endif %}
+                
+                </description>
+                    
+                {% if record.image is not empty %}
+                <image>http://www.frisbeesport.nl{{ record.image|image(600, 400) }}</image>
+                <enclosure url="http://www.frisbeesport.nl{{ record.image|image(600, 400, "c") }}" type="image/jpeg" />
+                {% endif %}
+            </item>
+{% endfor %}
+
+    </channel>
+</rss>

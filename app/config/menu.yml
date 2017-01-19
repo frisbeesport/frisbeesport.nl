@@ -161,6 +161,10 @@ spelers:
     title: Spelershome
     path: pagina/spelers-discgolf-competitie
     top: true
+  - label: Ultimate archief
+    title: Ultimate archief
+    path: pagina/spelers-ultimate-archief
+    top: true
   - label: Veilig sporten
     title: Veilig sporten
     path: paginaset/veilig-sporten

@@ -10,7 +10,7 @@
 {% set rss = afdeling %}
 {% if afdeling == 'homepage' %}
 	{% set rss = 'nieuws' %}
-{% endif %}
+{% endif %} 
 
 {% set cssfile = 'main_organisatie.css' %}
 {% if afdeling == 'ultimate' %}
@@ -84,7 +84,7 @@
 	<link rel="canonical" href="{{ paths.hosturl }}{{ url }}">
 
 	<!-- RSS -->
-	<link href="{{ paths.rooturl }}cms/rss/{{ rss }}/" rel="alternate" type="application/rss+xml" title="Frisbeesport.nl - {{ rss }}" />
+	<link href="{{ paths.rooturl }}cms/rss/{{ rss }}/" rel="alternate" type="application/rss+xml" title="Frisbeesport.nl - {{ rss | title }}" />
 
  
 

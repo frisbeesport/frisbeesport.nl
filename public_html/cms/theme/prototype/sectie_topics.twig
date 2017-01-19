@@ -2,7 +2,7 @@
 
 {% block sectie_classes %}
 	
-section--topics
+section--cards--small
 
 {% endblock %}
 
@@ -44,10 +44,12 @@ section--topics
 		{% endif %}{% if sectie.topic8 is not empty %}
 			{% include 'topic.twig' with { 'topicid': sectie.topic8 } %}
 		{% endif %}
-		
+
 		{% for topic in sectie.templatefields.topics %}
 			{% include 'part_sectie_topics_topic.twig' with { 'topic': topic } %}
-		{% endfor %}</div>
+		{% endfor %}
+
+		</div>
 
 		{% if sectie.linktitle is not empty %}
 

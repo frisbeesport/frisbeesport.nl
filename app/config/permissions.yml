@@ -34,19 +34,13 @@ roles:
         label: Developer
     documenten:
         description: Toegang tot documenten.
-        label: Documenten
-    aanbod:
-        description: Toegang tot aanbod (concepten).
-        label: Aanbod        
+        label: Documenten    
     nationaleteams:
         description: Toegang tot nationale teams.
         label: Nationale Teams 
     courses:
         description: Toegang tot Disc Golf courses.
         label: Courses         
-    competitie:
-        description: Toegang tot Ultimate competitie uitslagen.
-        label: Competitie
     kader:
         description: Toegang tot kader en werkgroepen.
         label: Kader en werkgroepen    
@@ -182,13 +176,6 @@ contenttypes:
         depublish: [ hoofdredacteur, paginaset ]
         delete: [ hoofdredacteur, paginaset ]
         view: [ hoofdredacteur, paginaset ]
-    ultimateuitslagen:
-        edit: [ hoofdredacteur, competitie ]
-        create: [ hoofdredacteur, competitie ]
-        publish: [ hoofdredacteur, competitie ]
-        depublish: [ hoofdredacteur, competitie ]
-        delete: [ hoofdredacteur, competitie ]
-        view: [ hoofdredacteur, competitie ]  
     courses:
         edit: [ hoofdredacteur, courses ]
         create: [ hoofdredacteur, courses ]
@@ -196,13 +183,6 @@ contenttypes:
         depublish: [ hoofdredacteur, courses ]
         delete: [ hoofdredacteur, courses ]
         view: [ hoofdredacteur, courses ]  
-    aanbod:
-        edit: [ hoofdredacteur, aanbod ]
-        create: [ hoofdredacteur, aanbod ]
-        publish: [ hoofdredacteur, aanbod ]
-        depublish: [ hoofdredacteur, aanbod ]
-        delete: [ hoofdredacteur, aanbod ]
-        view: [ hoofdredacteur, aanbod ]  
     nationaleteams:
         edit: [ hoofdredacteur, nationaleteams ]
         create: [ hoofdredacteur, nationaleteams ]
@@ -262,13 +242,6 @@ contenttypes:
         view: [ hoofdredacteur, paginas ]
 
     secties:
-        edit: [ hoofdredacteur ]
-        create: [ hoofdredacteur ]
-        publish: [ hoofdredacteur ]
-        depublish: [ hoofdredacteur ]
-        delete: [ hoofdredacteur ]
-        view: [ hoofdredacteur ]  
-    topics:
         edit: [ hoofdredacteur ]
         create: [ hoofdredacteur ]
         publish: [ hoofdredacteur ]

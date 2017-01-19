@@ -61,56 +61,62 @@
 
 	{% endif %}    
       
-    {% if pagina.sectie1 != '0' %}
+    {% if pagina.sectie1 != '0' and pagina.sectie1 is not empty %}
         {% include 'sectie.twig' with { 'sectieid': pagina.sectie1 } %}
     {% endif %}
       
-    {% if pagina.sectie2 != '0' %}
+    {% if pagina.sectie2 != '0' and pagina.sectie2 is not empty %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectie2 } %}
     {% endif %}
       
-    {% if pagina.sectie3 != '0' %}
+    {% if pagina.sectie3 != '0' and pagina.sectie3 is not empty %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectie3 } %}
     {% endif %}
         
-    {% if pagina.sectie4 != '0' %}
+    {% if pagina.sectie4 != '0' and pagina.sectie4 is not empty %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectie4 } %}
     {% endif %}
         
-    {% if pagina.sectie5  != '0' %}
+    {% if pagina.sectie5  != '0'and pagina.sectie5 is not empty  %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectie5 } %}
     {% endif %}
         
-    {% if pagina.sectie6h != '0' %}
+    {% if pagina.sectie6 != '0' and pagina.sectie6 is not empty %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectie6 } %}
     {% endif %}
    
+    {% for sectie in pagina.secties %}
+        {% include 'sectie.twig' with { 'sectieid': sectie.get('sectie') } %}
+    {% endfor %}
+   
     {% block extended_content %}
     {% endblock %}
 
+
+
     </article>
     
-    {% if pagina.sectiev1 != '0' %}
+    {% if pagina.sectiev1 != '0' and pagina.sectiev1 is not empty %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectiev1 } %}
     {% endif %}
         
-    {% if pagina.sectiev2 != '0' %}
+    {% if pagina.sectiev2 != '0' and pagina.sectiev2 is not empty %}
         <div class="separator"></div>  
         {% include 'sectie.twig' with { 'sectieid': pagina.sectiev2 } %}
     {% endif %}
       
-    {% if pagina.sectiev3 != '0' %}
+    {% if pagina.sectiev3 != '0' and pagina.sectiev3 is not empty %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectiev3 } %}
     {% endif %}
         
-    {% if pagina.sectiev4 != '0' %}
+    {% if pagina.sectiev4 != '0' and pagina.sectiev4 is not empty %}
         <div class="separator"></div>
         {% include 'sectie.twig' with { 'sectieid': pagina.sectiev4 } %}
     {% endif %}

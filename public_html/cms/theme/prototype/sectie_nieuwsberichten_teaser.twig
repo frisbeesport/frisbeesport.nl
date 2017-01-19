@@ -9,10 +9,9 @@ section--cards--small section--nieuws
 {% block sectie_content %}
     
     {% setcontent nieuwsberichten = 'nieuws/latest/6' where { afdelingen: afdeling } %}
-     
-    <div class="container">
-        <div class="section__content">
-
+      
+        <div class="container">
+        
             {% if sectie.caption is not empty %}
 
 			<div class="section__header">
@@ -33,7 +32,7 @@ section--cards--small section--nieuws
                <div class="btn-landing section__button"><a href="{{ path(afdeling ~ '-nieuws') }}">Meer nieuws...</a></div>
             </div>
             
-        </div>
+        
     </div>
-    
+
 {% endblock %}

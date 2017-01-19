@@ -463,85 +463,6 @@ documenten:
     default_status: published
 
 
-aanbod:
-    name: Aanbod
-    singular_name: Aanbieding
-    description: Concepten (trainersopleiding, cityleague, beginnerscursus) aangeboden aan verenigingen door de NFB.
-    fields: 
-        slug:
-            type: slug
-            uses: title
-            group: content
-        title:
-            label: Titel
-            type: text
-            required: true
-            group: content
-            variant: inline
-        url:
-            label: Externe link
-            type: text
-            filter: url
-            group: content
-            variant: inline
-        selectpagina:
-            label: Conceptpagina
-            type: select
-            values: paginas/title
-            group: content  
-        image:
-            label: Afbeelding
-            type: image
-            upload: concepten
-            group: content            
-        description:
-            label: Omschrijving
-            type: textarea
-            height: 150px
-            group: content
-    icon_many: fa:file-text-o
-    icon_one: fa:file-text-o
-    searchable: true
-    default_status: published
-
-    
-ultimateuitslagen:
-    name: UltimateUitslagen
-    singular_name: UltimateUitslag
-    description: Uitslagen van de Ultimate competitie.
-    fields:
-        slug:
-            type: slug
-            uses: title
-            group: content
-        title:
-            label: Titel
-            type: text
-            required: true
-            group: content
-            variant: inline
-        date:
-            label: datum
-            type: date
-            required: true
-            variant: inline
-        body:
-            label: Inhoud
-            type: markdown
-            height: 600px
-            group: content
-        bodyplus:
-            label: Geavanceerde inhoud
-            type: html
-            height: 600px
-            allowtwig: true           
-            group: geavanceerd
-    taxonomy: [ competities ]           
-    searchable: false
-    default_status: published
-    icon_many: fa:file-text-o
-    icon_one: fa:file-text-o
-
 paginas: 
     name: Pagina's
     singular_name: Pagina
@@ -610,58 +531,7 @@ paginas:
             label: Pagina button 3
             type: select
             values: paginas/slug
-            group: header   
-
-        sectie1:
-            label: Sectie 1
-            type: select
-            values: secties/title
-            group: secties               
-        sectie2:
-            label: Sectie 2
-            type: select
-            values: secties/title
-            group: secties               
-        sectie3:
-            label: Sectie 3
-            type: select
-            values: secties/title
-            group: secties 
-        sectie4:
-            label: Sectie 4
-            type: select
-            values: secties/title
-            group: secties 
-        sectie5:
-            label: Sectie 5
-            type: select
-            values: secties/title
-            group: secties                           
-        sectie6:
-            label: Sectie 6
-            type: select
-            values: secties/title
-            group: secties 
-        sectiev1:
-            label: Voetsectie 1
-            type: select
-            values: secties/title
-            group: secties    
-        sectiev2:
-            label: Voetsectie 2
-            type: select
-            values: secties/title
-            group: secties                
-        sectiev3:
-            label: Voetsectie 3
-            type: select
-            values: secties/title
-            group: secties    
-        sectiev4:
-            label: Voetsectie 4
-            type: select
-            values: secties/title
-            group: secties     
+            group: header       
         
         secties:
             type: repeater
@@ -673,14 +543,6 @@ paginas:
                     type: select
                     values: secties/title
                     group: secties 
- 
-        body_advanced:
-            label: Geavanceerde inhoud
-            type: html
-            height: 900px
-            allowtwig: true           
-            group: geavanceerd  
-        
            
     taxonomy: [ afdelingen ]
     recordsperpage: 100
@@ -771,47 +633,6 @@ secties:
             values: paginas/slug
             group: link  
             
-        topic1:
-            label: Topic 1
-            type: select
-            values: topics/title
-            group: topics   
-        topic2:
-            label: Topic 2
-            type: select
-            values: topics/title
-            group: topics 
-        topic3:
-            label: Topic 3
-            type: select
-            values: topics/title
-            group: topics 
-        topic4:
-            label: Topic 4
-            type: select
-            values: topics/title
-            group: topics       
-        topic5:
-            label: Topic 5
-            type: select
-            values: topics/title
-            group: topics   
-        topic6:
-            label: Topic 6
-            type: select
-            values: topics/title
-            group: topics 
-        topic7:
-            label: Topic 7
-            type: select
-            values: topics/title
-            group: topics 
-        topic8:
-            label: Topic 8
-            type: select
-            values: topics/title
-            group: topics     
-            
         body_advanced:
             label: Geavanceerde inhoud
             type: html
@@ -826,57 +647,6 @@ secties:
     icon_many: fa:file-o
     icon_one: fa:file-o    
 
-topics:
-    name: Topics
-    singular_name: Topic
-    description: Topics zijn onderwerpen die in een sectie met het sectie_topics template worden weergegeven.
-    fields: 
-        slug:
-            type: slug
-            uses: title
-            group: content
-        title:
-            label: Naam ter identificatie
-            type: text
-            required: true
-            group: content
-            variant: inline
-        caption:
-            label: Titel
-            type: text
-            group: content
-            variant: inline
-        image:
-            label: Afbeelding
-            type: image
-            upload: topics           
-            group: content            
-        description:
-            label: Omschrijving
-            type: textarea
-            height: 150px
-            group: content
-            
-        linktitle:
-            label: Link tekst
-            type: text
-            group: link
-            variant: inline
-        url:
-            label: Externe link
-            type: text
-            filter: url
-            group: link
-            variant: inline
-        selectpagina:
-            label: Interne link
-            type: select
-            values: paginas/slug
-            group: link  
-    searchable: false
-    default_status: published
-    icon_many: fa:file-o
-    icon_one: fa:file-o
 
 rss:
     name: RSS feeds
