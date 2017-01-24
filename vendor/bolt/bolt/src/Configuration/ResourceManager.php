@@ -53,6 +53,12 @@ class ResourceManager
     protected $pathManager;
 
     /**
+     * @deprecated since 3.0, to be removed in 4.0.
+     * @var PathsProxy
+     */
+    private $pathsProxy;
+
+    /**
      * Constructor initialises on the app root path.
      *
      * @param \ArrayAccess $container ArrayAccess compatible DI container that must contain one of:
@@ -265,11 +271,13 @@ class ResourceManager
             throw new \InvalidArgumentException("Requested url $name is not available", 1);
         }
 
-        if (!$includeBasePath) {
-            return $this->urls[$name];
+        $url = $this->urls[$name];
+
+        if (!$includeBasePath || strpos($url, 'http') === 0 || strpos($url, '//') === 0) {
+            return $url;
         }
 
-        return $this->urlPrefix . $this->urls[$name];
+        return $this->urlPrefix . $url;
     }
 
     /**
@@ -303,18 +311,19 @@ class ResourceManager
     }
 
     /**
-     * Returns merged array of Urls, Paths and current request.
+     * Just don't use this.
      *
-     * However $this->paths can be either mixed array elements of String or Path
-     * getPaths() will convert them string to provide homogeneous type result.
+     * @deprecated since 3.0, to be removed in 4.0.
      *
-     * @return string[] array of merged strings
+     * @return PathsProxy
      */
     public function getPaths()
     {
-        $paths = array_map('strval', $this->paths);
+        if ($this->pathsProxy === null) {
+            $this->pathsProxy = new PathsProxy($this);
+        }
 
-        return array_merge($paths, $this->urls, $this->request);
+        return $this->pathsProxy;
     }
 
     /**
@@ -333,43 +342,42 @@ class ResourceManager
         // This is where we set the canonical. Note: The protocol (scheme) defaults to 'http',
         // and the path is discarded, as it makes no sense in this context: Bolt always
         // determines the path for a page / record. This is not the canonical's job.
-        $canonical = $app['config']->get('general/canonical', '');
-        if ($canonical !== '' && strpos($canonical, 'http') !== 0) {
+        $canonical = $app['config']->get('general/canonical', $request->server->get('HTTP_HOST'));
+        if (strpos($canonical, 'http') !== 0) {
             $canonical = 'http://' . $canonical;
         }
+
         $canonical = parse_url($canonical);
-        if (empty($canonical['scheme'])) {
-            $canonical['scheme'] = 'http';
-        }
+
         if (empty($canonical['host'])) {
             $canonical['host'] = $request->server->get('HTTP_HOST');
         }
-        $this->setRequest('canonical', sprintf('%s://%s', $canonical['scheme'], $canonical['host']));
 
-        // Set the current protocol. Default to http, unless otherwise.
-        $protocol = 'http';
+        if (empty($canonical['scheme'])) {
+            $canonical['scheme'] = 'http';
+        }
 
         if (($request->server->get('HTTPS') == 'on') ||
             ($request->server->get('SERVER_PROTOCOL') == 'https') ||
             ($request->server->get('HTTP_X_FORWARDED_PROTO') == 'https') ||
             ($request->server->get('HTTP_X_FORWARDED_SSL') == 'on')) {
-            $protocol = 'https';
-        } elseif ($request->server->get('SERVER_PROTOCOL') === null) {
-            $protocol = 'cli';
+            $canonical['scheme'] = 'https';
         }
+
+        $this->setRequest('canonical', sprintf('%s://%s', $canonical['scheme'], $canonical['host']));
 
         $rootUrl = rtrim($this->getUrl('root'), '/');
         if ($rootUrl !== $request->getBasePath()) {
             $this->urlPrefix = $request->getBasePath();
         }
 
-        $this->setRequest('protocol', $protocol);
+        $this->setRequest('protocol', $canonical['scheme']);
         $hostname = $request->server->get('HTTP_HOST', 'localhost');
         $this->setRequest('hostname', $hostname);
         $current = $request->getBasePath() . $request->getPathInfo();
         $this->setUrl('current', $current);
-        $this->setUrl('currenturl', sprintf('%s://%s%s', $protocol, $hostname, $current));
-        $this->setUrl('hosturl', sprintf('%s://%s', $protocol, $hostname));
+        $this->setUrl('currenturl', sprintf('%s://%s%s', $canonical['scheme'], $hostname, $current));
+        $this->setUrl('hosturl', sprintf('%s://%s', $canonical['scheme'], $hostname));
         $this->setUrl('rooturl', sprintf('%s%s/', $this->getRequest('canonical'), $rootUrl));
 
         $url = sprintf('%s%s', $this->getRequest('canonical'), $current);

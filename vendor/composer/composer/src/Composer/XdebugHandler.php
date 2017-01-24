@@ -63,7 +63,10 @@ class XdebugHandler
         $args = explode('|', strval(getenv(self::ENV_ALLOW)), 2);
 
         if ($this->needsRestart($args[0])) {
-            $this->prepareRestart($command) && $this->restart($command);
+            if ($this->prepareRestart()) {
+                $command = $this->getCommand();
+                $this->restart($command);
+            }
             return;
         }
 
@@ -78,6 +81,11 @@ class XdebugHandler
                 } else {
                     putenv('PHP_INI_SCAN_DIR');
                 }
+            }
+
+            // Clear version if the restart failed to disable xdebug
+            if ($this->loaded) {
+                putenv(self::ENV_VERSION);
             }
         }
     }
@@ -122,19 +130,21 @@ class XdebugHandler
      *   - tmp ini file creation
      *   - environment variable creation
      *
-     * @param null|string $command The command to run, set by method
-     *
      * @return bool
      */
-    private function prepareRestart(&$command)
+    private function prepareRestart()
     {
         $this->tmpIni = '';
         $iniPaths = IniHelper::getAll();
-        $files = $this->getWorkingSet($iniPaths, $replace);
+        $additional = count($iniPaths) > 1;
 
-        if ($this->writeTmpIni($files, $replace)) {
-            $command = $this->getCommand();
-            return $this->setEnvironment($iniPaths);
+        if (empty($iniPaths[0])) {
+            // There is no loaded ini
+            array_shift($iniPaths);
+        }
+
+        if ($this->writeTmpIni($iniPaths)) {
+            return $this->setEnvironment($additional, $iniPaths);
         }
 
         return false;
@@ -146,81 +156,26 @@ class XdebugHandler
      * The filename is passed as the -c option when the process restarts.
      *
      * @param array $iniFiles The php.ini locations
-     * @param bool $replace Whether the files need modifying
      *
      * @return bool
      */
-    private function writeTmpIni(array $iniFiles, $replace)
+    private function writeTmpIni(array $iniFiles)
     {
-        if (empty($iniFiles)) {
-            // Unlikely, maybe xdebug was loaded through a command line option.
-            return true;
-        }
-
         if (!$this->tmpIni = tempnam(sys_get_temp_dir(), '')) {
             return false;
         }
 
         $content = '';
+        $regex = '/^\s*(zend_extension\s*=.*xdebug.*)$/mi';
+
         foreach ($iniFiles as $file) {
-            $content .= $this->getIniData($file, $replace);
+            $data = preg_replace($regex, ';$1', file_get_contents($file));
+            $content .= $data.PHP_EOL;
         }
+
+        $content .= PHP_EOL.'memory_limit='.ini_get('memory_limit').PHP_EOL;
 
         return @file_put_contents($this->tmpIni, $content);
-    }
-
-    /**
-     * Returns an array of ini files to use
-     *
-     * @param array $iniPaths Locations used by the current prcoess
-     * @param null|bool $replace Whether the files need modifying, set by method
-     *
-     * @return array
-     */
-    private function getWorkingSet(array $iniPaths, &$replace)
-    {
-        $replace = true;
-        $result = array();
-
-        if (empty($iniPaths[0])) {
-            // There is no loaded ini
-            array_shift($iniPaths);
-        }
-
-        foreach ($iniPaths as $file) {
-            if (preg_match('/xdebug.ini$/', $file)) {
-                // Skip the file, no need for regex replacing
-                $replace = false;
-            } else {
-                $result[] = $file;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns formatted ini file data
-     *
-     * @param string $iniFile The location of the ini file
-     * @param bool $replace Whether to regex replace content
-     *
-     * @return string The ini data
-     */
-    private function getIniData($iniFile, $replace)
-    {
-        $contents = file_get_contents($iniFile);
-        $data = PHP_EOL;
-
-        if ($replace) {
-            // Comment out xdebug config
-            $regex = '/^\s*(zend_extension\s*=.*xdebug.*)$/mi';
-            $data .= preg_replace($regex, ';$1', $contents);
-        } else {
-            $data .= $contents;
-        }
-
-        return $data;
     }
 
     /**
@@ -239,15 +194,14 @@ class XdebugHandler
     /**
      * Returns true if the restart environment variables were set
      *
+     * @param bool $additional Whether there were additional inis
      * @param array $iniPaths Locations used by the current prcoess
      *
      * @return bool
      */
-    private function setEnvironment(array $iniPaths)
+    private function setEnvironment($additional, array $iniPaths)
     {
         // Set scan dir to an empty value if additional ini files were used
-        $additional = count($iniPaths) > 1;
-
         if ($additional && !putenv('PHP_INI_SCAN_DIR=')) {
             return false;
         }
