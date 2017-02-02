@@ -1,0 +1,82 @@
+{% extends "displaytemplate.twig" %}
+
+{% block display_classes %}
+section--showcase	
+{% endblock %}
+
+{% block display_content %}
+
+<div class="container">
+	<div class="grid  section__content">
+		{% if display.caption is not empty %}
+			<div class="section__header section__title--double">
+			 	<h2 class="section__title">{{ display.caption }}</h2>
+			</div>
+		{% endif %}
+
+		<div class="section--showcase--double__left">
+
+		{% if display.templatefields.caption1 is not empty %}
+			
+			 	<h3>{{ display.templatefields.caption1 }}</h3>
+			
+		{% endif %}
+
+		
+		{% if display.templatefields.description1  is not empty %}
+		
+		<p class="afdeling--text">{{ display.templatefields.description1  }}</p>
+
+		{% endif %}
+
+
+		{% if display.templatefields.linktitle1 is not empty %}
+
+			{% if display.templatefields.selectpagina1 is not empty %}
+                {% setcontent paginalink = "paginas/#{display.templatefields.selectpagina1}" %}
+				<a class="arrow-link" href="{{ display.templatefields.selectpagina1.link }}">{{ display.templatefields.linktitle1 }}</a>
+			{% endif %}							
+
+			{% if display.templatefields.url1 is not empty %}
+				<a class="arrow-link" href="{{ display.templatefields.url1 }}">{{  display.templatefields.linktitle1 }}</a> 
+			{% endif %}					
+			
+		{% endif %}	
+		
+		</div>	
+
+		<div class="section--showcase--double__right">
+
+	 
+		{% if display.templatefields.caption2 is not empty %}
+			
+			<h3>{{ display.templatefields.caption2 }}</h3>
+			
+		{% endif %}
+
+		
+		{% if display.templatefields.description2  is not empty %}
+		
+			<p class="afdeling--text">{{ display.templatefields.description2  }}</p>
+
+		{% endif %}
+
+	{% if display.templatefields.linktitle2 is not empty %}
+
+			{% if display.templatefields.selectpagina2 is not empty %}
+                {% setcontent paginalink = "paginas/#{display.templatefields.selectpagina2}" %}
+				<a class="arrow-link" href="{{ display.templatefields.selectpagina2.link }}">{{ display.templatefields.linktitle2 }}</a>
+			{% endif %}							
+
+			{% if display.templatefields.url2 is not empty %}
+				<a class="arrow-link" href="{{ display.templatefields.url2 }}">{{  display.templatefields.linktitle2 }}</a> 
+			{% endif %}					
+			
+		{% endif %}	
+		
+		</div>	
+	</div>			
+</div>
+
+
+{% endblock %}

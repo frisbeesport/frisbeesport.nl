@@ -542,7 +542,11 @@ paginas:
                     label: Sectie
                     type: select
                     values: secties/title
-           
+                display:
+                    label: Display
+                    type: select
+                    values: displays/title
+                    
     taxonomy: [ afdelingen ]
     recordsperpage: 100
     icon_many: fa:file-o
@@ -646,6 +650,88 @@ secties:
     icon_many: fa:file-o
     icon_one: fa:file-o    
 
+display:
+    name: Displays
+    singular_name: Display
+    description: Displays zijn onderdelen van de pagina's. 
+    fields: 
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Naam ter identificatie
+            type: text
+            required: true
+            group: content
+            variant: inline 
+        caption:
+            label: Titel
+            type: text
+            group: content 
+            variant: inline   
+        body:
+            label: Inhoud
+            type: markdown
+            height: 300px
+            group: content
+
+        template:
+            type: templateselect
+            filter: 'display*.twig' 
+            group: layout
+        achtergrond:
+            label: Achtergrond
+            type: image
+            upload: secties           
+            group: layout 
+        minheight:
+            label: Minimale hoogte
+            type: integer
+            group: layout 
+            variant: inline
+        parallax:
+            label: Parallax
+            type: checkbox
+            group: layout 
+            variant: inline
+        achtergrondkleur:
+            label: Achtergrondkleur
+            type: text
+            variant: inline           
+            group: layout  
+        overlaykleur:
+            label: Overlaykleur
+            type: text
+            variant: inline           
+            group: layout  
+        inverted:
+            label: Geinverteerd
+            type: checkbox
+            group: layout 
+            variant: inline
+
+        linktitle:
+            label: Link tekst
+            type: text
+            group: link
+            variant: inline
+        url:
+            label: Externe link
+            type: text
+            filter: url
+            group: link
+            variant: inline
+        selectpagina:
+            label: Interne link
+            type: select
+            values: paginas/slug
+            group: link   
+
+    searchable: false
+    default_status: published
+    icon_many: fa:file-o
+    icon_one: fa:file-o  
 
 rss:
     name: RSS feeds

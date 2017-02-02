@@ -1,0 +1,59 @@
+{% extends "displaytemplate.twig" %}
+
+{% block display_classes %}
+section--showcase	
+{% endblock %}
+
+{% block display_content %}
+
+
+        <div class="container">
+
+  
+            <div class="grid  section__content">
+		        <div class="{% if display.templatefields.wide %}section--showcase__content--right--wide{% else %}section--showcase__content--right{% endif %}">
+
+                {% if display.caption is not empty %}
+                
+                <div class="section__header">
+                    <h2 class="section__title">{{ display.caption }}</h2>
+                </div>
+
+                {% endif %}
+
+                <div class="afdeling--text">
+
+                    {% if display.body is not empty %}
+                    
+                    {{ display.body }}
+
+                    {% endif %}
+    
+
+                </div>	
+
+                {% if display.linktitle is not empty %}
+
+                    {% if display.selectpagina is not empty %}
+                        {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
+                        <a class="arrow-link" href="{{ paginalink.link }}">{{ display.linktitle }}</a>
+                    {% endif %}							
+
+                    {% if display.url is not empty %}
+                        <a class="arrow-link" href="{{ display.url }}">{{ display.linktitle }}</a> 
+                    {% endif %}					
+                    
+                {% endif %}	
+		
+		        </div>	
+	        </div>			
+        </div>
+
+        {% if display.templatefields.image is not empty %}
+            <div class="lazyload {% if display.templatefields.wide %}section--showcase__image--left--wide{% else %}section--showcase__image--left{% endif %}" data-bg=" {{ asset(display.templatefields.image, 'files') }}"></div>
+            <noscript>
+                <div class="{% if display.templatefields.wide %}section--showcase__image--left--wide{% else %}section--showcase__image--left{% endif %}" style="background-image: url('{{ asset(display.templatefields.image, 'files') }}')"></div>
+            </noscript>
+        {% endif %}	 
+
+{% endblock %}

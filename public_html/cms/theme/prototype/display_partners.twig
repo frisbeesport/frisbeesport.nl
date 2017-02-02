@@ -1,0 +1,48 @@
+{% extends "displaytemplate.twig" %}
+
+{% block display_classes %}
+section--centered	
+{% endblock %}
+
+{% block display_content %}
+
+
+   <div class="container">
+        <div class="grid section__content">
+
+            {% if display.caption is not empty %}
+			
+            <div class="section__header">
+            	<h2 class="section__title">{{ display.caption }}</h2>
+			</div>
+            
+			{% endif %}
+
+			<div class="afdeling--text">
+			            
+            <div class="c-partner"><img src="/cms/files/partners/logo_nocnsf.gif" /><!-- NFB logo --></div>
+
+            <div class="c-partner"><img src="/cms/files/partners/logo_lotto.jpg" /><!-- NFB logo --></div>
+
+            <div class="c-partner"><img src="/cms/files/partners/logo_righttoplay.png" /><!-- NFB logo --></div>
+
+            </div>
+            
+            {% if display.linktitle is not empty %}
+
+                {% if display.selectpagina is not empty %}
+                    {% setcontent paginalink = "paginas/#{display.selectpagina}" %}
+					<a class="arrow-link" href="{{ paginalink.link }}">{{ display.linktitle }}</a> 
+				{% endif %}		
+            
+				{% if display.url is not empty %}
+					<a class="arrow-link" href="{{ display.url }}">{{ display.linktitle }}</a> 
+				{% endif %}					
+				
+			{% endif %}	
+            
+        </div>
+    </div>
+ 
+
+{% endblock %}

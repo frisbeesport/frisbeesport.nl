@@ -62,7 +62,18 @@
 	{% endif %}    
     
     {% for sectie in pagina.secties %}
+        {% if sectie.get('sectie') is not empty %}
+
         {% include 'sectie.twig' with { 'sectieid': sectie.get('sectie') } %}
+        
+        {% endif %}   
+           
+        {% if sectie.get('display') is not empty %}
+        
+        {% include 'display.twig' with { 'displayid': sectie.get('display') } %}
+
+        {% endif %}   
+           
     {% endfor %}
    
     {% block extended_content %}

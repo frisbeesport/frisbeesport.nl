@@ -1,0 +1,5 @@
+{% setcontent display = "displays/#{displayid}" %}
+
+{% if display.template is not empty %}
+    {% include display.template %}
+{% endif %}

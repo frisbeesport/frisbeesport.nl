@@ -1,0 +1,28 @@
+<section id="display{{ displayid }}"
+         class="{% block display_classes %}{% endblock %}
+    	        {% if display.inverted %}inverse{% endif %} 
+                {% if display.achtergrond %}section--background{% endif %} 
+                {% if display.parallax %}section--parallax{% endif %}" 
+         style="{% if display.minheight %} min-height:{{display.minheight}}em; {% endif %}
+                {% if display.achtergrondkleur is not empty %} background-color:{{display.achtergrondkleur}}; {% endif %}">
+	
+	<div class="section__foreground" style="{% if display.minheight %} min-height:{{display.minheight}}em; {% endif %}">                 
+	 
+		{% block display_content %}
+        {% endblock %}
+
+  	</div>
+  	
+  	{% if display.achtergrond %}
+
+  		{% if display.parallax %}	
+  			<div class="section__background" style="height: {{ display.minheight * 2 }}em; background-image: url('{{ display.achtergrond|image(2000, 1600, "c") }}');"></div>
+  		{% else %}
+			<div class="section__background" style="height: {{ display.minheight }}em; background-image: url('{{ display.achtergrond|image(2000, 800, "c") }}');"></div>
+  		{% endif %}
+		
+  	{% endif %}
+	
+	{% if display.overlaykleur is not empty %}<div class="color-overlay" style="background-color: {{ display.overlaykleur }};"></div>{% endif %}
+
+</section>

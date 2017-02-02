@@ -1,0 +1,47 @@
+{% extends "displaytemplate.twig" %}
+
+{% block display_classes %}
+	
+    section--call-to-action inverse
+{% endblock %}
+
+{% block display_content %}
+
+        <div class="container">
+            <div class="grid section__content">
+
+                {% if display.caption is not empty %}
+
+                <div class="section__header">
+                    <h2>{{ display.caption }}</h2>
+                </div>
+                
+                {% endif %}
+        
+                
+                {% if display.body is not empty %}
+                
+                {{ display.body }}
+
+                {% endif %}
+
+                {% if display.linktitle is not empty %}
+
+                    {% if display.selectpagina is not empty %}
+                        {% setcontent paginalink = "paginas/#{display.selectpagina}" %}
+                        <div class="btn-ghost"><a href="{{ paginalink.link }}">{{ display.linktitle }}</a> </div>
+                    {% endif %}		
+                
+                    
+                    {% if display.url is not empty %}
+                        <div class="btn-ghost"><a  href="{{ display.url }}">{{ display.linktitle }}</a></div>
+                    {% endif %}					
+                    
+                {% endif %}	
+
+            </div>			
+        </div>
+ 
+
+{% endblock %}
+  

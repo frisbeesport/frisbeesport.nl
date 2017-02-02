@@ -6,6 +6,7 @@ templatefields:
             height: 600px
             allowtwig: true       
 
+
     pagina_landing.twig:
         image:
             label: Afbeelding
@@ -51,13 +52,16 @@ templatefields:
             type: select
             values: paginas/slug
             group: header   
-            
+
+
+
     pagina_html.twig:     
         html:
             label: Html
             type: html
             height: 600px
-            allowtwig: true      
+            allowtwig: true 
+ 
 
     sectie_calltoaction.twig:
         linktitle:
@@ -75,9 +79,87 @@ templatefields:
             label: Interne link
             type: select
             values: paginas/slug
-            group: link      
-    
-    
+            group: link 
+
+    display_left.twig:
+        image:
+            label: Afbeelding
+            type: image
+            upload: displays           
+            group: content                  
+        wide:
+            label: Wide
+            type: checkbox
+            group: layout 
+            variant: inline
+
+    display_right.twig:        
+        image:
+            label: Afbeelding
+            type: image
+            upload: displays           
+            group: content                  
+        wide:
+            label: Wide
+            type: checkbox
+            group: layout 
+            variant: inline
+
+    display_twocolumns.twig:
+        caption1:
+            label: Titel
+            type: text
+            group: content 
+            variant: inline                 
+        body1:
+            label: Inhoud
+            type: markdown
+            height: 300px
+            group: content
+        linktitle1:
+            label: Link tekst
+            type: text
+            group: link
+            variant: inline
+        url1:
+            label: Externe link
+            type: text
+            filter: url
+            group: link
+            variant: inline
+        selectpagina1:
+            label: Interne link
+            type: select
+            values: paginas/slug
+            group: link
+
+        caption2:
+            label: Titel 2
+            type: text
+            group: content 
+            variant: inline                 
+        body2:
+            label: Inhoud 2
+            type: markdown
+            height: 300px
+            group: content
+        linktitle2:
+            label: Link tekst 2
+            type: text
+            group: link
+            variant: inline
+        url2:
+            label: Externe link 2
+            type: text
+            filter: url
+            group: link
+            variant: inline
+        selectpagina2:
+            label: Interne link 2
+            type: select
+            values: paginas/slug
+            group: link
+
     sectie_topics.twig: 
         topics:
             type: repeater 
