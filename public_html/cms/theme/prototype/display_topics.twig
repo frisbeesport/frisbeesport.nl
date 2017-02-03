@@ -1,0 +1,54 @@
+{% extends "displaytemplate.twig" %}
+
+{% block sectie_classes %}
+	
+section--cards--small
+
+{% endblock %}
+
+{% block sectie_content %}
+
+<div class="container">
+	<div class="section__content">
+
+		{% if display.caption is not empty %}
+		
+		<div class="section__title section__title--centered">
+			<h2>{{ display.caption }}</h2>
+		</div>
+		
+		{% endif %}
+
+		
+		{% if display.body  is not empty %}
+		
+		{{ display.body }}
+
+		{% endif %}
+
+ 
+
+		<div class="topics"> 
+
+		{% for topic in display.templatefields.topics %}
+			{% include 'part_display_topics_topic.twig' with { 'topic': topic } %}
+		{% endfor %}
+
+		</div>
+
+		{% if display.linktitle is not empty %}
+
+			{% if display.selectpagina  is not empty %}
+				<a class="arrow-link" href="{{ display.selectpagina.link }}">{{ display.linktitle }}</a></div>
+			{% endif %}					
+
+			{% if display.url  is not empty %}
+				<a class="arrow-link" href="{{ display.url }}">{{ display.linktitle }}</a></div>
+			{% endif %}					
+			
+		{% endif %}	
+
+	</div>			
+</div>
+
+{% endblock %}
