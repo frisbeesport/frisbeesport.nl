@@ -240,7 +240,13 @@ contenttypes:
         depublish: [ hoofdredacteur, paginas ]
         delete: [ hoofdredacteur, paginas ]
         view: [ hoofdredacteur, paginas ]
-
+    displays:
+        edit: [ hoofdredacteur, paginas ]
+        create: [ hoofdredacteur, paginas ]
+        publish: [ hoofdredacteur, paginas ]
+        depublish: [ hoofdredacteur, paginas ]
+        delete: [ hoofdredacteur, paginas ]
+        view: [ hoofdredacteur, paginas ]
     secties:
         edit: [ hoofdredacteur ]
         create: [ hoofdredacteur ]
