@@ -35,7 +35,7 @@ section--showcase
                 {% if display.linktitle is not empty %}
 
                     {% if display.selectpagina is not empty %}
-                        {% setcontent paginalink = "paginas/#{sectie.selectpagina}" %}
+                        {% setcontent paginalink = "paginas/#{display.selectpagina}" %}
                         <a class="arrow-link" href="{{ paginalink.link }}">{{ display.linktitle }}</a>
                     {% endif %}							
 

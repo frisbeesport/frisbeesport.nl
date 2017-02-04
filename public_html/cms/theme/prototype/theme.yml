@@ -1,4 +1,5 @@
 templatefields:
+ 
     sectie_html.twig:     
         html:
             label: Html
@@ -197,3 +198,42 @@ templatefields:
                     type: select
                     values: paginas/slug
                     group: link  
+
+
+    display_topics.twig: 
+        topics:
+            type: repeater 
+            label: Topics 
+
+            fields:
+                caption:
+                    label: Titel
+                    type: text
+                    group: content
+                    variant: inline
+                image:
+                    label: Afbeelding
+                    type: image
+                    upload: topics           
+                    group: content            
+                description:
+                    label: Omschrijving
+                    type: textarea
+                    height: 150px
+                    group: content   
+                linktitle:
+                    label: Link tekst
+                    type: text
+                    group: link
+                    variant: inline
+                url:
+                    label: Externe link
+                    type: text
+                    filter: url
+                    group: link
+                    variant: inline
+                selectpagina:
+                    label: Interne link
+                    type: select
+                    values: paginas/slug
+                    group: link                      

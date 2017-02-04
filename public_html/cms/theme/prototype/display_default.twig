@@ -1,10 +1,10 @@
 {% extends "displaytemplate.twig" %}
 
-{% block sectie_classes %}
+{% block display_classes %}
 	
 {% endblock %}
 
-{% block sectie_content %}
+{% block display_content %}
 
     <div class="container">
         <div class="grid section__content">
@@ -28,7 +28,20 @@
 			{% endif %}
     
             </div>
-           
+
+                {% if display.linktitle is not empty %}
+
+                    {% if display.selectpagina is not empty %}
+                        {% setcontent paginalink = "paginas/#{display.selectpagina}" %}
+                        <a class="arrow-link" href="{{ paginalink.link }}">{{ display.linktitle }}</a>
+                    {% endif %}							
+
+                    {% if display.url is not empty %}
+                        <a class="arrow-link" href="{{ display.url }}">{{ display.linktitle }}</a> 
+                    {% endif %}					
+                    
+                {% endif %}	
+
         </div>
     </div>
     
