@@ -7,6 +7,9 @@ templatefields:
             height: 600px
             allowtwig: true       
 
+    sectie_application.twig:     
+        application:
+            type: text     
 
     pagina_landing.twig:
         image:

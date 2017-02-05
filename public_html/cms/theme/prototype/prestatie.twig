@@ -1,0 +1,17 @@
+<table class="tables">
+    <tbody>
+        <tr>
+            <th colspan="4">{{ prestatie.title }}</th>
+        </tr>
+
+        {% for score in prestatie.scores %}
+        <tr>
+            <td>{{ score.geslacht | title }}</td>
+            <td>{{ score.leeftijd | title }}</td>
+            <td>{{ score.score }}</td>
+            <td>{{ score.sporter }} </td>
+            <td>{{ score.jaar }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

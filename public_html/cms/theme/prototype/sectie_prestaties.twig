@@ -1,0 +1,24 @@
+{% extends "sectietemplate.twig" %}
+
+{% block sectie_classes %}
+	
+{% endblock %}
+
+{% block sectie_content %}
+
+    <div class="container">
+        <div class="grid section__content">
+            <div class="section__header"></div>
+            
+            {% setcontent prestaties = 'prestaties' %}
+
+            {% for prestatie in prestaties %}       
+
+                {% include 'prestatie.twig' with { 'prestatie': prestatie } %} 
+
+            {% endfor %}
+            
+        </div>
+    </div>
+
+{% endblock %}

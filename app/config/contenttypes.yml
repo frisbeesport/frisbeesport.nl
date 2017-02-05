@@ -553,6 +553,58 @@ paginas:
     icon_one: fa:file-o
     searchable: true
 
+prestaties:
+    name: Records
+    singular_name: Record
+    description: Records.
+    fields: 
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Onderdeel
+            type: text
+            required: true
+            group: content
+            variant: inline
+        description:
+            label: Omschrijving
+            type: markdown
+            height: 300px
+            group: content
+        
+        scores:
+            type: repeater
+            group: content
+            
+            fields:
+                geslacht:
+                    label: Geslacht
+                    type: select
+                    values: { 'open': "Open", 'dames': "Dames" }
+                leeftijd:
+                    label: Leeftijd
+                    type: select
+                    values: { 'senioren': "Senioren", 'u13': "U13", 'u16': "U16", 'u19': "U19" }
+                sporter:
+                    label: Sporter
+                    type: text
+                    variant: inline
+                score:
+                    label: Score
+                    type: text
+                    variant: inline
+                jaar:
+                    label: Jaar
+                    type: text
+                    variant: inline
+          
+    searchable: false
+    default_status: published
+    icon_many: fa:file-o
+    icon_one: fa:file-o    
+
 secties:
     name: Secties
     singular_name: Sectie
@@ -573,75 +625,17 @@ secties:
             type: text
             group: content 
             variant: inline
-        image:
-            label: Afbeelding
-            type: image
-            upload: secties           
-            group: content  
         body:
             label: Inhoud
             type: markdown
             height: 300px
             group: content
         
-        achtergrond:
-            label: Achtergrond
-            type: image
-            upload: secties           
-            group: layout  
         template:
             type: templateselect
             filter: 'sectie_*.twig' 
-            group: layout  
-        minheight:
-            label: Minimale hoogte
-            type: integer
-            group: layout 
-            variant: inline
-        inverted:
-            label: Geinverteerd
-            type: checkbox
-            group: layout 
-            variant: inline
-        parallax:
-            label: Parallax
-            type: checkbox
-            group: layout 
-            variant: inline
-        achtergrondkleur:
-            label: Achtergrondkleur
-            type: text
-            variant: inline           
-            group: layout  
-        overlaykleur:
-            label: Overlaykleur
-            type: text
-            variant: inline           
-            group: layout  
-                    
-        linktitle:
-            label: Link tekst
-            type: text
-            group: link
-            variant: inline
-        url:
-            label: Externe link
-            type: text
-            filter: url
-            group: link
-            variant: inline
-        selectpagina:
-            label: Interne link
-            type: select
-            values: paginas/slug
-            group: link  
-            
-        body_advanced:
-            label: Geavanceerde inhoud
-            type: html
-            height: 600px
-            allowtwig: true           
-            group: geavanceerd   
+            group: content  
+          
         application:
             type: text    
     searchable: true

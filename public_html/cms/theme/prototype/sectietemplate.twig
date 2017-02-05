@@ -1,28 +1,10 @@
-<section id="sectie{{ sectie.id }}"
-         class="{% block sectie_classes %}{% endblock %}
-    	        {% if sectie.inverted %}inverse{% endif %} 
-                {% if sectie.achtergrond %}section--background{% endif %} 
-                {% if sectie.parallax %}section--parallax{% endif %}" 
-         style="{% if sectie.minheight %} min-height:{{sectie.minheight}}em; {% endif %}
-                {% if sectie.achtergrondkleur is not empty %} background-color:{{sectie.achtergrondkleur}}; {% endif %}">
-	
-	<div class="section__foreground" style="{% if sectie.minheight %} min-height:{{sectie.minheight}}em; {% endif %}">                 
+<section id="sectie{{ sectie.id }}" class="{% block sectie_classes %}{% endblock %}" 
+     
+	<div class="section__foreground">                 
 	 
-		{% block sectie_content %}
+	{% block sectie_content %}
     {% endblock %}
 
   	</div>
-  	
-  	{% if sectie.achtergrond %}
-
-  		{% if sectie.parallax %}	
-  			<div class="section__background" style="height: {{ sectie.minheight * 2 }}em; background-image: url('{{ sectie.achtergrond|image(2000, 1600, "c") }}');"></div>
-  		{% else %}
-			<div class="section__background" style="height: {{ sectie.minheight }}em; background-image: url('{{ sectie.achtergrond|image(2000, 800, "c") }}');"></div>
-  		{% endif %}
-		
-  	{% endif %}
 	
-	{% if sectie.overlaykleur is not empty %}<div class="color-overlay" style="background-color: {{ sectie.overlaykleur }};"></div>{% endif %}
-
 </section>
