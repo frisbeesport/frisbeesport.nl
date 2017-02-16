@@ -477,11 +477,7 @@ paginas:
             type: text
             class: large
             group: content
-            variant: inline
-        template:
-            type: templateselect
-            filter: 'pagina*.twig'
-            group: content            
+            variant: inline     
         body:
             label: Pagina tekst
             type: markdown
@@ -635,9 +631,7 @@ secties:
             type: templateselect
             filter: 'sectie_*.twig' 
             group: content  
-          
-        application:
-            type: text    
+
     searchable: true
     default_status: published
     taxonomy: [ documentcategorien ]

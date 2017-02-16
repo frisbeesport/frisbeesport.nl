@@ -51,7 +51,7 @@ cron_hour: 3
 # the website, be sure to check for a config.yml file in your theme's folder. If
 # a template is set there, it will override the setting here.
 homepage: pagina/homepage 
-homepage_template: pagina_homepage.twig
+homepage_template: pagina.twig
 
 # The default content for the 404 page. Uses the 'record_template' template by default.
 # Make sure this is set to an existing record, otherwise visitors will get an error-page

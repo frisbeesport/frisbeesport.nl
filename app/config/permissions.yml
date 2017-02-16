@@ -50,7 +50,10 @@ roles:
     paginas:
         description: Toegang tot paginas.
         label: Pagina's
-        
+    prestaties:
+        description: Toegang tot records.
+        label: Records
+
 # Now we'll define some permissions. Each permission comes with a list of roles
 # that grant access.
 
@@ -261,7 +264,14 @@ contenttypes:
         depublish: [ hoofdredacteur, documenten ]
         delete: [ hoofdredacteur, documenten ]
         view: [ hoofdredacteur, documenten ]
-        
+    prestaties:
+        edit: [ hoofdredacteur, prestaties ]
+        create: [ hoofdredacteur, prestaties ]
+        publish: [ hoofdredacteur, prestaties ]
+        depublish: [ hoofdredacteur, prestaties ]
+        delete: [ hoofdredacteur, prestaties ]
+        view: [ hoofdredacteur, prestaties ]
+
 # This is an example of how to define Contenttype specific permissions
 #
 # contenttypes:
