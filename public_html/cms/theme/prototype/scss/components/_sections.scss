@@ -309,7 +309,41 @@
     margin:0px 20px 50px 20px;
 }
 
+.noombers {
+    
+    @include media($large-screen) {
+        display: inline-block;
+        float:left;
+        width:50%;
+        margin:20px 0px 30px 20px;
+    }
+    
+    margin:20px 20px 20px 20px;
+}
 
+.noomberstekst-small {
+    text-align: center;
+    
+    @include media($large-screen) {
+        display: none;
+    }
+    
+    margin:20px 20px 50px 20px;
+}
+
+.noomberstekst {
+    text-align: center;
+    display: none;
+    @include media($large-screen) {
+        text-align: left;
+        display: inline-block;
+        margin-left:0%;
+        width: 45%;
+        margin-top: 20px;
+    }
+    
+    margin:20px 20px 50px 20px;
+}
 
 // (Parallax) background
 // --------------------------------------------------
