@@ -601,6 +601,31 @@ prestaties:
     icon_many: fa:file-o
     icon_one: fa:file-o    
 
+competities:
+    name: Competities
+    singular_name: Competities
+    description: Ultimate Competities.
+    fields: 
+        slug:
+            type: slug
+            uses: title
+            group: content
+        title:
+            label: Titel
+            type: text
+            required: true
+            variant: inline 
+        date:
+            label: Startdatum
+            type: date
+            required: true
+            variant: inline 
+        url:
+            label: Link
+            type: text
+            filter: url 
+            variant: inline
+            
 secties:
     name: Secties
     singular_name: Sectie
