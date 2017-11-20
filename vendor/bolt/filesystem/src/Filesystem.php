@@ -3,7 +3,6 @@
 namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception as Ex;
-use Bolt\Filesystem\Handler;
 use Bolt\Filesystem\Handler\FileInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
 use Carbon\Carbon;
@@ -56,6 +55,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     public function has($path)
     {
         $path = $this->normalizePath($path);
+
         return $this->doHas($path);
     }
 
@@ -119,6 +119,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
 
         /** @var resource $resource */
         $resource = $object['stream'];
+
         return new Stream($resource);
     }
 
@@ -481,6 +482,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
     private function getIterator($path, $mode = null)
     {
         $it = new Iterator\RecursiveDirectoryIterator($this, $path);
+
         return new \RecursiveIteratorIterator($it, $mode);
     }
 
@@ -526,6 +528,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
 
             $handler = $this->getHandlerForType($path, $type);
         }
+
         return $this->get($path, $handler);
     }
 
@@ -567,6 +570,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         if ($metadata === false || !isset($metadata['type'])) {
             throw new Ex\IOException("Failed to get file's type", $path);
         }
+        $metadata += ['path' => $path];
 
         return $this->getTypeFromMetadata($metadata);
     }
@@ -661,7 +665,15 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
      */
     public function getImageInfo($path)
     {
-        return Handler\Image\Info::createFromString($this->read($path));
+        $path = $this->normalizePath($path);
+        $this->assertPresent($path);
+
+        $adapter = $this->getAdapter();
+        if ($adapter instanceof Capability\ImageInfo) {
+            return $adapter->getImageInfo($path);
+        }
+
+        return Handler\Image\Info::createFromString($this->doRead($path), $path);
     }
 
     /**
@@ -732,13 +744,8 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
             function ($entry) {
                 $type = $this->getTypeFromMetadata($entry);
 
-                if ($type === 'dir') {
-                    $handler = new Handler\Directory($this, $entry['path']);
-                } elseif ($type === 'image') {
-                    $handler = new Handler\Image($this, $entry['path']);
-                } else {
-                    $handler = new Handler\File($this, $entry['path']);
-                }
+                $handler = $this->getHandlerForType($entry['path'], $type);
+
                 $handler->setMountPoint($this->mountPoint);
 
                 return $handler;
@@ -765,7 +772,7 @@ class Filesystem implements FilesystemInterface, MountPointAwareInterface
         $adapter = $this->getAdapter();
 
         if (!$adapter instanceof Capability\IncludeFile) {
-            throw new Ex\NotSupportedException('Filesystem does not support including PHP files.', $path);
+            throw new Ex\NotSupportedException('Filesystem does not support including PHP files.');
         }
         $this->assertPresent($path);
 

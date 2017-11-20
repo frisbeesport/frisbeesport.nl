@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\Asset\File;
 
 use Bolt\Controller\Zone;
@@ -39,6 +40,17 @@ abstract class FileAssetBase implements FileAssetInterface
     {
         $this->path = $path;
         $this->packageName = $packageName;
+    }
+
+    /**
+     * @param string $path
+     * @param string $packageName
+     *
+     * @return FileAssetInterface
+     */
+    public static function create($path = null, $packageName = null)
+    {
+        return new static($path, $packageName);
     }
 
     /**

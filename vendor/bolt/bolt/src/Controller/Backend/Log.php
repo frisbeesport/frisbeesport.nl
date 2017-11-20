@@ -1,7 +1,9 @@
 <?php
+
 namespace Bolt\Controller\Backend;
 
-use Bolt\Pager;
+use Bolt\Storage\Entity;
+use Bolt\Storage\Repository;
 use Bolt\Translation\Translator as Trans;
 use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +42,7 @@ class Log extends BackendBase
      *
      * @param Request $request
      *
-     * @return \Bolt\Response\BoltResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Bolt\Response\TemplateResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function changeOverview(Request $request)
     {
@@ -79,7 +81,7 @@ class Log extends BackendBase
      * @param integer $contentid   Content record ID
      * @param integer $id          The change log entry ID
      *
-     * @return \Bolt\Response\BoltResponse
+     * @return \Bolt\Response\TemplateResponse
      */
     public function changeRecord(Request $request, $contenttype, $contentid, $id)
     {
@@ -93,7 +95,7 @@ class Log extends BackendBase
         $next = $this->changeLogRepository()->getChangeLogEntry($contenttype, $contentid, $id, '>');
 
         $context = [
-            'contenttype' => ['slug' => $contenttype],
+            'contenttype' => $this->getOption('contenttypes/' . $contenttype),
             'entry'       => $entry,
             'next_entry'  => $next,
             'prev_entry'  => $prev,
@@ -109,7 +111,7 @@ class Log extends BackendBase
      * @param string  $contenttype ContentType slug
      * @param integer $contentid   Content record ID
      *
-     * @return \Bolt\Response\BoltResponse
+     * @return \Bolt\Response\TemplateResponse
      */
     public function changeRecordListing(Request $request, $contenttype, $contentid)
     {
@@ -127,7 +129,8 @@ class Log extends BackendBase
             $data = [
                 'title'   => Trans::__('logs.change-log.contenttypes.all'),
                 'entries' => $this->changeLogRepository()->getChangeLog($queryOptions),
-                'count'   => $this->changeLogRepository()->countChangeLog(),
+                'count'   => $this->changeLogRepository()->count(),
+                'content' => null,
             ];
         } else {
             $contenttype = $this->getContentType($contenttype);
@@ -136,6 +139,7 @@ class Log extends BackendBase
 
         $context = [
             'contenttype' => $contenttype,
+            'entry'       => null,
             'entries'     => $data['entries'],
             'content'     => $data['content'],
             'title'       => $data['title'],
@@ -147,11 +151,11 @@ class Log extends BackendBase
     }
 
     /**
-     * System log overview route
+     * System log overview route.
      *
      * @param Request $request
      *
-     * @return \Bolt\Response\BoltResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Bolt\Response\TemplateResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function systemOverview(Request $request)
     {
@@ -191,19 +195,19 @@ class Log extends BackendBase
     }
 
     /**
-     * @return \Bolt\Storage\Repository\LogChangeRepository
+     * @return Repository\LogChangeRepository|Repository
      */
     protected function changeLogRepository()
     {
-        return $this->storage()->getRepository('Bolt\Storage\Entity\LogChange');
+        return $this->storage()->getRepository(Entity\LogChange::class);
     }
 
     /**
-     * @return \Bolt\Storage\Repository\LogSystemRepository
+     * @return Repository\LogSystemRepository|Repository
      */
     protected function systemLogRepository()
     {
-        return $this->storage()->getRepository('Bolt\Storage\Entity\LogSystem');
+        return $this->storage()->getRepository(Entity\LogSystem::class);
     }
 
     /**
@@ -221,7 +225,7 @@ class Log extends BackendBase
                 $limit = null;
                 $page = null;
             } else {
-                $page = intval($page);
+                $page = (int) $page;
             }
         } else {
             $page = 1;

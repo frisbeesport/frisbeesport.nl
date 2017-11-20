@@ -8,6 +8,7 @@ use Bolt\Events\StorageEvent;
 use Bolt\Events\StorageEvents;
 use Bolt\Storage\Entity\Builder;
 use Bolt\Storage\Entity\Entity;
+use Bolt\Storage\Field\Type\FieldTypeInterface;
 use Bolt\Storage\Mapping\ClassMetadata;
 use Bolt\Storage\Query\QueryInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -89,6 +90,22 @@ class Repository implements ObjectRepository
     }
 
     /**
+     * Return the number of rows used in this repository table.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        $qb = $this->getLoadQuery()
+            ->select('COUNT(' . $this->getAlias() . '.id) as count')
+            ->resetQueryParts(['groupBy', 'join'])
+        ;
+        $result = $qb->execute()->fetchColumn(0);
+
+        return (int) $result;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function find($id)
@@ -136,7 +153,7 @@ class Repository implements ObjectRepository
      * @param array $criteria The criteria.
      * @param array $orderBy
      *
-     * @return object The object.
+     * @return object|false The object.
      */
     public function findOneBy(array $criteria, array $orderBy = null)
     {
@@ -188,8 +205,10 @@ class Repository implements ObjectRepository
     /**
      * Method to hydrate and return a QueryBuilder query.
      *
+     * @param QueryBuilder $query
+     *
      * @return array Entity
-     **/
+     */
     public function findWith(QueryBuilder $query)
     {
         $this->load($query);
@@ -197,25 +216,27 @@ class Repository implements ObjectRepository
         $result = $query->execute()->fetchAll();
         if ($result) {
             return $this->hydrateAll($result, $query);
-        } else {
-            return [];
         }
+
+        return [];
     }
 
     /**
      * Method to hydrate and return a single QueryBuilder result.
      *
-     * @return Entity | false
-     **/
+     * @param QueryBuilder $query
+     *
+     * @return Entity|false
+     */
     public function findOneWith(QueryBuilder $query)
     {
         $this->load($query);
         $result = $query->execute()->fetch();
         if ($result) {
             return $this->hydrate($result, $query);
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -261,7 +282,9 @@ class Repository implements ObjectRepository
         $metadata = $this->getClassMetadata();
         foreach ($metadata->getFieldMappings() as $field) {
             $fieldtype = $this->getFieldManager()->get($field['fieldtype'], $field);
-            $fieldtype->load($query, $metadata);
+            if ($fieldtype instanceof FieldTypeInterface) {
+                $fieldtype->load($query, $metadata);
+            }
         }
     }
 
@@ -278,7 +301,9 @@ class Repository implements ObjectRepository
 
         foreach ($metadata->getFieldMappings() as $field) {
             $fieldtype = $this->getFieldManager()->get($field['fieldtype'], $field);
-            $fieldtype->query($query, $metadata);
+            if ($fieldtype instanceof FieldTypeInterface) {
+                $fieldtype->query($query, $metadata);
+            }
         }
     }
 
@@ -307,7 +332,9 @@ class Repository implements ObjectRepository
             }
 
             $field = $this->getFieldManager()->get($field['fieldtype'], $field);
-            $field->persist($queries, $entity);
+            if ($field instanceof FieldTypeInterface) {
+                $field->persist($queries, $entity);
+            }
         }
     }
 

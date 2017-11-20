@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\Storage\Entity;
 
 /**
@@ -36,8 +37,6 @@ trait ContentSearchTrait
      * The query is assumed to be in a format as returned by decode Storage->decodeSearchQuery().
      *
      * @param array $query Query to weigh against
-     *
-     * @return void
      */
     public function weighSearchResult($query)
     {
@@ -45,7 +44,7 @@ trait ContentSearchTrait
         static $contenttypeTaxonomies = null;
 
         $ct = $this->contenttype['slug'];
-        if ((is_null($contenttypeFields)) || (!isset($contenttypeFields[$ct]))) {
+        if (($contenttypeFields === null) || (!isset($contenttypeFields[$ct]))) {
             // Should run only once per contenttype (e.g. singular_name)
             $contenttypeFields[$ct] = $this->getFieldWeights();
             $contenttypeTaxonomies[$ct] = $this->getTaxonomyWeights();
@@ -140,7 +139,7 @@ trait ContentSearchTrait
      *
      * @return integer The weight
      */
-    private function weighQueryText($subject, $complete, $words, $max)
+    private function weighQueryText($subject, $complete, array $words, $max)
     {
         $lowSubject = mb_strtolower(trim($subject));
 
@@ -148,16 +147,16 @@ trait ContentSearchTrait
             // a complete match is 100% of the maximum
             return round((100 / 100) * $max);
         }
-        if (strstr($lowSubject, $complete)) {
+        if (strpos($lowSubject, $complete) !== false) {
             // when the whole query is found somewhere is 70% of the maximum
             return round((70 / 100) * $max);
         }
 
         $wordMatches = 0;
         $cntWords = count($words);
-        for ($i = 0; $i < $cntWords; $i++) {
-            if (strstr($lowSubject, $words[$i])) {
-                $wordMatches++;
+        foreach (array_keys($words) as $k) {
+            if (strpos($lowSubject, $words[$k]) !== false) {
+                ++$wordMatches;
             }
         }
         if ($wordMatches > 0) {

@@ -24,7 +24,7 @@ with _extensions_. If you have found a bug in an extension, the best place to
 report this would be in the extension's own repository, so that the original
 author can look into it.
 
-1. I'm reporting a bug
+<a name="1-im-reporting-a-bug"></a>1. I'm reporting a bug
 ----------------------
 
 If you think you've found a bug, try to make sure it's actually a bug, and not
@@ -75,13 +75,13 @@ will be handled confidentially. After fixing them, you will be credited for any
 security issues that you may have discovered.
 
 
-2. I'd like to request/propose a feature
+<a name="2-id-like-to-requestpropose-a-feature"></a>2. I'd like to request/propose a feature
 ----------------------------------------
 
 We get a lot of feature requests for Bolt, and we can't do them all, even if we
 wanted to. In fact, since Bolt is designed to be 'simple, sophisticated and
 straightforward', not all feature requests might be a good fit for Bolt. Be sure
-to read [our manifesto](https://docs.bolt.cm/manifesto) to get an idea of our
+to read [our manifesto](https://docs.bolt.cm/other/manifesto) to get an idea of our
 goals and values.
 
 If you're proposing an idea, with the intent to work on it yourself, please open
@@ -96,7 +96,7 @@ have the skill to work on it yourself, we'll gladly read it, and comment on it,
 but we can't make any promises as to when/if it'll be realised.
 
 
-3. I'm making a pull request
+<a name="3-im-making-a-pull-request"></a>3. I'm making a pull request
 ----------------------------
 
 Your contributions to the project are very welcome. If you would like to fix a
@@ -136,7 +136,7 @@ right though to a released and maintained Bolt.
 
  1. Open an RFC [issue](https://github.com/bolt/bolt/issues/new) following these criteria:
      * Prefix the title with "[RFC]"
-     * Breifely describe the use case
+     * Briefly describe the use case
      * If requireing new libraries, a brief justification of why that one was chosen
  3. Be assigned a "sponsor" from the core team
  4. Submit the PR

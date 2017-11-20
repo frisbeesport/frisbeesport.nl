@@ -2,6 +2,7 @@
 
 namespace Bolt\AccessControl;
 
+use Bolt\Common\Json;
 use Bolt\Exception\AccessControlException;
 use Bolt\Legacy\Content;
 use Bolt\Storage\Entity;
@@ -69,7 +70,7 @@ class Permissions
     {
         // Log the message if enabled
         if ($this->app['config']->get('general/debug_permission_audit_mode', false)) {
-            $this->app['logger.system']->addInfo($msg, ['event' => 'authentication']);
+            $this->app['logger.system']->info($msg, ['event' => 'authentication']);
         }
     }
 
@@ -133,9 +134,9 @@ class Permissions
                 $roles = $this->getDefinedRoles();
                 if (isset($roles[$roleName])) {
                     return $roles[$roleName];
-                } else {
-                    return null;
                 }
+
+                return null;
         }
     }
 
@@ -312,7 +313,13 @@ class Permissions
     {
         $roles = $this->getRolesByGlobalPermission($permissionName);
         if (!is_array($roles)) {
-            $this->app['logger.system']->addInfo("Configuration error: $permissionName is not granted to any roles.", ['event' => 'authentication']);
+            // We log it, unless the permission name is 'root'.
+            if ($roleName !== self::ROLE_ROOT) {
+                $this->app['logger.system']->info(
+                    "Configuration error: Permission '$permissionName' is not granted to any roles. You should add a role for this permission to <tt>permissions.yml</tt>.",
+                    ['event' => 'authentication']
+                );
+            }
 
             return false;
         }
@@ -545,11 +552,11 @@ class Permissions
 
         $cacheKey = "_permission_rule:$what";
         if ($this->app['cache']->contains($cacheKey)) {
-            $rule = json_decode($this->app['cache']->fetch($cacheKey), true);
+            $rule = Json::parse($this->app['cache']->fetch($cacheKey));
         } else {
             $parser = new PermissionParser();
             $rule = $parser->run($what);
-            $this->app['cache']->save($cacheKey, json_encode($rule));
+            $this->app['cache']->save($cacheKey, Json::dump($rule));
         }
         $userRoles = $this->getEffectiveRolesForUser($user);
         $isAllowed = $this->isAllowedRule($rule, $user, $userRoles, $content, $contenttypeSlug, $contentId);
@@ -640,14 +647,13 @@ class Permissions
                         $this->audit("Granting 'overview' for everyone (hard-coded override)");
 
                         return true;
-                    } else {
-                        $this->audit("Denying 'overview' for anonymous user (hard-coded override)");
-
-                        return false;
                     }
-                } else {
-                    $permission = 'view';
+                    $this->audit("Denying 'overview' for anonymous user (hard-coded override)");
+
+                    return false;
                 }
+                $permission = 'view';
+
                 break;
 
             case 'relatedto':
@@ -656,9 +662,9 @@ class Permissions
                     $this->audit("Granting 'relatedto' globally (hard-coded override)");
 
                     return true;
-                } else {
-                    $permission = 'view';
                 }
+                $permission = 'view';
+
                 break;
 
             case 'contenttype':
@@ -685,7 +691,7 @@ class Permissions
                     $content = $this->app['storage']->getContent("$contenttype/$contentId", ['hydrate' => false]);
                 }
 
-                if (intval($content['ownerid']) && (intval($content['ownerid']) === intval($user['id']))) {
+                if ((int) ($content['ownerid']) && ((int) ($content['ownerid']) === (int) ($user['id']))) {
                     $userRoles[] = self::ROLE_OWNER;
                 }
                 break;

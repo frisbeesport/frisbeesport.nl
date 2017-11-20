@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\EventListener;
 
 use Bolt\AccessControl\Permissions;
@@ -8,8 +9,10 @@ use Bolt\Events\StorageEvents;
 use Bolt\Exception\AccessControlException;
 use Bolt\Logger\FlashLoggerInterface;
 use Bolt\Request\ProfilerAwareTrait;
+use Bolt\Storage\Collection;
 use Bolt\Storage\Database\Schema;
 use Bolt\Storage\Entity;
+use Bolt\Storage\EntityManagerInterface;
 use Bolt\Storage\EventProcessor;
 use Bolt\Translation\Translator as Trans;
 use PasswordLib\Password\Factory as PasswordFactory;
@@ -24,6 +27,8 @@ class StorageEventListener implements EventSubscriberInterface
 {
     use ProfilerAwareTrait;
 
+    /** @var EntityManagerInterface */
+    protected $em;
     /** @var EventProcessor\TimedRecord */
     protected $timedRecord;
     /** @var Schema\SchemaManagerInterface */
@@ -36,31 +41,39 @@ class StorageEventListener implements EventSubscriberInterface
     protected $passwordFactory;
     /** @var integer */
     protected $hashStrength;
+    /** @var bool */
+    protected $timedRecordsEnabled;
 
     /**
      * Constructor.
      *
+     * @param EntityManagerInterface        $em
      * @param EventProcessor\TimedRecord    $timedRecord
      * @param Schema\SchemaManagerInterface $schemaManager
      * @param UrlGeneratorInterface         $urlGenerator
      * @param FlashLoggerInterface          $loggerFlash
      * @param PasswordFactory               $passwordFactory
      * @param integer                       $hashStrength
+     * @param bool                          $timedRecordsEnabled
      */
     public function __construct(
+        EntityManagerInterface $em,
         EventProcessor\TimedRecord $timedRecord,
         Schema\SchemaManagerInterface $schemaManager,
         UrlGeneratorInterface $urlGenerator,
         FlashLoggerInterface $loggerFlash,
         PasswordFactory $passwordFactory,
-        $hashStrength
+        $hashStrength,
+        $timedRecordsEnabled
     ) {
+        $this->em = $em;
         $this->timedRecord = $timedRecord;
         $this->schemaManager = $schemaManager;
         $this->urlGenerator = $urlGenerator;
         $this->loggerFlash = $loggerFlash;
         $this->passwordFactory = $passwordFactory;
         $this->hashStrength = $hashStrength;
+        $this->timedRecordsEnabled = $timedRecordsEnabled;
     }
 
     /**
@@ -99,6 +112,33 @@ class StorageEventListener implements EventSubscriberInterface
     }
 
     /**
+     * Pre-delete event to delete an entities taxonomy & relation entities.
+     *
+     * @param StorageEvent $event
+     */
+    public function onPreDelete(StorageEvent $event)
+    {
+        $entity = $event->getContent();
+        if (!$entity instanceof Entity\Content) {
+            return;
+        }
+        $taxonomies = $entity->getTaxonomy();
+        if ($taxonomies instanceof Collection\Taxonomy) {
+            $repo = $this->em->getRepository(Entity\Taxonomy::class);
+            foreach ($taxonomies as $taxonomy) {
+                $repo->delete($taxonomy);
+            }
+        }
+        $relations = $entity->getRelation();
+        if ($relations instanceof Collection\Relations) {
+            $repo = $this->em->getRepository(Entity\Relations::class);
+            foreach ($relations as $relation) {
+                $repo->delete($relation);
+            }
+        }
+    }
+
+    /**
      * Kernel request listener callback.
      *
      * @param GetResponseEvent $event
@@ -115,10 +155,10 @@ class StorageEventListener implements EventSubscriberInterface
         $this->schemaCheck($event);
 
         // Check if we need to 'publish' any 'timed' records, or 'hold' any expired records.
-        if ($this->timedRecord->isDuePublish()) {
+        if ($this->timedRecordsEnabled && $this->timedRecord->isDuePublish()) {
             $this->timedRecord->publishTimedRecords();
         }
-        if ($this->timedRecord->isDueHold()) {
+        if ($this->timedRecordsEnabled && $this->timedRecord->isDueHold()) {
             $this->timedRecord->holdExpiredRecords();
         }
     }
@@ -141,10 +181,13 @@ class StorageEventListener implements EventSubscriberInterface
         );
 
         if ($validSession && $expired && $this->schemaManager->isUpdateRequired() && $notInCheck) {
-            $msg = Trans::__(
-                "The database needs to be updated/repaired. Go to 'Configuration' > '<a href=\"%link%\">Check Database</a>' to do this now.",
-                ['%link%' => $this->urlGenerator->generate('dbcheck')]
-                );
+            $msg = sprintf(
+                '%s > \'<a href="%s">%s</a>\' %s',
+                Trans::__('general.phrase.database-update-required-pre'),
+                $this->urlGenerator->generate('dbcheck'),
+                Trans::__('general.phrase.database-check'),
+                Trans::__('general.phrase.database-update-required-post')
+            );
             $this->loggerFlash->error($msg);
         }
     }
@@ -192,6 +235,7 @@ class StorageEventListener implements EventSubscriberInterface
             KernelEvents::REQUEST       => ['onKernelRequest', 31],
             StorageEvents::PRE_SAVE     => ['onUserEntityPreSave', Application::EARLY_EVENT],
             StorageEvents::POST_HYDRATE => 'onPostHydrate',
+            StorageEvents::PRE_DELETE   => 'onPreDelete',
         ];
     }
 }

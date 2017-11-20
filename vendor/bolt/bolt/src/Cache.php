@@ -2,7 +2,8 @@
 
 namespace Bolt;
 
-use Bolt\Filesystem\AggregateFilesystemInterface;
+use Bolt\Common\Deprecated;
+use Bolt\Filesystem\CompositeFilesystemInterface;
 use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Handler\DirectoryInterface;
 use Bolt\Filesystem\Handler\HandlerInterface;
@@ -23,8 +24,10 @@ class Cache extends FilesystemCache
     /** Default cache file extension. */
     const EXTENSION = '.data';
 
-    /** @var AggregateFilesystemInterface */
+    /** @var CompositeFilesystemInterface */
     private $filesystem;
+    /** @var int */
+    private $umask;
 
     /**
      * Cache constructor.
@@ -32,12 +35,14 @@ class Cache extends FilesystemCache
      * @param string                       $directory
      * @param string                       $extension
      * @param int                          $umask
-     * @param AggregateFilesystemInterface $filesystem
+     * @param CompositeFilesystemInterface $filesystem
      */
-    public function __construct($directory, $extension = self::EXTENSION, $umask = 0002, AggregateFilesystemInterface $filesystem = null)
+    public function __construct($directory, $extension = self::EXTENSION, $umask = 0002, CompositeFilesystemInterface $filesystem = null)
     {
-        parent::__construct($directory, $extension, $umask);
+        umask($umask);
         $this->filesystem = $filesystem;
+        $this->umask = $umask;
+        parent::__construct($directory, $extension, $umask);
     }
 
     /**
@@ -45,6 +50,8 @@ class Cache extends FilesystemCache
      */
     public function clearCache()
     {
+        Deprecated::method(3.0, 'flushAll');
+
         $this->flushAll();
 
         return [
@@ -67,14 +74,26 @@ class Cache extends FilesystemCache
         // Clear Doctrine's folder.
         $result = parent::doFlush();
 
-        if ($this->filesystem instanceof AggregateFilesystemInterface) {
+        if ($this->filesystem instanceof CompositeFilesystemInterface) {
+            $cacheFs = $this->filesystem->getFilesystem('cache');
+            // Clear our cached configuration
+            if ($cacheFs->has('config-cache.json')) {
+                $cacheFs->delete('config-cache.json');
+            }
+
             // Clear our own cache folder.
-            $this->flushDirectory($this->filesystem->getFilesystem('cache')->getDir('/development'));
-            $this->flushDirectory($this->filesystem->getFilesystem('cache')->getDir('/production'));
-            $this->flushDirectory($this->filesystem->getFilesystem('cache')->getDir('/profiler'));
+            $this->flushDirectory($cacheFs->getDir('/development'));
+            $this->flushDirectory($cacheFs->getDir('/exception'));
+            $this->flushDirectory($cacheFs->getDir('/production'));
+            $this->flushDirectory($cacheFs->getDir('/profiler'));
+            $this->flushDirectory($cacheFs->getDir('/trans'));
 
             // Clear the thumbs folder.
             $this->flushDirectory($this->filesystem->getFilesystem('web')->getDir('/thumbs'));
+
+            // We need to recreate our base Doctrine cache directory, as it
+            // will be a subdirectory of one of the ones we just wiped.
+            $this->createPathIfNeeded();
         }
 
         return $result;
@@ -103,5 +122,19 @@ class Cache extends FilesystemCache
             } catch (IOException $e) {
             }
         }
+    }
+
+    /**
+     * Create base path path if needed.
+     *
+     * @return bool
+     */
+    private function createPathIfNeeded()
+    {
+        if (!is_dir($this->directory)) {
+            return @mkdir($this->directory, 0777 & (~$this->umask), true) && !is_dir($this->directory);
+        }
+
+        return true;
     }
 }

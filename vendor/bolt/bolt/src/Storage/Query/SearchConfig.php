@@ -62,15 +62,13 @@ class SearchConfig
     /**
      * Iterates over the main config and delegates weighting to both
      * searchable columns and searchable taxonomies.
-     *
-     * @return void
      */
     protected function parseContenttypes()
     {
         $contentTypes = $this->config->get('contenttypes');
 
         foreach ($contentTypes as $type => $values) {
-            if (! $this->isInvisible($type)) {
+            if (!$this->isInvisible($type)) {
                 $this->getSearchableColumns($type);
                 if (isset($values['taxonomy'])) {
                     $this->parseTaxonomies($type, $values['taxonomy']);
@@ -85,8 +83,6 @@ class SearchConfig
      *
      * @param string $contentType
      * @param array  $taxonomies
-     *
-     * @return void
      */
     protected function parseTaxonomies($contentType, $taxonomies)
     {
@@ -121,8 +117,6 @@ class SearchConfig
      * Determine what columns are searchable for a given ContentType.
      *
      * @param string $type
-     *
-     * @return void
      */
     protected function getSearchableColumns($type)
     {
@@ -156,10 +150,10 @@ class SearchConfig
     {
         $info = $this->config->get('contenttypes/' . $contentType);
         if ($info) {
-            if (array_key_exists('viewless', $info) && $info['viewless'] == true) {
+            if (array_key_exists('viewless', $info) && $info['viewless'] === true) {
                 return true;
             }
-            if (array_key_exists('searchable', $info) && $info['searchable'] == false) {
+            if (array_key_exists('searchable', $info) && $info['searchable'] === false) {
                 return true;
             }
         }

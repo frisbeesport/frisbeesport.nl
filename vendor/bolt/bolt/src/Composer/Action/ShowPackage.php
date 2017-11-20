@@ -38,7 +38,7 @@ final class ShowPackage extends BaseAction
         $io = $this->getIO();
 
         if ($root) {
-            $composerJson = $this->app['resources']->getPath('root/composer.json');
+            $composerJson = $this->app['path_resolver']->resolve('composer.json');
             $composer = Factory::create($io, $composerJson, true);
         } else {
             $composer = $this->getComposer();
@@ -99,9 +99,9 @@ final class ShowPackage extends BaseAction
                         'versions' => $package->getVersion(),
                     ],
                 ];
-            } else {
-                return $this->getPackage($installedRepo, $repos, $package, $version);
             }
+
+            return $this->getPackage($installedRepo, $repos, $package, $version);
         }
 
         $packages = [];

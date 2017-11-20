@@ -1,7 +1,11 @@
 <?php
+
 namespace Bolt\Controller;
 
 use Bolt\AccessControl\Token\Token;
+use Bolt\Common\Deprecated;
+use Bolt\Response\TemplateResponse;
+use Bolt\Response\TemplateView;
 use Bolt\Routing\DefaultControllerClassAwareInterface;
 use Bolt\Storage\Entity;
 use Bolt\Storage\Repository;
@@ -63,17 +67,74 @@ abstract class Base implements ControllerProviderInterface
     }
 
     /**
-     * Renders a template
+     * Renders a template.
      *
-     * @param string $template  the template name
-     * @param array  $variables array of context variables
-     * @param array  $globals   array of global variables
+     * @param string|string[] $template Template name(s)
+     * @param array           $context  Context variables
+     * @param array           $globals  Global variables
      *
-     * @return \Bolt\Response\BoltResponse
+     * @return TemplateResponse|TemplateView
      */
-    protected function render($template, array $variables = [], array $globals = [])
+    protected function render($template, array $context = [], array $globals = [])
     {
-        return $this->app['render']->render($template, $variables, $globals);
+        $twig = $this->app['twig'];
+
+        $template = $twig->resolveTemplate($template);
+
+        if ($this->getOption('general/compatibility/twig_globals', true)) {
+            foreach ($globals as $name => $value) {
+                $twig->addGlobal($name, $value);
+            }
+        }
+        $context += $globals;
+
+        $this->addResolvedRoute($context, $template->getTemplateName());
+
+        if ($this->getOption('general/compatibility/template_view', false)) {
+            return new TemplateView($template->getTemplateName(), $context);
+        }
+        Deprecated::warn(
+            'Returning a TemplateResponse from Bolt\Controller\Base::render',
+            3.3,
+            'Be sure no Response methods are used from return value and then set "compatibility/template_view"' .
+            ' to true in config.yml. This changes render() to return a TemplateView instead.'
+        );
+
+        $content = $template->render($context);
+        $response = new TemplateResponse($template->getTemplateName(), $context, $content);
+
+        return $response;
+    }
+
+    /**
+     * Update the route attributes to change the canonical URL generated.
+     *
+     * @param array  $context
+     * @param string $template
+     */
+    private function addResolvedRoute(array $context, $template)
+    {
+        if (!isset($context['record'])) {
+            return;
+        }
+
+        $content = $context['record'];
+        $request = $this->app['request_stack']->getCurrentRequest();
+
+        $homepage = $this->getOption('theme/homepage') ?: $this->getOption('general/homepage');
+        $uriID = $content->contenttype['singular_slug'] . '/' . $content->get('id');
+        $uriSlug = $content->contenttype['singular_slug'] . '/' . $content->get('slug');
+
+        if (($uriID === $homepage || $uriSlug === $homepage) && ($template === $this->getOption('general/homepage_template'))) {
+            $request->attributes->add(['_route' => 'homepage', '_route_params' => []]);
+
+            return;
+        }
+
+        list($routeName, $routeParams) = $content->getRouteNameAndParams();
+        if ($routeName) {
+            $request->attributes->add(['_route' => $routeName, '_route_params' => $routeParams]);
+        }
     }
 
     /**
@@ -119,7 +180,7 @@ abstract class Base implements ControllerProviderInterface
     }
 
     /**
-     * Shortcut for {@see UrlGeneratorInterface::generate}
+     * Shortcut for {@see UrlGeneratorInterface::generate}.
      *
      * @param string $name          The name of the route
      * @param array  $params        An array of parameters
@@ -165,7 +226,7 @@ abstract class Base implements ControllerProviderInterface
     /**
      * Returns the Entity Manager.
      *
-     * @return \Bolt\Storage\EntityManager
+     * @return \Bolt\Storage\EntityManager|\Bolt\Legacy\Storage
      */
     protected function storage()
     {
@@ -183,7 +244,7 @@ abstract class Base implements ControllerProviderInterface
     }
 
     /**
-     * Gets the flash logger
+     * Gets the flash logger.
      *
      * @return \Bolt\Logger\FlashLoggerInterface
      */
@@ -213,7 +274,6 @@ abstract class Base implements ControllerProviderInterface
     protected function validateCsrfToken($value = null, $id = 'bolt')
     {
         if (!$this->isCsrfTokenValid($value, $id)) {
-            //$this->app['logger.flash']->warning('The security token was incorrect. Please try again.');
             $this->abort(Response::HTTP_BAD_REQUEST, Trans::__('general.phrase.something-went-wrong'));
         }
     }
@@ -300,13 +360,13 @@ abstract class Base implements ControllerProviderInterface
             return false;
         }
         /** @var Repository\UsersRepository $repo */
-        $repo = $this->storage()->getRepository('Bolt\Storage\Entity\Users');
+        $repo = $this->storage()->getRepository(Entity\Users::class);
 
         return $repo->getUser($userId);
     }
 
     /**
-     * Shortcut for {@see \Bolt\AccessControl\Permissions::isAllowed}
+     * Shortcut for {@see \Bolt\AccessControl\Permissions::isAllowed}.
      *
      * @param string       $what
      * @param mixed        $user        The user to check permissions against.
@@ -338,20 +398,26 @@ abstract class Base implements ControllerProviderInterface
     }
 
     /**
-     * Shortcut for {@see \Bolt\Legacy\Storage::getContent()}
+     * Shortcut for {@see \Bolt\Legacy\Storage::getContent()}.
      *
-     * @param string $textquery
+     * @param string $textQuery
      * @param array  $parameters
      * @param array  $pager
-     * @param array  $whereparameters
+     * @param array  $whereParameters
      *
      * @return \Bolt\Legacy\Content|\Bolt\Legacy\Content[]
      *
      * @see \Bolt\Legacy\Storage::getContent()
      */
-    protected function getContent($textquery, $parameters = [], &$pager = [], $whereparameters = [])
+    protected function getContent($textQuery, $parameters = [], &$pager = [], $whereParameters = [])
     {
-        return $this->storage()->getContent($textquery, $parameters, $pager, $whereparameters);
+        $isLegacy = $this->getOption('general/compatibility/setcontent_legacy', true);
+        if ($isLegacy) {
+            return $this->storage()->getContent($textQuery, $parameters, $pager, $whereParameters);
+        }
+        $params = array_merge($parameters, $whereParameters);
+
+        return  $this->app['query']->getContent($textQuery, $params);
     }
 
     /**

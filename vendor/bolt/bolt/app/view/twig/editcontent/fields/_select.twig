@@ -12,39 +12,41 @@
 
 {#=== INIT ===========================================================================================================#}
 
-{% if option.values is iterable %}
-    {% set values = option.values %}
-{% else %}
-    {% set lookuptype = option.values|split('/')|slice(0,1)|first %}
-    {% set lookupfield = option.values|split('/')|slice(1,1)|first %}
-    {% if ',' in lookupfield %}
-        {% set lookupfieldlist = lookupfield|split(',') %}
-    {% endif %}
-    {% set sortingorder = field.sort|default(lookupfieldlist|default([])|first)|default(lookupfield)|default('id') %}
-    {% set querylimit = field.limit|default(500) %}
-    {% set wherefilter = field.filter|default({}) %}
-    {% setcontent lookups = lookuptype where wherefilter order sortingorder nohydrate limit querylimit %}
-    {% set valuefield = lookupfieldlist|default(lookupfield)|default('id') %}
-    {% set values = lookups|selectfield(valuefield, option.multiple, field.keys|default('id')) %}
+{# Conditional is an ugly hack to be removed with Forms cutover #}
+{% if values is not defined %}
+    {% set values = context.values.select_choices[contentkey]|default([]) %}
 {% endif %}
 
 {# Get the current selection. Either a single value, or an array. #}
 {% set selection = context.content.get(contentkey)|default(option.default) %}
-{% if selection is not iterable %}
+{# Make sure the value is either `null` (for empty), or cast to an array for a string. Prevent breakage when switching from 'single' to 'mulptiple' #}
+{% if selection is not iterable and selection is not empty %}
     {% set selection = [ selection ] %}
 {% endif %}
 
 {# If the current selection contains an existing id, we must use _only_ the id, and not accept a fallback. #}
 {% set onlyids = selection|first in values|keys %}
 
-{# Build the select options array #}
+{# Build the select options array, in two steps. #}
 {% set options = [] %}
-{% for id, value in values %}
-    {% set is_array = (value is iterable and (value | length) > 1) %}
+
+{# Step 1: If we have a current selection, we need to add these _first_, maintaining their order #}
+{% for id in selection %}
+    {% if values[id]|default() %}
+        {% set options = options|merge([{
+            'value':     id,
+            'text':      values[id],
+            'selected':  true,
+        }]) %}
+    {% endif %}
+{% endfor %}
+
+{# Step 2: Next, add all the values, _not_ in the selection. For new records, or records with no selection, this will add them all. #}
+{% for id, value in values if (id not in selection) %}
     {% set options = options|merge([{
-        value:     id,
-        text:      is_array ? value[0:]|join(' / ') : value,
-        selected:  id in selection or (not onlyids and (is_array ? value[0] : value) in selection),
+        'value':     id,
+        'text':      value,
+        'selected':  false,
     }]) %}
 {% endfor %}
 

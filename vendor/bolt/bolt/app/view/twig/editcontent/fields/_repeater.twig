@@ -1,9 +1,9 @@
 {% set repeatfieldvals = context.content.get(contentkey) %}
-{% set labelkey = field.label ?: key|ucfirst %}
+{% set labelkey = field.label ?: key|capitalize %}
 
 {% set data_bolt_widget = {
     fieldRepeater: {
-        minimum: 1,
+        minimum: field.initial|default(1),
         maximum: field.limit|default(0),
         name:    name,
     }
@@ -12,9 +12,6 @@
 <fieldset class="bolt-field-repeater" data-bolt-widget="{{ data_bolt_widget|json_encode }}">
     <legend class="sr-only">{{ labelkey }}</legend>
     <label class="main col-xs-12">{{ labelkey }}</label>
-    {% if 'html' not in context.fieldtypes %}
-        {{ include('@bolt/editcontent/fielddata/_html.twig') }}
-    {% endif %}
 
     {# Prefix #}
     {% if field.prefix is defined and field.prefix is not empty %}
@@ -22,6 +19,9 @@
             {{ field.prefix|markdown }}
         </div>
     {% endif %}
+
+    {# This ensures that an empty value is always submitted even if there are no subsequent repeater sets #}
+    <input type="hidden" name="{{ name }}[]">
 
     <div class="repeater-slot">
         <script type="text/template">
@@ -34,9 +34,7 @@
         {% endfor %}
     </div>
 
-    <div class="repeater-add">
-        <button type="button" class="btn btn-default add-button">
-            <i class="fa fa-plus"></i> Add new {{ labelkey }} set
-        </button>
-    </div>
+    <button type="button" class="btn btn-default add-button">
+        <i class="fa fa-plus"></i> {{ __('field.repeater.label.add-set', {'%label%': labelkey}) }}
+    </button>
 </fieldset>

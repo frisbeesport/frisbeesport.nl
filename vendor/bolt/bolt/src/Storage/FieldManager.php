@@ -1,12 +1,14 @@
 <?php
+
 namespace Bolt\Storage;
 
 use Bolt\Config;
 use Bolt\Storage\Field\Sanitiser\SanitiserAwareInterface;
 use Bolt\Storage\Field\Sanitiser\SanitiserInterface;
+use Bolt\Storage\Field\Type\FieldTypeBase;
 
 /**
- * Uses a typemap to construct an instance of a Field
+ * Uses a typemap to construct an instance of a Field.
  */
 class FieldManager
 {
@@ -37,7 +39,7 @@ class FieldManager
     }
 
     /**
-     * Set an instance of EntityManager
+     * Set an instance of EntityManager.
      *
      * @param EntityManager $em
      */
@@ -49,10 +51,10 @@ class FieldManager
     /**
      * Gets the field instance for the supplied class.
      *
-     * @param $class
-     * @param $mapping
+     * @param string $class
+     * @param array  $mapping
      *
-     * @return mixed
+     * @return FieldTypeBase
      */
     public function get($class, $mapping)
     {
@@ -62,7 +64,7 @@ class FieldManager
         if (array_key_exists($class, $this->handlers)) {
             $handler = $this->handlers[$class];
 
-            $field = call_user_func_array($handler, [$mapping, $this->em]);
+            $field = call_user_func($handler, $mapping, $this->em);
         } else {
             $field = new $class($mapping, $this->em);
         }
@@ -77,9 +79,9 @@ class FieldManager
     /**
      * Looks up a type from the typemap and returns a field class.
      *
-     * @param $type
+     * @param string $type
      *
-     * @return bool|mixed
+     * @return FieldTypeBase|false
      */
     public function getFieldFor($type)
     {
@@ -94,7 +96,7 @@ class FieldManager
     /**
      * Links the field name found in the config to a callable handler.
      *
-     * @param $class
+     * @param string          $class
      * @param callable|object $handler
      */
     public function setHandler($class, $handler)
@@ -105,21 +107,21 @@ class FieldManager
     /**
      * Shorthand to add a field to both the new and legacy managers.
      *
-     * @param $name
-     * @param $handler
+     * @param string               $name
+     * @param Field\FieldInterface $field
      */
-    public function addFieldType($name, $handler)
+    public function addFieldType($name, Field\FieldInterface $field)
     {
-        $this->setHandler($name, $handler);
+        $this->setHandler($name, $field);
         $this->customHandlers[] = $name;
-        $this->boltConfig->getFields()->addField($handler);
+        $this->boltConfig->getFields()->addField($field);
     }
 
     /**
      * Note, this method is for Bolt use only, as a way to distinguish which fields have been added outside of the
      * core system. It will be removed in a future version.
      *
-     * @param $name
+     * @param string $name
      *
      * @internal
      *

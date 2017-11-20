@@ -5,7 +5,9 @@ namespace Bolt\Storage\ContentRequest;
 use Bolt\Helpers\Input;
 use Bolt\Logger\FlashLoggerInterface;
 use Bolt\Storage\Entity\Content;
+use Bolt\Storage\Entity\FieldValue;
 use Bolt\Storage\EntityManager;
+use Bolt\Storage\Mapping;
 use Bolt\Storage\Repository;
 use Bolt\Translation\Translator as Trans;
 use Bolt\Users;
@@ -82,7 +84,8 @@ class Modify
     {
         if ($action === 'delete') {
             return $this->deleteRecord($repo, $entity);
-        } elseif ($action === 'modify' && $fieldData !== null) {
+        }
+        if ($action === 'modify' && $fieldData !== null) {
             $this->modifyRecord($entity, $fieldData);
 
             if ($entity->_modified === true) {
@@ -102,14 +105,28 @@ class Modify
     protected function deleteRecord(Repository $repo, Content $entity)
     {
         $recordId = $entity->getId();
-        $contentTypeName = (string) $entity->getContenttype();
+        /** @var Mapping\ContentType $contentType */
+        $contentType = $entity->getContenttype();
+        $contentTypeName = (string) $contentType;
         if (!$this->users->isAllowed("contenttype:$contentTypeName:delete:$recordId")) {
             $this->loggerFlash->error(Trans::__('general.access-denied.content-not-modified', ['%title%' => $entity->getTitle()]));
 
-            return;
+            return false;
+        }
+        $result = $repo->delete($entity);
+        if ($result) {
+            $this->loggerSystem->info(sprintf('Deleted %s: %s', $contentType['singular_name'], $entity->getTitle()), ['event' => 'content']);
+            $fieldRepo = $this->em->getRepository(FieldValue::class);
+            $deleteFieldQuery = $fieldRepo->createQueryBuilder()
+                ->delete($fieldRepo->getTableName())
+                ->where('content_id = :content_id')
+                ->andWhere('contenttype= :contenttype')
+                ->setParameter('content_id', $recordId)
+                ->setParameter('contenttype', $contentTypeName);
+            $deleteFieldQuery->execute();
         }
 
-        return $repo->delete($entity);
+        return $result;
     }
 
     /**

@@ -1,19 +1,21 @@
 <?php
+
 namespace Bolt\Provider;
 
 use Bolt\Asset;
 use Bolt\Filesystem\Exception\FileNotFoundException;
+use Bolt\Filesystem\Handler\DirectoryInterface;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\Asset\Context\RequestStackContext;
-use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\PathPackage;
+use Webmozart\PathUtil\Path;
 
 /**
  * HTML asset service providers.
  *
- * @author Gawain Lynch <gawain.lynch@gmaill.com>
+ * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
 class AssetServiceProvider implements ServiceProviderInterface
 {
@@ -21,13 +23,17 @@ class AssetServiceProvider implements ServiceProviderInterface
     {
         $app['asset.packages'] = $app->share(
             function ($app) {
-                $defaultPackage = new Package($app['asset.version_strategy']('view'));
-                $packages = new Packages($defaultPackage);
+                $packages = new Packages();
 
-                $packages->addPackage('bolt', $app['asset.package_factory']('view'));
+                $bolt = $app['asset.package_factory']('bolt_assets');
+                $packages->addPackage('bolt', $bolt);
+                $packages->addPackage('bolt_assets', $bolt); // For FS plugin
+
                 $packages->addPackage('extensions', new PathPackage('', $app['asset.version_strategy']('web'), $app['asset.context']));
                 $packages->addPackage('files', $app['asset.package_factory']('files'));
                 $packages->addPackage('theme', $app['asset.package_factory']('theme'));
+                $packages->addPackage('themes', $app['asset.package_factory']('themes'));
+                $packages->addPackage('web', $app['asset.package_factory']('web'));
 
                 return $packages;
             }
@@ -35,8 +41,12 @@ class AssetServiceProvider implements ServiceProviderInterface
 
         $app['asset.package_factory'] = $app->protect(
             function ($name) use ($app) {
+                $path = $app['path_resolver']->resolve($name);
+                $web = $app['path_resolver']->resolve('web');
+                $basePath = Path::makeRelative($path, $web);
+
                 return new PathPackage(
-                    $app['resources']->getUrl($name, false),
+                    $basePath,
                     $app['asset.version_strategy']($name),
                     $app['asset.context']
                 );
@@ -44,8 +54,11 @@ class AssetServiceProvider implements ServiceProviderInterface
         );
 
         $app['asset.version_strategy'] = $app->protect(
-            function ($name) use ($app) {
-                return new Asset\BoltVersionStrategy($app['filesystem']->getFilesystem($name), $app['asset.salt']);
+            function ($nameOrDir) use ($app) {
+                $dir = $nameOrDir instanceof DirectoryInterface ? $nameOrDir :
+                    $app['filesystem']->getFilesystem($nameOrDir)->getDir('');
+
+                return new Asset\BoltVersionStrategy($dir, $app['asset.salt']);
             }
         );
 
@@ -86,7 +99,8 @@ class AssetServiceProvider implements ServiceProviderInterface
             function ($app) {
                 $queue = new Asset\File\Queue(
                     $app['asset.injector'],
-                    $app['asset.packages']
+                    $app['asset.packages'],
+                    $app['config']
                 );
 
                 return $queue;
@@ -97,9 +111,7 @@ class AssetServiceProvider implements ServiceProviderInterface
             function ($app) {
                 $queue = new Asset\Snippet\Queue(
                     $app['asset.injector'],
-                    $app['cache'],
-                    $app['config'],
-                    $app['resources']
+                    $app['cache']
                 );
 
                 return $queue;
@@ -111,7 +123,7 @@ class AssetServiceProvider implements ServiceProviderInterface
                 $queue = new Asset\Widget\Queue(
                     $app['asset.injector'],
                     $app['cache'],
-                    $app['render']
+                    $app['twig']
                 );
 
                 return $queue;

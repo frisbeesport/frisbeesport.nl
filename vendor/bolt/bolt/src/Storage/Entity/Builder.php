@@ -2,6 +2,7 @@
 
 namespace Bolt\Storage\Entity;
 
+use Bolt\Storage\Field\Type\FieldTypeInterface;
 use Bolt\Storage\FieldManager;
 use Bolt\Storage\Mapping\ClassMetadata;
 use Bolt\Storage\Mapping\MetadataDriver;
@@ -16,7 +17,7 @@ class Builder
      *
      * @var string
      */
-    protected $class = 'Bolt\Storage\Entity\Content';
+    protected $class = Content::class;
     protected $classMetadata;
 
     protected $metadata;
@@ -136,10 +137,12 @@ class Builder
             $handler = isset($this->transformers[$mappedType]) ? $this->transformers[$mappedType] : null;
 
             if ($handler) {
-                call_user_func_array($handler, [$entity, $data[$key]]);
+                call_user_func($handler, $entity, $data[$key]);
             } else {
                 $val = isset($data[$key]) ? $data[$key] : null;
-                call_user_func_array([$fieldType, 'set'], [$entity, $val]);
+                if ($fieldType instanceof FieldTypeInterface) {
+                    call_user_func([$fieldType, 'set'], $entity, $val);
+                }
             }
         }
 
@@ -162,7 +165,9 @@ class Builder
         // set fields
         foreach ((array) $fields as $key => $mapping) {
             $fieldType = $this->fieldManager->get($mapping['fieldtype'], $mapping);
-            call_user_func_array([$fieldType, 'hydrate'], [$data, $entity]);
+            if ($fieldType instanceof FieldTypeInterface) {
+                call_user_func([$fieldType, 'hydrate'], $data, $entity);
+            }
         }
 
         return $entity;
@@ -182,19 +187,20 @@ class Builder
             $getter = 'get' . ucfirst($key);
             $value = $entity->$getter();
             if ($value) {
-                call_user_func_array([$fieldType, 'set'], [$entity, $value]);
+                call_user_func([$fieldType, 'set'], $entity, $value);
             }
         }
     }
 
     /**
-     * @param $value
-     * @param $field
-     * @param null $subField
+     * @param mixed       $value
+     * @param string      $field
+     * @param string|null $subField
+     * @param string|null $block
      *
      * @return FieldValue|bool
      */
-    public function getHydratedValue($value, $field, $subField = null)
+    public function getHydratedValue($value, $field, $subField = null, $block = null)
     {
         $fields = $this->getFields();
 
@@ -205,7 +211,16 @@ class Builder
             $fieldType = $this->fieldManager->get($mapping['fieldtype'], $mapping);
 
             if ($subField !== null) {
-                $subMapping = $mapping['data']['fields'][$subField];
+                $subMapping = isset($mapping['data']['fields'][$subField]) ? $mapping['data']['fields'][$subField] : null;
+                if ($subMapping === null) {
+                    continue;
+                }
+                $fieldType = $this->fieldManager->get($subMapping['fieldtype'], $subMapping);
+                $field = $subField;
+            }
+
+            if ($block !== null) {
+                $subMapping = $mapping['data']['fields'][$block]['fields'][$subField];
                 $fieldType = $this->fieldManager->get($subMapping['fieldtype'], $subMapping);
                 $field = $subField;
             }

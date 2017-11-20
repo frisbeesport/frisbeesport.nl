@@ -5,8 +5,6 @@ namespace Bolt\Provider;
 use Bolt;
 use Bolt\Config;
 use Bolt\Configuration\Environment;
-use Bolt\Configuration\PreBoot;
-use Bolt\Configuration\ResourceManager;
 use Bolt\Configuration\Validation\Validator as ConfigValidator;
 use Bolt\EventListener\ConfigListener;
 use Silex\Application;
@@ -28,12 +26,12 @@ class ConfigServiceProvider implements ServiceProviderInterface
 
         $app['config.environment'] = $app->share(
             function ($app) {
-                $appPath = $app['resources']->getPath('app');
-                $viewPath = $app['resources']->getPath('view');
+                $boltPath = $app['path_resolver']->resolve('bolt');
+                $boltAssetsPath = $app['path_resolver']->resolve('bolt_assets');
 
                 $environment = new Environment(
-                    $appPath,
-                    $viewPath,
+                    $boltPath,
+                    $boltAssetsPath,
                     $app['cache'],
                     $app['extend.action'],
                     Bolt\Version::VERSION
@@ -46,45 +44,33 @@ class ConfigServiceProvider implements ServiceProviderInterface
         $app['config.validator'] = $app->share(
             function ($app) {
                 $validator = new ConfigValidator(
-                    $app['controller.exception'],
                     $app['config'],
-                    $app['resources'],
+                    $app['path_resolver'],
                     $app['logger.flash']
                 );
+                if (!$app['config.validator.apache_enabled']) {
+                    $validator->remove('apache');
+                }
 
                 return $validator;
             }
         );
+        if (!isset($app['config.validator.apache_enabled'])) {
+            $app['config.validator.apache_enabled'] = true;
+        }
 
         $app['config.listener'] = $app->share(
             function ($app) {
                 return new ConfigListener($app);
             }
         );
-
-        if (!isset($app['config.pre_boot'])) {
-            $this->preBoot($app['resources']);
-            $app['config.pre_boot'] = true;
-        }
-    }
-
-    /**
-     * Internal pre-boot checks.
-     *
-     * @param ResourceManager $resources
-     */
-    private function preBoot(ResourceManager $resources)
-    {
-        PreBoot\ConfigurationFile::checkConfigFiles(
-            ['config', 'contenttypes', 'menu', 'permissions', 'routing', 'taxonomy'],
-            $resources->getPath('src/../app/config'),
-            $resources->getPath('config')
-        );
     }
 
     public function boot(Application $app)
     {
         $app['config']->doReplacements();
+
+        $app['config.environment']->checkVersion();
 
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $app['dispatcher'];

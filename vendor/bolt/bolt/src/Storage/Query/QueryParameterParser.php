@@ -47,8 +47,8 @@ class QueryParameterParser
         $this->addValueMatcher('>(\w+)',            ['value' => '$1', 'operator' => 'gt']);
         $this->addValueMatcher('!$',                ['value' => '',   'operator' => 'isNotNull']);
         $this->addValueMatcher('!(\w+)',            ['value' => '$1', 'operator' => 'neq']);
-        $this->addValueMatcher('!\[([\w ,]+)\]',    ['value' => function($val) { return explode(',', $val); }, 'operator' => 'notIn']);
-        $this->addValueMatcher('\[([\w ,]+)\]',     ['value' => function($val) { return explode(',', $val); }, 'operator' => 'in']);
+        $this->addValueMatcher('!\[([\w ,]+)\]',    ['value' => function ($val) { return explode(',', $val); }, 'operator' => 'notIn']);
+        $this->addValueMatcher('\[([\w ,]+)\]',     ['value' => function ($val) { return explode(',', $val); }, 'operator' => 'in']);
         $this->addValueMatcher('(%\w+|\w+%|%\w+%)', ['value' => '$1', 'operator' => 'like']);
         $this->addValueMatcher('(\w+)',             ['value' => '$1', 'operator' => 'eq']);
         // @codingStandardsIgnoreEnd
@@ -73,7 +73,6 @@ class QueryParameterParser
      * Runs the keys/values through the relevant parsers.
      *
      * @param string $key
-     * @param mixed  $value
      * @param mixed  $value
      *
      * @throws QueryParseException
@@ -154,7 +153,7 @@ class QueryParameterParser
             }
 
             $parts[] = $filter;
-            $count++;
+            ++$count;
         }
 
         $filter = new Filter();
@@ -206,7 +205,7 @@ class QueryParameterParser
             $filterParams[$placeholder] = $val['value'];
             $exprMethod = $val['operator'];
             $parts[] = $this->expr->$exprMethod($this->alias . $key, ':' . $placeholder);
-            $count++;
+            ++$count;
         }
 
         $filter = new Filter();
@@ -241,8 +240,9 @@ class QueryParameterParser
     }
 
     /**
-     * This method uses the defined value matchers to parse a passed in value to the following
-     * component parts:
+     * This method uses the defined value matchers to parse a passed in value.
+     *
+     * The following component parts will be returned in the array:
      * [
      *     'value'    => <the value remaining after the parse>
      *     'operator' => <the operator that should be used>
@@ -284,7 +284,7 @@ class QueryParameterParser
      * Note: the callback should either return nothing or an instance of
      * \Bolt\Storage\Query\Filter
      *
-     * @param Callable $handler
+     * @param callable $handler
      */
     public function addFilterHandler(callable $handler)
     {

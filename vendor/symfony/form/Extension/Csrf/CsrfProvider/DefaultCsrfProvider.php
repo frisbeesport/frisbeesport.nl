@@ -28,11 +28,6 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
  */
 class DefaultCsrfProvider implements CsrfProviderInterface
 {
-    /**
-     * A secret value used for generating the CSRF token.
-     *
-     * @var string
-     */
     protected $secret;
 
     /**
@@ -75,7 +70,7 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      */
     protected function getSessionId()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (\PHP_VERSION_ID >= 50400) {
             if (PHP_SESSION_NONE === session_status()) {
                 session_start();
             }

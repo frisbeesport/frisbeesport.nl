@@ -2,6 +2,8 @@
 
 namespace Bolt\Logger\Handler;
 
+use Bolt\AccessControl\Token\Token;
+use Bolt\Common\Json;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Silex\Application;
@@ -23,9 +25,11 @@ class SystemHandler extends AbstractProcessingHandler
     private $tablename;
 
     /**
+     * Constructor.
+     *
      * @param Application $app
-     * @param integer     $level
-     * @param boolean     $bubble
+     * @param bool|int    $level
+     * @param bool        $bubble
      */
     public function __construct(Application $app, $level = Logger::DEBUG, $bubble = true)
     {
@@ -69,7 +73,7 @@ class SystemHandler extends AbstractProcessingHandler
             && $e instanceof \Exception
         ) {
             $trace = $e->getTrace();
-            $source = json_encode(
+            $source = Json::dump(
                 [
                     'file'     => $e->getFile(),
                     'line'     => $e->getLine(),
@@ -82,9 +86,9 @@ class SystemHandler extends AbstractProcessingHandler
             $backtrace = debug_backtrace();
             $backtrace = $backtrace[3];
 
-            $source = json_encode(
+            $source = Json::dump(
                 [
-                    'file'     => str_replace($this->app['resources']->getPath('root'), '', $backtrace['file']),
+                    'file'     => str_replace($this->app['path_resolver']->resolve('root'), '', $backtrace['file']),
                     'line'     => $backtrace['line'],
                 ]
             );
@@ -94,8 +98,9 @@ class SystemHandler extends AbstractProcessingHandler
 
         // Only get a user session if it's started
         if ($this->app['session']->isStarted()) {
-            $user = $this->app['session']->get('authentication');
-            $user = $user ? $user->getUser()->toArray() : null;
+            /** @var Token $sessionAuth */
+            $sessionAuth = $this->app['session']->get('authentication');
+            $user = $sessionAuth ? $sessionAuth->getUser()->toArray() : null;
         }
 
         // Get request data if available

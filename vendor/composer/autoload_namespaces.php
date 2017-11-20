@@ -17,8 +17,10 @@ return array(
     'Parsedown' => array($vendorDir . '/erusev/parsedown'),
     'PHPExif' => array($vendorDir . '/miljar/php-exif/lib'),
     'Maid\\' => array($vendorDir . '/tdammers/htmlmaid/src'),
+    'Imagine' => array($vendorDir . '/imagine/imagine/lib'),
     'Doctrine\\DBAL\\' => array($vendorDir . '/doctrine/dbal/lib'),
     'Doctrine\\Common\\Lexer\\' => array($vendorDir . '/doctrine/lexer/lib'),
     'Doctrine\\Common\\Inflector\\' => array($vendorDir . '/doctrine/inflector/lib'),
     'Doctrine\\Common\\Collections\\' => array($vendorDir . '/doctrine/collections/lib'),
+    'Doctrine\\Common\\Annotations\\' => array($vendorDir . '/doctrine/annotations/lib'),
 );

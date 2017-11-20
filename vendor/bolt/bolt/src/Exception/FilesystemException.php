@@ -2,8 +2,12 @@
 
 namespace Bolt\Exception;
 
+use Bolt\Common\Deprecated;
+
 /**
  * Filesystem exceptions.
+ *
+ * @deprecated since 3.3, to be removed in 4.0.
  */
 class FilesystemException extends \Exception
 {
@@ -17,6 +21,6 @@ class FilesystemException extends \Exception
     {
         parent::__construct($message, $code, $previous);
 
-        $this->code = $code;
+        Deprecated::cls(self::class, 3.3);
     }
 }

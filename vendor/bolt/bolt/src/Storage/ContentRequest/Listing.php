@@ -3,8 +3,11 @@
 namespace Bolt\Storage\ContentRequest;
 
 use Bolt\Config;
+use Bolt\Pager\PagerManager;
 use Bolt\Storage\Entity\Content;
 use Bolt\Storage\EntityManager;
+use Bolt\Storage\Query\Query;
+use Bolt\Storage\Query\QueryResultset;
 
 /**
  * Helper class for ContentType overview listings.
@@ -17,17 +20,25 @@ class Listing
     protected $em;
     /** @var Config */
     protected $config;
+    /** @var Query */
+    private $query;
+    /** @var PagerManager */
+    protected $pager;
 
     /**
-     * Constructor function.
+     * Constructor.
      *
      * @param EntityManager $em
+     * @param Query         $query
      * @param Config        $config
+     * @param PagerManager  $pager
      */
-    public function __construct(EntityManager $em, Config $config)
+    public function __construct(EntityManager $em, Query $query, Config $config, PagerManager $pager = null)
     {
         $this->em = $em;
+        $this->query = $query;
         $this->config = $config;
+        $this->pager = $pager;
     }
 
     /**
@@ -81,16 +92,77 @@ class Listing
      */
     protected function getContent($contentTypeSlug, array $contentParameters, ListingOptions $options)
     {
-        $records = $this->em->getContent($contentTypeSlug, $contentParameters);
-
-        // UGLY HACK! Remove when cutting over to the new storage layer!
-        $records = empty($records) ? false : $records;
-
-        if ($records === false && $options->getPage() !== null) {
+        $contentParameters = array_filter($contentParameters);
+        $records = $this->query->getContent($contentTypeSlug, $contentParameters);
+        if ($records === null && $options->getPage() !== null) {
             $contentParameters['page'] = $options->getPreviousPage();
-            $records = $this->em->getContent($contentTypeSlug, $contentParameters);
+            $records = $this->query->getContent($contentTypeSlug, $contentParameters);
+        }
+        $this->runPagerQueries($records);
+        if ($options->getGroupSort()) {
+            $records = $this->runGroupSort($records);
         }
 
         return $records;
+    }
+
+    /**
+     * @param QueryResultset $results
+     */
+    protected function runPagerQueries($results)
+    {
+        if (!$results instanceof QueryResultset || $this->pager === null) {
+            return;
+        }
+        foreach ($results->getOriginalQueries() as $pagerName => $query) {
+            $queryCopy = clone $query;
+            $queryCopy->select('count(*)');
+            $queryCopy->setMaxResults(null);
+            $queryCopy->setFirstResult(null);
+            $queryCopy->resetQueryPart('orderBy');
+
+            $totalResults = (int) count($queryCopy->execute()->fetchAll());
+            $start = $query->getFirstResult() ? $query->getFirstResult() : 0;
+            $currentPage = ($start + $query->getMaxResults()) / $query->getMaxResults();
+
+            $this->pager->createPager($pagerName)
+                ->setCount($totalResults)
+                ->setTotalpages(ceil($totalResults / $query->getMaxResults()))
+                ->setCurrent($currentPage)
+                ->setShowingFrom($start + 1)
+                ->setShowingTo($start + $results->count());
+        }
+    }
+
+    /**
+     * @param $results
+     *
+     * @return array
+     */
+    protected function runGroupSort($results)
+    {
+        if (!$results instanceof QueryResultset) {
+            return $results;
+        }
+        $grouped = [];
+        foreach ($results as $result) {
+            $taxGroup = null;
+            foreach ($result->getTaxonomy() as $taxonomy) {
+                if ($taxonomy->getTaxonomytype() == $result->getTaxonomy()->getGroupingTaxonomy()) {
+                    $taxGroup = $taxonomy->getSlug();
+                }
+            }
+            if ($taxGroup !== null) {
+                $grouped[$taxGroup][] = $result;
+            } else {
+                $grouped['ungrouped'][] = $result;
+            }
+        }
+
+        if (!count($grouped)) {
+            return $results;
+        }
+
+        return call_user_func_array('array_merge', $grouped);
     }
 }

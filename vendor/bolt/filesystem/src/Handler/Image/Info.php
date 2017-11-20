@@ -3,19 +3,25 @@
 namespace Bolt\Filesystem\Handler\Image;
 
 use Bolt\Filesystem\Exception\IOException;
+use Bolt\Filesystem\Exception\LogicException;
+use Contao\ImagineSvg\Imagine as SvgImagine;
+use Imagine\Exception\RuntimeException;
+use JsonSerializable;
+use League\Flysystem;
 use PHPExif\Reader\Reader;
 use PHPExif\Reader\ReaderInterface;
+use Serializable;
 
 /**
  * An object representation of properties returned from getimagesize() and EXIF data
  *
  * @author Carson Full <carsonfull@gmail.com>
  */
-class Info
+class Info implements JsonSerializable, Serializable
 {
     /** @var Dimensions */
     protected $dimensions;
-    /** @var Type */
+    /** @var TypeInterface */
     protected $type;
     /** @var int */
     protected $bits;
@@ -25,6 +31,8 @@ class Info
     protected $mime;
     /** @var Exif */
     protected $exif;
+    /** @var bool */
+    protected $valid;
 
     /** @var ReaderInterface */
     protected static $exifReader;
@@ -32,14 +40,14 @@ class Info
     /**
      * Constructor.
      *
-     * @param Dimensions $dimensions
-     * @param Type       $type
-     * @param int        $bits
-     * @param int        $channels
-     * @param string     $mime
-     * @param Exif       $exif
+     * @param Dimensions    $dimensions
+     * @param TypeInterface $type
+     * @param int           $bits
+     * @param int           $channels
+     * @param string        $mime
+     * @param Exif          $exif
      */
-    public function __construct(Dimensions $dimensions, Type $type, $bits, $channels, $mime, Exif $exif)
+    public function __construct(Dimensions $dimensions, TypeInterface $type, $bits, $channels, $mime, Exif $exif)
     {
         $this->dimensions = $dimensions;
         $this->type = $type;
@@ -47,16 +55,32 @@ class Info
         $this->channels = (int) $channels;
         $this->mime = $mime;
         $this->exif = $exif;
+        $this->valid = true;
     }
 
     /**
      * Creates an empty Info. Useful for when image does not exists to prevent null checks.
      *
      * @return Info
+     *
+     * @deprecated Use {@see createInvalid} instead.
      */
     public static function createEmpty()
     {
-        return new static(new Dimensions(0, 0), Type::unknown(), 0, 0, null, new Exif([]));
+        return static::createInvalid();
+    }
+
+    /**
+     * Creates an empty, invalid Info. Useful to prevent null checks for non-existent or invalid images.
+     *
+     * @return Info
+     */
+    public static function createInvalid()
+    {
+        $invalid = new static(new Dimensions(0, 0), Type::unknown(), 0, 0, null, new Exif([]));
+        $invalid->valid = false;
+
+        return $invalid;
     }
 
     /**
@@ -70,7 +94,12 @@ class Info
     {
         $info = @getimagesize($file);
         if ($info === false) {
-            throw new IOException('Failed to get image data from file');
+            $data = @file_get_contents($file);
+            if ($data === '' || !static::isSvg($data, $file)) {
+                return static::createInvalid();
+            }
+
+            return static::createSvgFromString($data);
         }
 
         $exif = static::readExif($file);
@@ -81,21 +110,49 @@ class Info
     /**
      * Creates an Info from a string of image data.
      *
-     * @param string $data A string containing the image data
+     * @param string      $data     A string containing the image data
+     * @param string|null $filename The filename used for determining the MIME Type.
      *
      * @return Info
      */
-    public static function createFromString($data)
+    public static function createFromString($data, $filename = null)
     {
+        if ($data === '') {
+            return static::createInvalid();
+        }
+
+        if (static::isSvg($data, $filename)) {
+            return static::createSvgFromString($data);
+        }
+
         $info = @getimagesizefromstring($data);
         if ($info === false) {
-            throw new IOException('Failed to get image data from string');
+            return static::createInvalid();
         }
 
         $file = sprintf('data://%s;base64,%s', $info['mime'], base64_encode($data));
         $exif = static::readExif($file);
 
         return static::createFromArray($info, $exif);
+    }
+
+    /**
+     * Creates info from a previous json serialized object.
+     *
+     * @param array $data
+     *
+     * @return Info
+     */
+    public static function createFromJson(array $data)
+    {
+        return new static(
+            new Dimensions($data['dims'][0], $data['dims'][1]),
+            Type::getById($data['type']),
+            $data['bits'],
+            $data['channels'],
+            $data['mime'],
+            new Exif($data['exif'])
+        );
     }
 
     /**
@@ -127,6 +184,38 @@ class Info
     }
 
     /**
+     * Creates an Info from a string of SVG image data.
+     *
+     * @param string $data
+     *
+     * @return Info
+     */
+    protected static function createSvgFromString($data)
+    {
+        if (!class_exists(SvgImagine::class)) {
+            throw new LogicException('Cannot parse SVG Image Info without "contao/imagine-svg" library.');
+        }
+
+        try {
+            $image = (new SvgImagine())->load($data);
+        } catch (RuntimeException $e) {
+            throw new IOException('Failed to parse image data from string', null, 0, $e);
+        }
+
+        $box = $image->getSize();
+        $dimensions = new Dimensions($box->getWidth(), $box->getHeight());
+
+        return new static(
+            $dimensions,
+            Type::getById(SvgType::ID),
+            0,
+            0,
+            SvgType::MIME,
+            new Exif([])
+        );
+    }
+
+    /**
      * @param string $file
      *
      * @return Exif
@@ -136,13 +225,38 @@ class Info
         if (static::$exifReader === null) {
             static::$exifReader = Reader::factory(Reader::TYPE_NATIVE);
         }
-        try {
-            $exif = static::$exifReader->read($file);
 
+        $exif = static::$exifReader->read($file);
+        if ($exif instanceof \PHPExif\Exif) {
             return Exif::cast($exif);
-        } catch (\RuntimeException $e) {
-            return new Exif();
         }
+
+        return new Exif();
+    }
+
+    /**
+     * Determine data string is an SVG image.
+     *
+     * @param string $data
+     * @param string $filename
+     *
+     * @return bool
+     */
+    protected static function isSvg($data, $filename)
+    {
+        $type = Flysystem\Util::guessMimeType($filename, $data);
+
+        if ($type === SvgType::MIME) {
+            return true;
+        }
+
+        // Detect SVG files without the xml declaration (like from Adobe Illustrator)
+        if (strpos($data, '<svg') === 0) {
+            $data = '<?xml version="1.0" encoding="utf-8"?>' . $data;
+            $type = Flysystem\Util::guessMimeType($filename, $data);
+        }
+
+        return $type === SvgType::MIME;
     }
 
     /**
@@ -236,7 +350,7 @@ class Info
     /**
      * Returns the image type.
      *
-     * @return Type
+     * @return TypeInterface
      */
     public function getType()
     {
@@ -286,10 +400,60 @@ class Info
     }
 
     /**
-     * @inheritDoc
+     * Whether this Info is valid or if there was an error.
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->valid;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function __clone()
     {
         $this->exif = clone $this->exif;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'dims'     => [$this->dimensions->getWidth(), $this->dimensions->getHeight()],
+            'type'     => $this->type->getId(),
+            'bits'     => $this->bits,
+            'channels' => $this->channels,
+            'mime'     => $this->mime,
+            'exif'     => $this->exif->getData(),
+            'valid'    => $this->valid,
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize($this->jsonSerialize());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+
+        $this->dimensions = new Dimensions($data['dims'][0], $data['dims'][1]);
+        $this->type = Type::getById($data['type']);
+        $this->bits = $data['bits'];
+        $this->channels = $data['channels'];
+        $this->mime = $data['mime'];
+        $this->exif = new Exif($data['exif']);
+        $this->valid = $data['valid'];
     }
 }

@@ -1,5 +1,8 @@
 <?php
+
 namespace Bolt\Asset;
+
+use Bolt\Common\Deprecated;
 
 /**
  * Bolt Snippet target location.
@@ -79,6 +82,8 @@ class Target
      */
     public function listAll()
     {
+        Deprecated::method();
+
         $reflection = new \ReflectionClass($this);
 
         return $reflection->getConstants();

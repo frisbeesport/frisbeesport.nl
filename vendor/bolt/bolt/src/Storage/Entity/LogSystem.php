@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\Storage\Entity;
 
 /**
@@ -18,6 +19,8 @@ class LogSystem extends Entity
     protected $ownerid;
     /** @var string */
     protected $route;
+    /** @var string */
+    protected $requesturi;
     /** @var string */
     protected $ip;
     /** @var string */
@@ -119,6 +122,22 @@ class LogSystem extends Entity
     public function setRoute($route)
     {
         $this->route = $route;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequesturi()
+    {
+        return $this->requesturi;
+    }
+
+    /**
+     * @param string $requestUri
+     */
+    public function setRequesturi($requestUri)
+    {
+        $this->requesturi = $requestUri;
     }
 
     /**

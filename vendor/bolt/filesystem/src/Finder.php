@@ -4,8 +4,9 @@ namespace Bolt\Filesystem;
 
 use Bolt\Filesystem\Exception\InvalidArgumentException;
 use Bolt\Filesystem\Exception\LogicException;
-use League\Flysystem;
+use Bolt\Filesystem\Iterator\EnsureHandlerIterator;
 use Symfony\Component\Finder as Symfony;
+use Traversable;
 
 /**
  * Finder allows to build rules to find files and directories.
@@ -502,11 +503,10 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Appends an existing set of files/directories to the finder.
+     * Appends an existing set of files/directories to the finder. The items need to be
+     * HandlerInterface objects or string paths that exist.
      *
-     * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
-     *
-     * @param mixed $iterator
+     * @param array|Traversable $iterator
      *
      * @throws InvalidArgumentException When the given argument is not iterable.
      *
@@ -514,19 +514,11 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function append($iterator)
     {
-        if ($iterator instanceof \IteratorAggregate) {
-            $this->iterators[] = $iterator->getIterator();
-        } elseif ($iterator instanceof \Iterator) {
-            $this->iterators[] = $iterator;
-        } elseif ($iterator instanceof \Traversable || is_array($iterator)) {
-            $it = new \ArrayIterator();
-            foreach ($iterator as $file) {
-                $it->append($file instanceof Flysystem\Handler ? $file : $this->filesystem->get($file));
-            }
-            $this->iterators[] = $it;
-        } else {
-            throw new InvalidArgumentException('Finder::append() method wrong argument type.');
+        if (!$iterator instanceof Traversable && !is_array($iterator)) {
+            throw new InvalidArgumentException('Finder::append() must be given an iterable object.');
         }
+
+        $this->iterators[] = new EnsureHandlerIterator($this->filesystem, $iterator);
 
         return $this;
     }
@@ -550,12 +542,12 @@ class Finder implements \IteratorAggregate, \Countable
              * adapters are created with an appropriate root path, which Symfony
              * can't assume for native filesystem.
              *
-             * This won't work for aggregate filesystems so we try/catch.
+             * This won't work for composite filesystems so we try/catch.
              */
             try {
                 $this->in('');
             } catch (InvalidArgumentException $e) {
-                throw new LogicException('You must call one of in() or append() methods before iterating over a Finder with an aggregate filesystem.');
+                throw new LogicException('You must call one of in() or append() methods before iterating over a Finder with a composite filesystem.');
             }
         }
 

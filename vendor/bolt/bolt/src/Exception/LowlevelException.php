@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\Exception;
 
 use Silex\Application;
@@ -84,15 +85,8 @@ HTML;
         $output = str_replace('%error%', $message, $output);
         $output = str_replace('%info%', $info, $output);
 
-        // TODO: Information disclosure vulnerability. A misconfigured system
-        // will give an attacker detailed information about the state of the
-        // system.
-        // Suggested solution: in the config file, provide a whitelist of hosts
-        // that may access the self-configuration functionality, and only
-        // expose the information to hosts on the whitelist.
-
         // Determine if we're on the command line. If so, don't output HTML.
-        if (php_sapi_name() === 'cli') {
+        if (PHP_SAPI === 'cli') {
             if ($previous instanceof \Exception) {
                 $output .= "\n\nException message:\n" . $previous->getMessage() . "\n\n";
             }
@@ -193,7 +187,7 @@ HTML;
             $html = str_replace('%error%', $message, $html);
 
             // Determine if we're on the command line. If so, don't output HTML.
-            if (php_sapi_name() == 'cli') {
+            if (PHP_SAPI == 'cli') {
                 $html = self::cleanHTML($html);
             }
 

@@ -336,9 +336,9 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
                 $origin = str_replace($targetDir, $originDir, $handler->getPath());
                 if (!$fsOrigin->has($origin)) {
                     if ($handler->isDir()) {
-                        $fsTarget->deleteDir($origin);
+                        $fsTarget->deleteDir($handler->getPath());
                     } else {
-                        $fsTarget->delete($origin);
+                        $fsTarget->delete($handler->getPath());
                     }
                 }
             }
@@ -475,7 +475,7 @@ class Manager implements AggregateFilesystemInterface, FilesystemInterface
     protected function parsePath($path)
     {
         if (!is_string($path)) {
-            throw new InvalidArgumentException('First argument, $path, should be a string');
+            throw new InvalidArgumentException(sprintf('Path should be a string, %s provided.', is_object($path) ? get_class($path) : gettype($path)));
         }
 
         if (!preg_match('#^.+\:\/\/.*#', $path)) {

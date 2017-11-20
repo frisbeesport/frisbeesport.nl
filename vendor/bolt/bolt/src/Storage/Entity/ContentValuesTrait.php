@@ -1,11 +1,16 @@
 <?php
+
 namespace Bolt\Storage\Entity;
 
+use Bolt\Common\Json;
 use Bolt\Helpers\Excerpt;
 use Bolt\Helpers\Input;
 use Bolt\Legacy;
 use Bolt\Library as Lib;
 use Bolt\Storage\Field\Collection\RepeatingFieldCollection;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Markup;
 
 /**
  * Trait class for ContentType relations.
@@ -23,7 +28,7 @@ use Bolt\Storage\Field\Collection\RepeatingFieldCollection;
  */
 trait ContentValuesTrait
 {
-    /** @var boolean Whether this is a "real" contenttype or an embedded ones */
+    /** @var boolean Whether this is a "real" ContentType or an embedded ones */
     protected $isRootType;
 
     /**
@@ -46,13 +51,19 @@ trait ContentValuesTrait
 
         if (isset($this->values[$name])) {
             return $this->values[$name];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
-     * Alias for getExcerpt()
+     * Alias for getExcerpt().
+     *
+     * @param integer      $length
+     * @param boolean      $includeTitle
+     * @param string|array $focus
+     *
+     * @return Markup
      */
     public function excerpt($length = 200, $includeTitle = false, $focus = null)
     {
@@ -66,7 +77,7 @@ trait ContentValuesTrait
      * @param boolean      $includeTitle
      * @param string|array $focus
      *
-     * @return \Twig_Markup
+     * @return Markup
      */
     public function getExcerpt($length = 200, $includeTitle = false, $focus = null)
     {
@@ -92,7 +103,7 @@ trait ContentValuesTrait
         $excerpter = new Excerpt(implode(' ', $excerptParts), $this->getTitle());
         $excerpt = $excerpter->getExcerpt($length, $includeTitle, $focus);
 
-        return new \Twig_Markup($excerpt, 'UTF-8');
+        return new Markup($excerpt, 'UTF-8');
     }
 
     /**
@@ -125,6 +136,9 @@ trait ContentValuesTrait
         // add the fields for this contenttype,
         if (is_array($contenttype)) {
             foreach ($contenttype['fields'] as $field => $property) {
+                if (!isset($this->values[$field])) {
+                    continue;
+                }
                 switch ($property['type']) {
                     // Set the slug, while we're at it
                     case 'slug':
@@ -148,7 +162,7 @@ trait ContentValuesTrait
                             }
                         }
                         if (!empty($this->values[$field]['url'])) {
-                            $newvalue[$field] = json_encode($this->values[$field]);
+                            $newvalue[$field] = Json::dump($this->values[$field]);
                         } else {
                             $newvalue[$field] = '';
                         }
@@ -156,7 +170,7 @@ trait ContentValuesTrait
 
                     case 'geolocation':
                         if (!empty($this->values[$field]['latitude']) && !empty($this->values[$field]['longitude'])) {
-                            $newvalue[$field] = json_encode($this->values[$field]);
+                            $newvalue[$field] = Json::dump($this->values[$field]);
                         } else {
                             $newvalue[$field] = '';
                         }
@@ -164,7 +178,7 @@ trait ContentValuesTrait
 
                     case 'image':
                         if (!empty($this->values[$field]['file'])) {
-                            $newvalue[$field] = json_encode($this->values[$field]);
+                            $newvalue[$field] = Json::dump($this->values[$field]);
                         } else {
                             $newvalue[$field] = '';
                         }
@@ -173,7 +187,7 @@ trait ContentValuesTrait
                     case 'imagelist':
                     case 'filelist':
                         if (is_array($this->values[$field])) {
-                            $newvalue[$field] = json_encode($this->values[$field]);
+                            $newvalue[$field] = Json::dump($this->values[$field]);
                         } elseif (!empty($this->values[$field]) && strlen($this->values[$field]) < 3) {
                             // Don't store '[]'
                             $newvalue[$field] = '';
@@ -186,7 +200,7 @@ trait ContentValuesTrait
 
                     case 'select':
                         if (is_array($this->values[$field])) {
-                            $newvalue[$field] = json_encode($this->values[$field]);
+                            $newvalue[$field] = Json::dump($this->values[$field]);
                         } else {
                             $newvalue[$field] = $this->values[$field];
                         }
@@ -207,7 +221,7 @@ trait ContentValuesTrait
 
         if (!$stripped) {
             if (!empty($this['templatefields'])) {
-                $newvalue['templatefields'] = json_encode($this->values['templatefields']->getValues(true, true));
+                $newvalue['templatefields'] = Json::dump($this->values['templatefields']->getValues(true, true));
             } else {
                 $newvalue['templatefields'] = '';
             }
@@ -258,19 +272,22 @@ trait ContentValuesTrait
             return;
         }
 
-        /**
+        /*
          * This Block starts introducing new-style hydration into the legacy content object.
          * To do this we fetch the new field from the manager and hydrate a temporary entity.
          *
          * We don't return at this point so continue to let other transforms happen below so the
          * old behaviour will still happen where adjusted.
          */
-
         if (isset($this->contenttype['fields'][$key]['type']) && $this->app['storage.field_manager']->hasCustomHandler($this->contenttype['fields'][$key]['type'])) {
             $newFieldType = $this->app['storage.field_manager']->getFieldFor($this->contenttype['fields'][$key]['type']);
             $newFieldType->mapping['fieldname'] = $key;
             $entity = new Content();
-            $newFieldType->hydrate([$key => $value], $entity);
+            // Note: Extensions _should_ implement \Bolt\Storage\Field\Type\FieldTypeInterface,
+            // but if they don't, 'hydrate' doesn't exist.
+            if (method_exists($newFieldType, 'hydrate')) {
+                $newFieldType->hydrate([$key => $value], $entity);
+            }
             $value = $entity->$key;
         }
 
@@ -359,7 +376,7 @@ trait ContentValuesTrait
         ];
         // Check if the values need to be unserialized, and pre-processed.
         foreach ($this->values as $key => $value) {
-            if ((in_array($this->fieldtype($key), $serializedFieldTypes)) || ($key === 'templatefields')) {
+            if ((in_array($this->fieldType($key), $serializedFieldTypes)) || ($key === 'templatefields')) {
                 if (!empty($value) && is_string($value) && (substr($value, 0, 2) === 'a:' || $value[0] === '[' || $value[0] === '{')) {
                     try {
                         $unserdata = Lib::smartUnserialize($value);
@@ -373,8 +390,16 @@ trait ContentValuesTrait
                 }
             }
 
-            if ($this->fieldtype($key) === 'video' && is_array($this->values[$key]) && !empty($this->values[$key]['url'])) {
-                $video = $this->values[$key];
+            if ($this->fieldType($key) === 'video' && is_array($this->values[$key]) && !empty($this->values[$key]['url'])) {
+                $defaultValues = [
+                    'html'       => '',
+                    'responsive' => '',
+                    'width'      => '1',
+                    'height'     => '1',
+                    'ratio'      => '1',
+                ];
+
+                $video = array_replace($defaultValues, $this->values[$key]);
 
                 // update the HTML, according to given width and height
                 if (!empty($video['width']) && !empty($video['height'])) {
@@ -385,7 +410,7 @@ trait ContentValuesTrait
                 $responsiveclass = 'responsive-video';
 
                 // See if it's widescreen or not.
-                if (!empty($video['height']) && (($video['width'] / $video['height']) > 1.76)) {
+                if (!empty($video['height']) && (((int) $video['width'] / (int) $video['height']) > 1.76)) {
                     $responsiveclass .= ' widescreen';
                 }
 
@@ -395,14 +420,14 @@ trait ContentValuesTrait
 
                 $video['responsive'] = sprintf('<div class="%s">%s</div>', $responsiveclass, $video['html']);
 
-                // Mark them up as Twig_Markup.
-                $video['html'] = new \Twig_Markup($video['html'], 'UTF-8');
-                $video['responsive'] = new \Twig_Markup($video['responsive'], 'UTF-8');
+                // Mark them up as Twig markup.
+                $video['html'] = new Markup($video['html'], 'UTF-8');
+                $video['responsive'] = new Markup($video['responsive'], 'UTF-8');
 
                 $this->values[$key] = $video;
             }
 
-            if ($this->fieldtype($key) === 'repeater' && is_array($this->values[$key]) && !$this->isRootType) {
+            if ($this->fieldType($key) === 'repeater' && is_array($this->values[$key]) && !$this->isRootType) {
                 $originalMapping = null;
                 $originalMapping[$key]['fields'] = $this->contenttype['fields'][$key]['fields'];
                 $originalMapping[$key]['type'] = 'repeater';
@@ -418,7 +443,7 @@ trait ContentValuesTrait
                 $this->values[$key] = $repeater;
             }
 
-            if ($this->fieldtype($key) === 'date' || $this->fieldtype($key) === 'datetime') {
+            if ($this->fieldType($key) === 'date' || $this->fieldType($key) === 'datetime') {
                 if ($this->values[$key] === '') {
                     $this->values[$key] = null;
                 }
@@ -439,16 +464,15 @@ trait ContentValuesTrait
     /**
      * Set a ContentType record values from a HTTP POST.
      *
-     * @param array  $values
-     * @param string $contenttype
+     * @param array $values
+     * @param array $contenttype
      *
      * @throws \Exception
-     *
-     * @return void
      */
     public function setFromPost($values, $contenttype)
     {
         $values = Input::cleanPostedData($values);
+        $values += ['status' => 'draft'];
 
         if (!$this->id) {
             // this is a new record: current user becomes the owner.
@@ -463,12 +487,12 @@ trait ContentValuesTrait
                 if (!$this->app['users']->isAllowed("contenttype:{$contenttype['slug']}:change-ownership:{$this->id}")) {
                     throw new \Exception('Changing ownership is not allowed.');
                 }
-                $this['ownerid'] = intval($values['ownerid']);
+                $this['ownerid'] = (int) ($values['ownerid']);
             }
         }
 
         // Make sure we have a proper status.
-        if (!in_array($values['status'], ['published', 'timed', 'held', 'draft'])) {
+        if (!isset($values['status']) || (isset($values['status']) && !in_array($values['status'], ['published', 'timed', 'held', 'draft']))) {
             if ($this['status']) {
                 $values['status'] = $this['status'];
             } else {
@@ -487,8 +511,21 @@ trait ContentValuesTrait
                     }
                 }
 
-                $this->taxonomy[$taxonomytype] = $value;
+                $taxonomyOptions = $this->app['config']->get('taxonomy/' . $taxonomytype . '/options');
+
+                if ($taxonomyOptions && is_array($value)) {
+                    foreach ($value as $k => $v) {
+                        if (isset($taxonomyOptions[$v])) {
+                            $this->setTaxonomy($taxonomytype, $v, $taxonomyOptions[$v], $k);
+                        }
+                    }
+                } elseif ($taxonomyOptions && isset($taxonomyOptions[$value])) {
+                    $this->setTaxonomy($taxonomytype, $value, $taxonomyOptions[$value], 0);
+                } else {
+                    $this->setTaxonomy($taxonomytype, $value, $value, 0);
+                }
             }
+
             unset($values['taxonomy']);
             unset($values['taxonomy-order']);
         }
@@ -540,6 +577,8 @@ trait ContentValuesTrait
     /**
      * Get the title, name, caption or subject.
      *
+     * @param bool $allowBasicTags
+     *
      * @return string
      */
     public function getTitle($allowBasicTags = false)
@@ -553,8 +592,10 @@ trait ContentValuesTrait
         }
 
         foreach ($this->getTitleColumnName() as $fieldName) {
-            if (strip_tags($this->values[$fieldName], $allowedTags) !== '') {
-                $titleParts[] = strip_tags($this->values[$fieldName], $allowedTags);
+            // Make sure we add strings only, as some fields may be an array or DateTime.
+            $value = is_array($this->values[$fieldName]) ? implode(' ', $this->values[$fieldName]) : (string) $this->values[$fieldName];
+            if (strip_tags($value, $allowedTags) !== '') {
+                $titleParts[] = strip_tags($value, $allowedTags);
             }
         }
 
@@ -577,11 +618,7 @@ trait ContentValuesTrait
     {
         // If we specified a specific fieldname or array of fieldnames as 'title'.
         if (!empty($this->contenttype['title_format'])) {
-            if (!is_array($this->contenttype['title_format'])) {
-                $this->contenttype['title_format'] = [$this->contenttype['title_format']];
-            }
-
-            return $this->contenttype['title_format'];
+            return (array) $this->contenttype['title_format'];
         }
 
         // Sets the names of some 'common' names for the 'title' column.
@@ -622,16 +659,7 @@ trait ContentValuesTrait
             return false;
         }
 
-        if ((!$this->contenttype['viewless'])
-            && (!empty($this['templatefields']))
-            && ($templateFieldsConfig = $this->app['config']->get('theme/templatefields'))) {
-            $template = $this->app['templatechooser']->record($this);
-            if (array_key_exists($template, $templateFieldsConfig)) {
-                return true;
-            }
-        }
-
-        return false;
+        return !$this->contenttype['viewless'] && $this->getTemplateFieldConfig();
     }
 
     /**
@@ -645,13 +673,37 @@ trait ContentValuesTrait
             return '';
         }
 
-        if ($templateFieldsConfig = $this->app['config']->get('theme/templatefields')) {
-            $template = $this->app['templatechooser']->record($this);
-            if (array_key_exists($template, $templateFieldsConfig)) {
-                return $templateFieldsConfig[$template];
-            }
+        if ($config = $this->getTemplateFieldConfig()) {
+            return $config;
         }
 
         return '';
+    }
+
+    private function getTemplateFieldConfig()
+    {
+        if (!$templateFieldsConfig = $this->app['config']->get('theme/templatefields')) {
+            return null;
+        }
+
+        /** @var \Bolt\TemplateChooser $templateChooser */
+        $templateChooser = $this->app['templatechooser'];
+        $templates = $templateChooser->record($this);
+        /** @var Environment $twig */
+        $twig = $this->app['twig'];
+
+        try {
+            $template = $twig->resolveTemplate($templates);
+        } catch (LoaderError $e) {
+            return null;
+        }
+
+        $name = $template->getSourceContext()->getName();
+
+        if (!array_key_exists($name, $templateFieldsConfig)) {
+            return null;
+        }
+
+        return $templateFieldsConfig[$name];
     }
 }

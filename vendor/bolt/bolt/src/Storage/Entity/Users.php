@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\Storage\Entity;
 
 /**
@@ -174,7 +175,7 @@ class Users extends Entity
     }
 
     /**
-     * Getter for enabled flag
+     * Getter for enabled flag.
      *
      * @return boolean
      */
@@ -284,6 +285,6 @@ class Users extends Entity
      */
     public function setRoles(array $roles)
     {
-        $this->roles = array_values(array_unique($roles));
+        $this->roles = array_keys(array_count_values($roles));
     }
 }

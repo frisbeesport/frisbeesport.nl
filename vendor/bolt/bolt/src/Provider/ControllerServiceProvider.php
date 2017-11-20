@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\Provider;
 
 use Bolt\Controller;
@@ -22,7 +23,7 @@ class ControllerServiceProvider implements ServiceProviderInterface, EventSubscr
         }
         if (!isset($app['controller.backend.extend.mount_prefix'])) {
             $app['controller.backend.extend.mount_prefix'] = function ($app) {
-                return $app['config']->get('general/branding/path') . '/extend';
+                return $app['config']->get('general/branding/path') . '/extensions';
             };
         }
         if (!isset($app['controller.backend.upload.mount_prefix'])) {
@@ -87,6 +88,11 @@ class ControllerServiceProvider implements ServiceProviderInterface, EventSubscr
                 return new Controller\Async\FilesystemManager();
             }
         );
+        $app['controller.async.embed'] = $app->share(
+            function () {
+                return new Controller\Async\Embed();
+            }
+        );
         $app['controller.async.records'] = $app->share(
             function () {
                 return new Controller\Async\Records();
@@ -108,12 +114,6 @@ class ControllerServiceProvider implements ServiceProviderInterface, EventSubscr
             }
         );
 
-        $app['controller.exception'] = $app->share(
-            function ($app) {
-                return new Controller\Exception();
-            }
-        );
-
         $app['controller.frontend'] = $app->share(
             function () {
                 return new Controller\Frontend();
@@ -130,6 +130,7 @@ class ControllerServiceProvider implements ServiceProviderInterface, EventSubscr
             }
         );
 
+        /** @deprecated Deprecated since 3.3, to be removed in 4.0. */
         $app['controller.classmap'] = [
             'Bolt\\Controllers\\Frontend' => 'controller.frontend',
             'Bolt\\Controllers\\Routing'  => 'controller.requirement.deprecated',
@@ -149,7 +150,6 @@ class ControllerServiceProvider implements ServiceProviderInterface, EventSubscr
     public function onMountFrontend(MountEvent $event)
     {
         $app = $event->getApp();
-        $event->mount('', $app['controller.exception']);
         $event->mount('', $app['controller.frontend']);
     }
 
@@ -176,6 +176,7 @@ class ControllerServiceProvider implements ServiceProviderInterface, EventSubscr
         $prefix = $app['controller.async.mount_prefix'];
         $asyncKeys = [
             'general',
+            'embed',
             'filesystem_manager',
             'records',
             'stack',

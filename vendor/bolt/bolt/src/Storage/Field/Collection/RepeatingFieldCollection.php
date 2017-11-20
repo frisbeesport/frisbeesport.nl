@@ -5,21 +5,25 @@ namespace Bolt\Storage\Field\Collection;
 use Bolt\Exception\FieldConfigurationException;
 use Bolt\Storage\Entity\FieldValue;
 use Bolt\Storage\EntityManager;
+use Bolt\Storage\Field\Type\FieldTypeBase;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * This class stores an array collection of Fields
+ * This class stores an array collection of Fields.
  *
  * @author Ross Riley <riley.ross@gmail.com>
  */
 class RepeatingFieldCollection extends ArrayCollection
 {
+    /** @var EntityManager */
     protected $em;
+    /** @var array */
     protected $mapping;
+    /** @var string */
     protected $name;
 
     /**
-     * RepeatingFieldCollection constructor.
+     * Constructor.
      *
      * @param EntityManager $em
      * @param array         $mapping
@@ -33,7 +37,15 @@ class RepeatingFieldCollection extends ArrayCollection
     }
 
     /**
-     * @param FieldCollection $collection
+     * {@inheritdoc}
+     */
+    protected function createFrom(array $elements)
+    {
+        return new static($this->em, $this->mapping, $elements);
+    }
+
+    /**
+     * @param FieldCollectionInterface $collection
      *
      * @return bool
      */
@@ -46,15 +58,17 @@ class RepeatingFieldCollection extends ArrayCollection
      * @param array  $fields
      * @param int    $grouping
      * @param object $entity
+     * @param string $block
      *
      * @throws FieldConfigurationException
      */
-    public function addFromArray(array $fields, $grouping = 0, $entity = null)
+    public function addFromArray(array $fields, $grouping = 0, $entity = null, $block = null)
     {
-        $collection = new FieldCollection([], $this->em);
+        $collection = new FieldCollection();
         $collection->setGrouping($grouping);
+        $collection->setBlock($block);
         foreach ($fields as $name => $value) {
-            $storageTypeHandler = $this->getFieldType($name);
+            $storageTypeHandler = $this->getFieldType($name, $block);
 
             $field = new FieldValue();
             $field->setName($this->getName());
@@ -73,8 +87,9 @@ class RepeatingFieldCollection extends ArrayCollection
             if ($entity) {
                 $field->setContenttype((string) $entity->contenttype);
             }
-            $field->setFieldtype($this->getFieldTypeName($field->getFieldname()));
+            $field->setFieldtype($this->getFieldTypeName($field->getFieldname(), $block));
             $field->setGrouping($grouping);
+            $field->setBlock($block);
             $collection->add($field);
         }
 
@@ -87,7 +102,7 @@ class RepeatingFieldCollection extends ArrayCollection
      */
     public function addFromReferences(array $ids, $grouping = 0)
     {
-        $collection = new FieldCollection($ids, $this->em);
+        $collection = new LazyFieldCollection($ids, $this->em);
         $collection->setGrouping($grouping);
         $this->add($collection);
     }
@@ -129,7 +144,7 @@ class RepeatingFieldCollection extends ArrayCollection
             $master = $this->getOriginal($entity);
             $master->setValue($entity->getValue());
             $master->setFieldtype($entity->getFieldtype());
-            $master->handleStorage($this->getFieldType($entity->getFieldname()));
+            $master->handleStorage($this->getFieldType($entity->getFieldname(), $entity->getBlock()));
 
             $updated[] = $master;
         }
@@ -177,7 +192,7 @@ class RepeatingFieldCollection extends ArrayCollection
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -185,13 +200,16 @@ class RepeatingFieldCollection extends ArrayCollection
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
     public function setName($name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @return array
+     */
     public function flatten()
     {
         $flat = [];
@@ -203,42 +221,80 @@ class RepeatingFieldCollection extends ArrayCollection
     }
 
     /**
-     * @param $field
+     * @param string      $field
+     * @param string|null $block
      *
      * @throws FieldConfigurationException
      *
-     * @return mixed
+     * @return FieldTypeBase
      */
-    protected function getFieldType($field)
+    protected function getFieldType($field, $block = null)
     {
-        if (!isset($this->mapping['data']['fields'][$field]['fieldtype'])) {
+        if ($block !== null && !isset($this->mapping['data']['fields'][$block]['fields'][$field]['fieldtype'])) {
             throw new FieldConfigurationException('Invalid repeating field configuration for ' . $field);
         }
-        $mapping = $this->mapping['data']['fields'][$field];
+
+        if ($block === null && !isset($this->mapping['data']['fields'][$field]['fieldtype'])) {
+            throw new FieldConfigurationException('Invalid repeating field configuration for ' . $field);
+        }
+
+        if ($block !== null) {
+            $mapping = $this->mapping['data']['fields'][$block]['fields'][$field];
+        } else {
+            $mapping = $this->mapping['data']['fields'][$field];
+        }
+
         $setting = $mapping['fieldtype'];
 
         return $this->em->getFieldManager()->get($setting, $mapping);
     }
 
     /**
-     * @param $field
+     * @param string $field
+     * @param null   $block
      *
      * @throws FieldConfigurationException
      *
      * @return mixed
      */
-    protected function getFieldTypeName($field)
+    protected function getFieldTypeName($field, $block = null)
     {
-        if (!isset($this->mapping['data']['fields'][$field]['type'])) {
+        if ($block !== null && !isset($this->mapping['data']['fields'][$block]['fields'][$field]['type'])) {
             throw new FieldConfigurationException('Invalid repeating field configuration for ' . $field);
         }
-        $mapping = $this->mapping['data']['fields'][$field];
+
+        if ($block === null && !isset($this->mapping['data']['fields'][$field]['type'])) {
+            throw new FieldConfigurationException('Invalid repeating field configuration for ' . $field);
+        }
+
+        if ($block !== null) {
+            $mapping = $this->mapping['data']['fields'][$block]['fields'][$field];
+        } else {
+            $mapping = $this->mapping['data']['fields'][$field];
+        }
 
         return $mapping['type'];
     }
 
+    /**
+     * @return FieldCollection
+     */
     public function getEmptySet()
     {
-        return new FieldCollection([], $this->em);
+        return new FieldCollection();
+    }
+
+    public function serialize()
+    {
+        $output = [];
+        foreach ($this as $collection => $vals) {
+            if ($vals->getBlock() !== null) {
+                $output[$collection][$vals->getBlock()] = $vals->serialize();
+            } else {
+                $output[$collection] = $vals->serialize();
+            }
+        }
+
+        return $output;
     }
 }

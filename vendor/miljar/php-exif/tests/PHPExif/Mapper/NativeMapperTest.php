@@ -142,6 +142,21 @@ class NativeMapperTest extends \PHPUnit_Framework_TestCase
      * @group mapper
      * @covers \PHPExif\Mapper\Native::mapRawData
      */
+    public function testMapRawDataCorrectlyFormatsFocalLengthDivisionByZero()
+    {
+        $rawData = array(
+            \PHPExif\Mapper\Native::FOCALLENGTH => '1/0',
+        );
+
+        $mapped = $this->mapper->mapRawData($rawData);
+
+        $this->assertEquals(0, reset($mapped));
+    }
+
+    /**
+     * @group mapper
+     * @covers \PHPExif\Mapper\Native::mapRawData
+     */
     public function testMapRawDataCorrectlyFormatsXResolution()
     {
         $rawData = array(
@@ -187,6 +202,27 @@ class NativeMapperTest extends \PHPUnit_Framework_TestCase
         $expected = array(
             \PHPExif\Mapper\Native::TITLE,
             \PHPExif\Mapper\Native::HEADLINE
+        );
+        $this->assertEquals($expected, $keys);
+    }
+
+    /**
+     * @group mapper
+     * @covers \PHPExif\Mapper\Native::mapRawData
+     */
+    public function testMapRawDataMacthesFieldsWithoutCaseSensibilityOnFirstLetter()
+    {
+        $rawData = array(
+            \PHPExif\Mapper\Native::ORIENTATION => 'Portrait',
+            'Copyright' => 'Acme',
+        );
+        $mapped = $this->mapper->mapRawData($rawData);
+        $this->assertCount(2, $mapped);
+        $keys = array_keys($mapped);
+
+        $expected = array(
+            \PHPExif\Mapper\Native::ORIENTATION,
+            \PHPExif\Mapper\Native::COPYRIGHT
         );
         $this->assertEquals($expected, $keys);
     }

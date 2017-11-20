@@ -3,9 +3,10 @@
 namespace Bolt\Composer;
 
 use Bolt;
+use Bolt\Collection\Arr;
+use Bolt\Common\Json;
 use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\Handler\JsonFile;
-use Bolt\Helpers\Arr;
 use Bolt\Translation\Translator as Trans;
 use Silex\Application;
 use Webmozart\PathUtil\Path;
@@ -20,7 +21,7 @@ class JsonManager
     /** @var array */
     protected $messages = [];
 
-    /** @var Application  */
+    /** @var Application */
     private $app;
 
     /**
@@ -44,7 +45,7 @@ class JsonManager
         if ($data === null) {
             $data = $this->setJsonDefaults([]);
         }
-        $this->app['filesystem']->write($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $this->app['filesystem']->write($file, Json::dump($data, Json::HUMAN));
     }
 
     /**
@@ -66,7 +67,7 @@ class JsonManager
                 $this->app['extend.writeable'] = false;
                 $this->app['extend.online'] = false;
 
-                return;
+                return null;
             }
         }
 
@@ -78,7 +79,6 @@ class JsonManager
         }
 
         $json = $this->setJsonDefaults($json);
-        $json = $this->setJsonLocal($json);
 
         // Write out the file, but only if it's actually changed, and if it's writable.
         if ($json != $jsonOrig) {
@@ -101,15 +101,22 @@ class JsonManager
      */
     private function setJsonDefaults(array $json)
     {
-        $rootPath = $this->app['resources']->getPath('root');
-        $extensionsPath = $this->app['resources']->getPath('extensions');
-        $srcPath = $this->app['resources']->getPath('src');
-        $webPath = $this->app['resources']->getPath('web');
+        $config = $this->app['config'];
+        $pathResolver = $this->app['path_resolver'];
+
+        $rootPath = $pathResolver->resolve('root');
+        $extensionsPath = $pathResolver->resolve('extensions');
+        $webPath = $pathResolver->resolve('web');
         $pathToRoot = Path::makeRelative($rootPath, $extensionsPath);
         $pathToWeb = Path::makeRelative($webPath, $extensionsPath);
-        $eventPath = Path::makeRelative($srcPath . '/Composer/EventListener', $extensionsPath);
+        $pathToListeners = Path::makeRelative(__DIR__ . '/EventListener', $extensionsPath);
         /** @deprecated Handle BC on 'stability' key until 4.0 */
-        $minimumStability = $this->app['config']->get('general/extensions/stability') ?: $this->app['config']->get('general/extensions/composer/minimum-stability', 'stable');
+        $minimumStability = $config->get('general/extensions/stability') ?: $config->get('general/extensions/composer/minimum-stability', 'stable');
+
+        $config = $config->get('general/extensions/composer/config', []) + [
+            'discard-changes'   => true,
+            'preferred-install' => 'dist',
+        ];
 
         // Enforce standard settings
         $defaults = [
@@ -125,11 +132,8 @@ class JsonManager
             ],
             'minimum-stability' => $minimumStability,
             'prefer-stable'     => true,
-            'config'            => [
-                'discard-changes'   => true,
-                'preferred-install' => 'dist',
-            ],
-            'provide' => [
+            'config'            => $config,
+            'provide'           => [
                 'bolt/bolt' => Bolt\Version::forComposer(),
             ],
             'extra' => [
@@ -138,7 +142,7 @@ class JsonManager
             ],
             'autoload' => [
                 'psr-4' => [
-                    'Bolt\\Composer\\EventListener\\' => $eventPath,
+                    'Bolt\\Composer\\EventListener\\' => $pathToListeners,
                 ],
             ],
             'scripts' => [
@@ -147,45 +151,9 @@ class JsonManager
                 'post-package-update'  => 'Bolt\\Composer\\EventListener\\PackageEventListener::handle',
             ],
         ];
-        $json = Arr::mergeRecursiveDistinct($json, $defaults);
+        $json = Arr::replaceRecursive($json, $defaults);
         ksort($json);
 
         return $json;
-    }
-
-    /**
-     * If we're using local extensions, install/require the merge plugin.
-     *
-     * @param array $composerJson
-     *
-     * @return array
-     */
-    private function setJsonLocal(array $composerJson)
-    {
-        $local = $this->app['filesystem']
-            ->getFilesystem('extensions')
-            ->getDir('local')
-            ->exists()
-        ;
-        if ($local === false) {
-            return $composerJson;
-        }
-
-        $defaults = [
-            'extra' => [
-                'merge-plugin'  => [
-                    'include' => [
-                        'local/*/*/composer.json',
-                    ],
-                ],
-            ],
-            'require' => [
-                'wikimedia/composer-merge-plugin' => '^1.3',
-            ],
-        ];
-        $composerJson = Arr::mergeRecursiveDistinct($composerJson, $defaults);
-        ksort($composerJson);
-
-        return $composerJson;
     }
 }

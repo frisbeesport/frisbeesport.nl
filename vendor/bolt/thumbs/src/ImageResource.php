@@ -29,7 +29,7 @@ class ImageResource
     protected static $normalizeJpegOrientation = true;
 
     /**
-     * ImageResource constructor.
+     * Constructor.
      *
      * Either type or info need to be provided.
      *
@@ -53,7 +53,7 @@ class ImageResource
             throw new InvalidArgumentException('Type or ImageInfo need to be provided');
         }
 
-        if ($this->type === IMAGETYPE_JPEG && static::$normalizeJpegOrientation) {
+        if ($this->type->getId() === IMAGETYPE_JPEG && static::$normalizeJpegOrientation) {
             $this->normalizeJpegOrientation();
         }
     }
@@ -98,7 +98,10 @@ class ImageResource
     public static function createFromString($data)
     {
         $info = Image\Info::createFromString($data);
-        $resource = imagecreatefromstring($data);
+        $resource = @imagecreatefromstring($data);
+        if ($resource === false) {
+            throw new InvalidArgumentException('Invalid image data');
+        }
 
         return new static($resource, null, $info);
     }

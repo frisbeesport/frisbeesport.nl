@@ -1,4 +1,5 @@
 <?php
+
 namespace Bolt\AccessControl\Token;
 
 use Bolt\Storage\Entity;
@@ -90,7 +91,7 @@ class Token
     }
 
     /**
-     * Get time of last check against datebase.
+     * Get time of last check against database.
      *
      * @return integer
      */

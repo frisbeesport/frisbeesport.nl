@@ -19,10 +19,9 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 /**
- * ProfilerController.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProfilerController
@@ -35,15 +34,13 @@ class ProfilerController
     private $toolbarPosition;
 
     /**
-     * Constructor.
-     *
      * @param UrlGeneratorInterface $generator       The URL Generator
      * @param Profiler              $profiler        The profiler
-     * @param \Twig_Environment     $twig            The twig environment
+     * @param Environment           $twig            The twig environment
      * @param array                 $templates       The templates
      * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, $toolbarPosition = 'bottom')
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -220,8 +217,6 @@ class ProfilerController
     /**
      * Renders the profiler search bar.
      *
-     * @param Request $request The current HTTP Request
-     *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
@@ -312,8 +307,6 @@ class ProfilerController
 
     /**
      * Narrows the search bar.
-     *
-     * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
      *

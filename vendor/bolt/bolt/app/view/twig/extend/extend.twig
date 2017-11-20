@@ -4,7 +4,11 @@
 
 {% block page_nav 'ExtendBolt' %}
 
-{% block page_title __('page.extend.pagetitle', {'%BOLTNAME%': app.config.get('general/branding/name')}) %}
+{% block page_title __('general.phrase.extensions') %}
+
+{% block page_subtitle %}
+    {{ __('page.extend.pagetitle', {'%BOLTNAME%': config.get('general/branding/name') }) }}
+{% endblock %}
 
 {# clear default messages, because we use them in a different spot, in this template #}
 {% block messages "" %}
@@ -96,6 +100,34 @@
             {# Modal for readmes  #}
             {{ include('@bolt/extend/_readme.twig') }}
 
+            <hr>
+            {% if context.bundled %}
+                <section class="installed-container">
+                    <h2>{{ __('page.extend.headline.bundled') }}</h2>
+                    <div class="installed-list">
+                        <div class="local-list-items">
+                            <table class="table-striped dashboardlisting">
+                                <thead>
+                                <tr>
+                                    <th>{{ __('page.extend.listheader.name') }}</th>
+                                    <th>{{ __('page.extend.listheader.class') }}</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for ext in context.bundled %}
+                                    <tr>
+                                        <td class="id"><strong>{{ ext.displayName }}</strong></td>
+                                        <td><code>{{ ext.className }}</code></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+
         </div>
 
         <aside class="col-md-3">
@@ -167,8 +199,8 @@
     {{ data('extend.text.updating',           __('page.extend.message.updating')) }}
     {{ data('extend.text.updated',            __('page.extend.message.updated')) }}
 
+    {{ data('extend.sitever',             context.extendVersion) }}
     {{ data('extend.siteurl',             context.site) }}
-    {{ data('extend.baseurl',             app['resources'].url('bolt') ~ 'extend'|trim('/') ~ '/') }}
-    {{ data('extend.rootpath',            paths.rootpath) }}
+    {{ data('extend.baseurl',             global.request.basePath ~ '/' ~ app['controller.backend.extend.mount_prefix']|trim('/') ~ '/') }}
 
 {% endblock page_main %}
