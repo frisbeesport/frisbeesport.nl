@@ -35,6 +35,9 @@ roles:
     documenten:
         description: Toegang tot documenten.
         label: Documenten    
+    competities:
+        description: Toegang tot ultimate competities.
+        label: Ultimate Competities 
     nationaleteams:
         description: Toegang tot nationale teams.
         label: Nationale Teams 
@@ -207,6 +210,13 @@ contenttypes:
         depublish: [ hoofdredacteur, kader ]
         delete: [ hoofdredacteur, kader ]
         view: [ hoofdredacteur, kader ]  
+    competities:
+        edit: [ hoofdredacteur, competities ]
+        create: [ hoofdredacteur, competities ]
+        publish: [ hoofdredacteur, competities ]
+        depublish: [ hoofdredacteur, competities ]
+        delete: [ hoofdredacteur, competities ]
+        view: [ hoofdredacteur, competities ]  
     verenigingen:
         edit: [ hoofdredacteur ]
         create: [ hoofdredacteur ]
