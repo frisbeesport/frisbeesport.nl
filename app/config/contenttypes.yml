@@ -541,7 +541,7 @@ paginas:
                 display:
                     label: Display
                     type: select
-                    values: displays/title
+                    values: display/title
                     
     taxonomy: [ afdelingen ]
     recordsperpage: 100
