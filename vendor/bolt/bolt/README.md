@@ -13,22 +13,19 @@ all, it's a joy to use!
 Bolt is created using modern open source libraries, and is best suited to build
 sites in HTML5 with modern markup.
 
-
 Installation
 ------------
 
 Detailed instructions can be found in the [official documentation][docs].
 
 **NOTE:** Cloning the repository directly is only supported for development of
-the core of Bolt, see the link above for various supported options to suite
+the core of Bolt, see the link above for various supported options to suit
 your needs.
-
 
 Reporting issues
 ----------------
 
 See our [Contributing to Bolt][contributing] guide.
-
 
 Support
 -------

@@ -32,10 +32,16 @@ class SearchQueryHandler
             $query->setContentType($contentType);
 
             $searchParam = $contentQuery->getParameter('filter');
+            /** If we have an empty search filter then we need to return early */
+            if (empty($searchParam)) {
+                return $set;
+            }
+
             $query->setParameters($contentQuery->getParameters());
             $query->setSearch($searchParam);
 
             $contentQuery->runDirectives($query);
+            $contentQuery->runScopes($query);
 
             $result = $repo->queryWith($query);
             if ($result) {
@@ -47,8 +53,10 @@ class SearchQueryHandler
                     $weighter->setSearchWords($query->getSearchWords());
 
                     $scores = $weighter->weight();
+                    $set->setOriginalQuery($contentType, $query->getQueryBuilder());
                     $set->add($result, $contentType, $scores);
                 } else {
+                    $set->setOriginalQuery($contentType, $query->getQueryBuilder());
                     $set->add($result, $contentType);
                 }
             }

@@ -10,9 +10,9 @@ class Str extends \Bolt\Common\Str
      * Returns a "safe" version of the given string - basically only US-ASCII and
      * numbers. Needed because filenames and titles and such, can't use all characters.
      *
-     * @param string  $str
-     * @param boolean $strict
-     * @param string  $extrachars
+     * @param string $str
+     * @param bool   $strict
+     * @param string $extrachars
      *
      * @return string
      */
@@ -25,12 +25,17 @@ class Str extends \Bolt\Common\Str
             $extrachars = preg_quote($extrachars, $delim);
         }
         if ($strict) {
-            $slugify = Slugify::create('/[^a-z0-9_' . $extrachars . ' -]+/');
+            $slugify = Slugify::create([
+                'regexp' => '/[^a-z0-9_' . $extrachars . ' -]+/'
+            ]);
             $str = $slugify->slugify($str, '');
             $str = str_replace(' ', '-', $str);
         } else {
             // Allow Uppercase and don't convert spaces to dashes
-            $slugify = Slugify::create('/[^a-zA-Z0-9_.,' . $extrachars . ' -]+/', ['lowercase' => false]);
+            $slugify = Slugify::create([
+                'regexp' => '/[^a-zA-Z0-9_.,' . $extrachars . ' -]+/',
+                'lowercase' => false
+            ]);
             $str = $slugify->slugify($str, '');
         }
 

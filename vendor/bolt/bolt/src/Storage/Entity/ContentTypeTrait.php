@@ -17,8 +17,8 @@ trait ContentTypeTrait
      *
      * @param string $key
      *
-     * @return array An associative array containing at least the key 'type',
-     *               and, depending on the type, other keys.
+     * @return array an associative array containing at least the key 'type',
+     *               and, depending on the type, other keys
      */
     public function fieldInfo($key)
     {
@@ -41,5 +41,15 @@ trait ContentTypeTrait
         $field = $this->fieldInfo($key);
 
         return $field['type'];
+    }
+
+    public function next($field = 'datepublish', $where = [])
+    {
+        return $this->app['twig.runtime.bolt_record']->next($this, $field, $where);
+    }
+
+    public function previous($field = 'datepublish', $where = [])
+    {
+        return $this->app['twig.runtime.bolt_record']->previous($this, $field, $where);
     }
 }

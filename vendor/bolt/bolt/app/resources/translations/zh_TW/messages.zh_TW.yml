@@ -7,11 +7,16 @@
 #          process and your PR so that it will eventually be necessary to
 #          re-map your translations.
 
-#   0 Unused messages
-#  21 Legacy untranslated messages
-# 219 Untranslated messages
-#  19 Legacy translation messages
+#   2 Unused messages
+#  22 Legacy untranslated messages
+# 233 Untranslated messages
+#  17 Legacy translation messages
 # 339 Translation messages
+
+#--- Unused messages ----------------------------------------------------------
+
+"contenttypes.generic.no-proper-type": "“%contenttype%(Entry)”的內容格式配置中，設定為'type: %type%'的欄位'%field%'不是合適的欄位類型(fieldtype)。請編輯contenttypes.yml檔案，修復此問題。"
+"users.your-password": "你的密碼"
 
 #--- Legacy untranslated messages ---------------------------------------------
 
@@ -36,15 +41,26 @@
 "Unable to rename directory: %DIR%": #
 "Unable to rename file: %FILE%": #
 "Unfortunately, no content could be found. Try another page, or go to the <a href=\"%paths_root%\">homepage</a>.": #
+"field.embed.provider_name": #
 
 #--- Untranslated messages ----------------------------------------------------
 
+contenttypes.generic.consecutive-underscores: # "In the ContentType for '%contenttype%', the field '%field%' has consecutive underscores, which is not supported. Please edit contenttypes.yml and use a single underscore."
 contenttypes.generic.invalid-hyphen: # "In the ContentType for '%contenttype%', you have used a hyphen in the definition which is not supported. Please edit contenttypes.yml and remove the hyphen or alternatively replace with an underscore."
 contenttypes.generic.invalid-relation: # "In the ContentType for '%contenttype%', the relation '%relation%' is defined, which is not a valid ContentType. Please edit contenttypes.yml, and correct this."
 contenttypes.generic.recent-changes-one: # "Recent changes to this %contenttype%"
 
 field.block.label.add-new: # "Add new..."
 field.block.label.add-set: # "Add new %label% set"
+
+field.embed.height: # "Height"
+field.embed.label.preview: # "Preview"
+field.embed.label.size: # "Size"
+field.embed.label.url: # "URL of content to embed"
+field.embed.matched-embed: # "Matched Embed"
+field.embed.pixel: # "pixel"
+field.embed.placeholder.url: # "URL of content on Facebook, Twitter, Soundcloud or other media website"
+field.embed.width: # "Width"
 
 field.general.stack: # "Stack"
 
@@ -54,6 +70,11 @@ field.image.label.alt: # "Alt"
 
 field.markdown.label.markedview: # "Markdown"
 
+field.repeater.collapse: # "Collapse this set"
+field.repeater.collapse-all: # "Collapse all"
+field.repeater.delete-set: # "Delete Set"
+field.repeater.expand: # "Expand this set"
+field.repeater.expand-all: # "Expand all"
 field.repeater.label.add-set: # "Add new %label% set"
 
 field.slug.button.generate: # "Generate from:"
@@ -95,11 +116,9 @@ general.phrase.database-check: # "Check Database"
 general.phrase.database-update-required-post: # "to do this now."
 general.phrase.database-update-required-pre: # "The database needs to be updated/repaired. Go to 'Configuration'"
 general.phrase.delete: # "Delete"
-general.phrase.delete-set: # "Delete Set"
 general.phrase.depublish: # "Depublish"
 general.phrase.depublish-date-past: # "Depublish date is in the past. Change the status if you want to depublish now."
 general.phrase.depublish-explanation: # "If set, the record will be automatically depublished on the given date."
-general.phrase.duplicate-set: # "Duplicate Set"
 general.phrase.error-cache-clear: # "Failed to clear cache. You should delete it manually."
 general.phrase.error-login-invalid-parameters: # "Invalid login parameters."
 general.phrase.error-mail-options-not-set: # "The email configuration setting 'mailoptions' hasn't been set. Bolt may be unable to send password reset."
@@ -145,13 +164,14 @@ general.phrase.required-is-or-match-pattern: # "Is required or needs to match a 
 general.phrase.search-results-for-variable: # "Search results for <b>%search%</b>."
 general.phrase.selection: # "Selection"
 general.phrase.show-proposed-alterations: # "Show proposed alterations"
-general.phrase.slug-colon: # "Slug:"
+general.phrase.slug: # "Slug"
 general.phrase.something-went-wrong-after-first-user: # "Something went wrong with logging in after first user creation!"
 general.phrase.stack: # "Stack"
 general.phrase.status-explanation: # "The status defines whether or not this record is published. Select 'Timed publish' to automatically publish on the set Publication Date."
 general.phrase.system-config-checks: # "System Configuration Checks"
 general.phrase.thumbnail: # "Thumbnail"
 general.phrase.toggle-all: # "Check/Uncheck all"
+general.phrase.upload-drop-here: # "Drop files in the file manager to upload them or use the button below."
 general.phrase.upload-not-allowed: # "Upload not allowed"
 general.phrase.upload-progress: # "Current uploads"
 general.phrase.users-permissions: # "Users & Permissions"
@@ -273,6 +293,8 @@ page.file-management.label.create-file: # "Create file"
 page.file-management.message.save-failed-invalid-form: # "File '%s' could not be saved, because the form wasn't valid."
 page.file-management.message.upload-not-writable: # "Unable to write to upload destination. Check permissions on %TARGET%"
 
+page.login.placeholder.password: # "Your password"
+
 page.prefill.connection-timeout: # "Timeout attempting connection to the 'Lorem Ipsum' generator. Unable to add dummy content."
 page.prefill.database-update-required: # "Table not found for ContentType %CONTENTTYPE%, a database update is probably required."
 page.prefill.skipped-singleton: # "Skipped singleton <code>%key%</code> (already has a record)"
@@ -286,7 +308,6 @@ panel.latest-activity.system: # "Latest system activity"
 
 "(default template)": "(默認模板)"
 "(no category)": "(沒有分類)"
-"(no group)": "(沒有分組)"
 "(none)": "(無)"
 "Add some sample <a href='%url%' class='btn btn-default'>Records with Loripsum text</a>": "可以添加一些 <a href='%url%' class='btn btn-default'>帶有 Loripsum 示例文字</a> 的記錄"
 "Added to <tt>%key%</tt> '%title%'": "添加到 <tt>%key%</tt> '%title%'"
@@ -299,7 +320,6 @@ panel.latest-activity.system: # "Latest system activity"
 "The slug '%slug%' is used in more than one contenttype. Please edit contenttypes.yml, and make them distinct.": "slug '%slug%'用在了多個內容格式中。請編輯 contenttypes.yml 區分它們。"
 "The translations file '%s' can't be created. You will have to use your own editor to make modifications to this file.": "無法創建翻譯檔案 '%s'。你需要自行使用編輯器修改檔案。"
 "This website is <a href='%url%' target='_blank' title='Sophisticated, lightweight & simple CMS'>Built with Bolt</a>.": "本網站由<a href='%url%' target='_blank' title='精緻、輕量、簡潔的 CMS'>Bolt 構建</a>。"
-"Title": "標題"
 "Try logging in with your ftp-client and make the file readable. Else try to go <a>back</a> to the last page.": "可以試著用FTP客戶端登入，將檔案設定可讀許可權，也可以嘗試<a>返回</a>上一個頁面。"
 "View (saved version) on site": "觀看站點中(儲存的版本)"
 "You've been logged on successfully.": "你已成功登入。"
@@ -322,7 +342,6 @@ contenttypes.generic.invalid-field: "未能設定%contenttype%的%field%欄位�
 contenttypes.generic.last-modified: "最近修改的%contenttypes%"
 contenttypes.generic.new: "新建%contenttype%"
 contenttypes.generic.no-latest: "無最新%contenttype%"
-contenttypes.generic.no-proper-type: "“%contenttype%(Entry)”的內容格式配置中，設定為'type: %type%'的欄位'%field%'不是合適的欄位類型(fieldtype)。請編輯contenttypes.yml檔案，修復此問題。"
 contenttypes.generic.no-recent: "無歷史%contenttype%。"
 contenttypes.generic.none-available: "無可用%contenttypes%。"
 contenttypes.generic.not-existing: "未找到你所尋找的%contenttype%，它可能已經被刪除，或者根本不存在。"
@@ -469,6 +488,7 @@ general.phrase.modifications-database-colon: "對資料庫作出的變更："
 general.phrase.modifications-needed-colon: "需要作出的修改："
 general.phrase.modified: "已修改"
 general.phrase.no-content: "無內容 …"
+general.phrase.no-group-parens: "(沒有分組)"
 general.phrase.no-result-for-search-term: "沒有找到 '%SEARCHTERM%'，請嘗試其他關鍵詞。"
 general.phrase.no-such-action-for-user: "使用者 '%s' 無此項操作。"
 general.phrase.no-title: "無標題 …"
@@ -531,6 +551,7 @@ general.phrase.taxonomy: "分類"
 general.phrase.template-detail: "詳情頁模板"
 general.phrase.time-format-24-12: "24/12小時制"
 general.phrase.tip-colon: "小貼士："
+general.phrase.title: "標題"
 general.phrase.translations: "翻譯"
 general.phrase.types: "類型"
 general.phrase.update-database: "更新資料庫"
@@ -654,7 +675,6 @@ page.login.password-hide: "隱藏"
 page.login.password-reset-link-sent: "密碼重置連結已發送到 '%user%'。"
 page.login.password-show: "顯示"
 page.login.placeholder.username: "你的使用者名"
-page.login.placeholder.password: # "Your password"
 page.login.title: "登入 Bolt"
 
 page.prefill.skipped-existing: "跳過 <code>%key%</code> (已有記錄)"
@@ -676,5 +696,3 @@ permissions.roles.label.anonymous: "匿名"
 permissions.roles.label.owner: "所有者"
 
 users.actions-for-users: "使用者操作"
-
-users.your-password: "你的密碼"

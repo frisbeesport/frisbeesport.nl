@@ -5,7 +5,7 @@ namespace Bolt\Twig\Runtime;
 use Bolt\Common\Exception\ParseException;
 use Bolt\Common\Json;
 use Bolt\Helpers\Str;
-use Cocur\Slugify\Slugify;
+use Cocur\Slugify\SlugifyInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -17,16 +17,16 @@ class TextRuntime
 {
     /** @var LoggerInterface */
     private $systemLogger;
-    /** @var Slugify */
+    /** @var SlugifyInterface */
     private $slugify;
 
     /**
      * Constructor.
      *
-     * @param LoggerInterface $systemLogger
-     * @param Slugify         $slugify
+     * @param LoggerInterface  $systemLogger
+     * @param SlugifyInterface $slugify
      */
-    public function __construct(LoggerInterface $systemLogger, Slugify $slugify)
+    public function __construct(LoggerInterface $systemLogger, SlugifyInterface $slugify)
     {
         $this->systemLogger = $systemLogger;
         $this->slugify = $slugify;
@@ -36,7 +36,7 @@ class TextRuntime
      * JSON decodes a variable. Twig has a built-in json_encode filter, but no built-in
      * function to JSON decode a string. This functionality remedies that.
      *
-     * @param string $string The string to decode.
+     * @param string $string the string to decode
      *
      * @return array|null The JSON decoded array
      */
@@ -58,7 +58,7 @@ class TextRuntime
      *
      * @return string Formatted date and time
      */
-    public function localeDateTime($dateTime, $format = '%B %e, %Y %H:%M')
+    public function localeDateTime($dateTime, $format = '%B %e, %Y %H:%M', $locale = 0)
     {
         if (!$dateTime instanceof \DateTime) {
             $dateTime = new \DateTime($dateTime);
@@ -72,7 +72,8 @@ class TextRuntime
         // According to http://php.net/manual/en/function.setlocale.php manual
         // if the second parameter is "0", the locale setting is not affected,
         // only the current setting is returned.
-        $result = setlocale(LC_ALL, 0);
+        $result = setlocale(LC_ALL, $locale);
+
         if ($result === false) {
             // This shouldn't occur, but.. Dude!
             // You ain't even got locale or English on your platform??
@@ -91,10 +92,10 @@ class TextRuntime
     /**
      * Perform a regular expression search and replace on the given string.
      *
-     * @param string  $str
-     * @param string  $pattern
-     * @param string  $replacement
-     * @param integer $limit
+     * @param string $str
+     * @param string $pattern
+     * @param string $replacement
+     * @param int    $limit
      *
      * @return string Same string where first character is in upper case
      */
@@ -108,9 +109,9 @@ class TextRuntime
      *
      * @see function Bolt\Library::safeString()
      *
-     * @param string  $str
-     * @param boolean $strict
-     * @param string  $extrachars
+     * @param string $str
+     * @param bool   $strict
+     * @param string $extrachars
      *
      * @return string
      */
@@ -138,9 +139,9 @@ class TextRuntime
     /**
      * Test whether a passed string contains valid JSON.
      *
-     * @param string $string The string to test.
+     * @param string $string the string to test
      *
-     * @return boolean
+     * @return bool
      */
     public function testJson($string)
     {

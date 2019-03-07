@@ -4,29 +4,25 @@ namespace Bolt\Composer;
 
 use Bolt;
 use Bolt\Composer\Package\Dependency;
+use Bolt\Composer\Satis\PingService;
 use Bolt\Extension\ResolvedExtension;
 use Bolt\Filesystem\Exception\ParseException;
 use Bolt\Translation\Translator as Trans;
 use Composer\CaBundle\CaBundle;
 use Composer\Package\CompletePackageInterface;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
 use Silex\Application;
 
 class PackageManager
 {
     /** @var Application */
     protected $app;
-    /** @var boolean */
+    /** @var bool */
     protected $started = false;
-    /** @var boolean */
+    /** @var bool */
     protected $useSsl;
 
     /** @var array|null */
     private $json;
-    /** @var string[] */
-    private $messages = [];
 
     /**
      * Constructor.
@@ -47,7 +43,10 @@ class PackageManager
      */
     public function getMessages()
     {
-        return $this->messages;
+        /** @var PingService $pinger */
+        $pinger = $this->app['extend.ping'];
+
+        return $pinger->getMessages()->toArray();
     }
 
     /**
@@ -83,9 +82,6 @@ class PackageManager
 
                 return;
             }
-
-            // Ping the extensions server to confirm connection
-            $this->ping(true);
         }
 
         $this->started = true;
@@ -141,7 +137,7 @@ class PackageManager
     /**
      * Dump fresh autoloader.
      *
-     * @return integer 0 on success or a positive error code on failure
+     * @return int 0 on success or a positive error code on failure
      */
     public function dumpAutoload()
     {
@@ -151,7 +147,7 @@ class PackageManager
     /**
      * Install configured packages.
      *
-     * @return integer 0 on success or a positive error code on failure
+     * @return int 0 on success or a positive error code on failure
      */
     public function installPackages()
     {
@@ -176,7 +172,7 @@ class PackageManager
      *
      * @param $packages array Indexed array of package names to remove
      *
-     * @return integer 0 on success or a positive error code on failure
+     * @return int 0 on success or a positive error code on failure
      */
     public function removePackage(array $packages)
     {
@@ -189,7 +185,7 @@ class PackageManager
      * @param $packages array Associative array of package names/versions to remove
      *                        Format: ['name' => '', 'version' => '']
      *
-     * @return integer 0 on success or a positive error code on failure
+     * @return int 0 on success or a positive error code on failure
      */
     public function requirePackage(array $packages)
     {
@@ -228,7 +224,7 @@ class PackageManager
      *
      * @param  $packages array Indexed array of package names to update
      *
-     * @return integer 0 on success or a positive error code on failure
+     * @return int 0 on success or a positive error code on failure
      */
     public function updatePackage(array $packages)
     {
@@ -269,16 +265,17 @@ class PackageManager
             $extension = $this->app['extensions']->getResolved($name);
 
             // Handle non-Bolt packages
-            if ($extension) {
+            if ($extension instanceof ResolvedExtension) {
                 $title = $extension->getDisplayName();
-                $constraint = $extension->getDescriptor()->getConstraint() ?: Bolt\Version::VERSION;
+                $descriptor = $extension->getDescriptor();
+                $constraint = $descriptor ? $descriptor->getConstraint() : null;
                 $readme = $this->linkReadMe($extension);
                 $config = $this->linkConfig($extension);
                 $valid = $extension->isValid();
                 $enabled = $extension->isEnabled();
             } else {
                 $title = $name;
-                $constraint = Bolt\Version::VERSION;
+                $constraint = null;
                 $readme = null;
                 $config = null;
                 $valid = true;
@@ -356,59 +353,5 @@ class PackageManager
     private function updateJson()
     {
         $this->json = $this->app['extend.manager.json']->update();
-    }
-
-    /**
-     * Ping site to see if we have a valid connection and it is responding correctly.
-     *
-     * @param boolean $addQuery
-     */
-    private function ping($addQuery = false)
-    {
-        $uri = $this->app['extend.site'] . 'ping';
-        $query = [];
-        if ($this->app['request_stack']->getCurrentRequest() !== null) {
-            $www = $this->app['request_stack']->getCurrentRequest()->server->get('SERVER_SOFTWARE', 'unknown');
-        } else {
-            $www = 'unknown';
-        }
-        if ($addQuery) {
-            $query = [
-                'bolt_ver'  => Bolt\Version::VERSION,
-                'php'       => PHP_VERSION,
-                'www'       => $www,
-            ];
-        }
-        $this->app['extend.online'] = false;
-        $guzzle = $this->app['guzzle.client'];
-
-        try {
-            $guzzle->head($uri, ['query' => $query, 'exceptions' => true, 'connect_timeout' => 10, 'timeout' => 30]);
-            $this->app['extend.online'] = true;
-        } catch (ClientException $e) {
-            // Thrown for 400 level errors
-            $this->messages[] = Trans::__(
-                'page.extend.error-message-client',
-                ['%errormessage%' => $e->getMessage()]
-            );
-        } catch (ServerException $e) {
-            // Thrown for 500 level errors
-            $this->messages[] = Trans::__(
-                'page.extend.error-message-server',
-                ['%errormessage%' => $e->getMessage()]
-            );
-        } catch (RequestException $e) {
-            // Thrown for connection timeout, DNS errors, etc
-            $this->messages[] = Trans::__(
-                'page.extend.error-message-connection',
-                ['%errormessage%' => $e->getMessage()]
-            );
-        } catch (\Exception $e) {
-            // Catch all
-            $this->messages[] = Trans::__(
-                'page.extend.error-message-generic',
-                ['%errormessage%' => $e->getMessage()]
-            );
-        }
     }
 }

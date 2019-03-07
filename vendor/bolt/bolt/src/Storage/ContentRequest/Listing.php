@@ -62,7 +62,16 @@ class Listing
             'order'   => $options->getOrder() ?: $contentType['sort'],
             'page'    => $options->getPage(),
             'filter'  => $options->getFilter(),
+            'status'  => $options->getStatus(),
         ];
+
+        // If we have a text filter we switch the query into search mode
+        if ($options->getFilter()) {
+            $textQuery = $contentTypeSlug . '/search';
+            $contentParameters['invisible'] = true;
+        } else {
+            $textQuery = $contentTypeSlug;
+        }
 
         // Set the amount of items to show per page
         if (!empty($contentType['recordsperpage'])) {
@@ -78,7 +87,7 @@ class Listing
             }
         }
 
-        return $this->getContent($contentTypeSlug, $contentParameters, $options);
+        return $this->getContent($textQuery, $contentParameters, $options);
     }
 
     /**
@@ -99,7 +108,7 @@ class Listing
             $records = $this->query->getContent($contentTypeSlug, $contentParameters);
         }
         $this->runPagerQueries($records);
-        if ($options->getGroupSort()) {
+        if ($options->getGroupSort() && !$options->getOrder()) {
             $records = $this->runGroupSort($records);
         }
 
@@ -137,7 +146,7 @@ class Listing
     /**
      * @param $results
      *
-     * @return array
+     * @return QueryResultset|array
      */
     protected function runGroupSort($results)
     {
@@ -145,11 +154,14 @@ class Listing
             return $results;
         }
         $grouped = [];
+        $resultTaxOrders = [];
         foreach ($results as $result) {
             $taxGroup = null;
             foreach ($result->getTaxonomy() as $taxonomy) {
-                if ($taxonomy->getTaxonomytype() == $result->getTaxonomy()->getGroupingTaxonomy()) {
+                if (in_array($taxonomy->getTaxonomytype(), $result->getTaxonomy()->getGroupingTaxonomies())) {
                     $taxGroup = $taxonomy->getSlug();
+                    $taxOrder = $taxonomy->getSortorder();
+                    $resultTaxOrders[$result->getId()] = $taxOrder;
                 }
             }
             if ($taxGroup !== null) {
@@ -161,6 +173,16 @@ class Listing
 
         if (!count($grouped)) {
             return $results;
+        }
+        if (isset($taxGroup) && $taxGroup !== null) {
+            foreach ($grouped as &$group) {
+                usort($group, function ($a, $b) use ($resultTaxOrders) {
+                    $aOrder = isset($resultTaxOrders[$a->getId()]) ? $resultTaxOrders[$a->getId()] : 0;
+                    $bOrder = isset($resultTaxOrders[$b->getId()]) ? $resultTaxOrders[$b->getId()] : 0;
+
+                    return $aOrder - $bOrder;
+                });
+            }
         }
 
         return call_user_func_array('array_merge', $grouped);

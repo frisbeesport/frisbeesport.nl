@@ -12,6 +12,8 @@ use Psr\Log\LoggerInterface;
 /**
  * Base class for handling table comparison.
  *
+ * @internal
+ *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
 abstract class BaseComparator
@@ -31,7 +33,7 @@ abstract class BaseComparator
     protected $tablesAlter;
     /** @var IgnoredChange[] */
     protected $ignoredChanges = [];
-    /** @var boolean */
+    /** @var bool */
     protected $pending;
     /** @var \Bolt\Storage\Database\Schema\SchemaCheck */
     protected $response;

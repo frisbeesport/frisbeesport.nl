@@ -55,9 +55,9 @@ abstract class Base implements ControllerProviderInterface
     /**
      * Shortcut to abort the current request by sending a proper HTTP error.
      *
-     * @param integer $statusCode The HTTP status code
-     * @param string  $message    The status message
-     * @param array   $headers    An array of HTTP headers
+     * @param int    $statusCode The HTTP status code
+     * @param string $message    The status message
+     * @param array  $headers    An array of HTTP headers
      *
      * @throws HttpExceptionInterface
      */
@@ -131,9 +131,17 @@ abstract class Base implements ControllerProviderInterface
             return;
         }
 
+        // In case we're previewing a record, this will override the `_route`, but keep the original
+        // one, used to see if we need to disable the XSS protection header.
+        // See PR https://github.com/bolt/bolt/pull/7458
         list($routeName, $routeParams) = $content->getRouteNameAndParams();
         if ($routeName) {
-            $request->attributes->add(['_route' => $routeName, '_route_params' => $routeParams]);
+            /** @deprecated since 3.4 to be removed in 4.0 */
+            $request->attributes->add([
+                '_route'          => $routeName,
+                '_route_params'   => $routeParams,
+                '_internal_route' => $request->attributes->get('_route'),
+            ]);
         }
     }
 
@@ -266,8 +274,8 @@ abstract class Base implements ControllerProviderInterface
     /**
      * Validates CSRF token and throws HttpException if not.
      *
-     * @param string|null $value The token value or null to use "bolt_csrf_token" parameter from request.
-     * @param string      $id    The token ID.
+     * @param string|null $value the token value or null to use "bolt_csrf_token" parameter from request
+     * @param string      $id    the token ID
      *
      * @throws HttpExceptionInterface
      */
@@ -281,8 +289,8 @@ abstract class Base implements ControllerProviderInterface
     /**
      * Check if csrf token is valid.
      *
-     * @param string|null $value The token value or null to use "bolt_csrf_token" parameter from request.
-     * @param string      $id    The token ID.
+     * @param string|null $value the token value or null to use "bolt_csrf_token" parameter from request
+     * @param string      $id    the token ID
      *
      * @return bool
      */
@@ -326,7 +334,7 @@ abstract class Base implements ControllerProviderInterface
     /**
      * Check to see if the user table exists and has records.
      *
-     * @return boolean
+     * @return bool
      */
     protected function hasUsers()
     {
@@ -345,7 +353,7 @@ abstract class Base implements ControllerProviderInterface
     /**
      * Return current user or user by ID.
      *
-     * @param integer|string|null $userId
+     * @param int|string|null $userId
      *
      * @return Entity\Users|false
      */
@@ -368,12 +376,12 @@ abstract class Base implements ControllerProviderInterface
     /**
      * Shortcut for {@see \Bolt\AccessControl\Permissions::isAllowed}.
      *
-     * @param string       $what
-     * @param mixed        $user        The user to check permissions against.
-     * @param string|null  $contenttype
-     * @param integer|null $contentid
+     * @param string      $what
+     * @param mixed       $user        the user to check permissions against
+     * @param string|null $contenttype
+     * @param int|null    $contentid
      *
-     * @return boolean
+     * @return bool
      */
     protected function isAllowed($what, $user = null, $contenttype = null, $contentid = null)
     {
@@ -416,8 +424,9 @@ abstract class Base implements ControllerProviderInterface
             return $this->storage()->getContent($textQuery, $parameters, $pager, $whereParameters);
         }
         $params = array_merge($parameters, $whereParameters);
+        unset($params['log_not_found']); // New storage system removes this functionality from the query engine
 
-        return  $this->app['query']->getContent($textQuery, $params);
+        return $this->app['query']->getContentForTwig($textQuery, $params);
     }
 
     /**
@@ -425,7 +434,7 @@ abstract class Base implements ControllerProviderInterface
      *
      * @param string $slug
      *
-     * @return boolean|array
+     * @return bool|array
      */
     protected function getContentType($slug)
     {
@@ -438,7 +447,7 @@ abstract class Base implements ControllerProviderInterface
      * @param string             $contentTypeSlug
      * @param array|Entity\Users $user
      *
-     * @return boolean[]
+     * @return bool[]
      */
     protected function getContentTypeUserPermissions($contentTypeSlug, $user = null)
     {
@@ -455,7 +464,7 @@ abstract class Base implements ControllerProviderInterface
      * @param string $path
      * @param mixed  $default
      *
-     * @return string|integer|array|null
+     * @return string|int|array|null
      */
     protected function getOption($path, $default = null)
     {

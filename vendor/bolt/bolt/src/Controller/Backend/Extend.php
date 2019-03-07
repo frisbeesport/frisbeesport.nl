@@ -3,6 +3,7 @@
 namespace Bolt\Controller\Backend;
 
 use Bolt;
+use Bolt\Composer\Satis\PingService;
 use Bolt\Exception\PackageManagerException;
 use Bolt\Extension\ResolvedExtension;
 use Bolt\Filesystem\Exception\FileNotFoundException;
@@ -14,6 +15,7 @@ use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Webmozart\PathUtil\Path;
 
 class Extend extends BackendBase
 {
@@ -277,7 +279,7 @@ class Extend extends BackendBase
     {
         $package = $request->query->get('package');
         if ($package === null) {
-            $message  = 'Extension browser request query was missing or invalid, check your web server configuration.';
+            $message = 'Extension browser request query was missing or invalid, check your web server configuration.';
 
             return $this->getJsonException(new \Exception($message));
         }
@@ -327,6 +329,11 @@ class Extend extends BackendBase
      */
     public function overview()
     {
+        /** @var PingService $pinger */
+        $pinger = $this->app['extend.ping'];
+        // Ping the extensions server to confirm connection
+        $this->app['extend.online'] = $pinger->ping(true);
+
         try {
             return $this->render('@bolt/extend/extend.twig', $this->getRenderContext());
         } catch (\Exception $e) {
@@ -460,7 +467,7 @@ class Extend extends BackendBase
         );
 
         return [
-            'messages'       => $this->app['extend.manager']->getMessages(),
+            'messages'       => $this->app['extend.ping']->getMessages(),
             'enabled'        => $this->app['extend.enabled'],
             'writeable'      => $this->app['extend.writeable'],
             'online'         => $this->app['extend.online'],
@@ -488,10 +495,7 @@ class Extend extends BackendBase
      */
     private function getJsonException(\Exception $e)
     {
-        // Make file path relative to not leak system info
-        $file = $e->getFile();
-        $base = realpath(__DIR__ . '/../../..');
-        $file = str_replace($base . '/', '', $file);
+        $file = Path::makeRelative($e->getFile(), $this->app['path_resolver']->resolve('root'));
 
         $error = [
             'error' => [

@@ -9,7 +9,7 @@
 
 {% block page_title %}
     {% set contenttype = {'%contenttype%': context.contenttype.singular_name} %}
-    {% if context.content.title is not empty %}
+    {% if context.content.title is not empty or context.contenttype.singleton %}
         {{ __('contenttypes.generic.edit', contenttype) }}
     {% else %}
         {{ __('contenttypes.generic.new', contenttype) }}
@@ -84,7 +84,7 @@
             {% endif %}
 
             {{ form_start(context.form, {'attr': attr_form}) }}
-                {{ form_widget(context.form._token) }}
+                {{ form_widget(context.form._token, { 'attr': { 'autocomplete': 'off' } }) }}
 
                 <input{{ macro.attr(attributes.hid_editreferrer) }}>
                 <input{{ macro.attr(attributes.hid_contenttype) }}>

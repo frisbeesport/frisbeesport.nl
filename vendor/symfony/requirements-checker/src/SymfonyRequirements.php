@@ -20,9 +20,10 @@ namespace Symfony\Requirements;
  */
 class SymfonyRequirements extends RequirementCollection
 {
-    const REQUIRED_PHP_VERSION = '5.5.9';
+    const REQUIRED_PHP_VERSION_3x = '5.5.9';
+    const REQUIRED_PHP_VERSION_4x = '7.1.3';
 
-    public function __construct($rootDir)
+    public function __construct($rootDir, $symfonyVersion = null)
     {
         /* mandatory requirements follow */
 
@@ -31,26 +32,22 @@ class SymfonyRequirements extends RequirementCollection
         $rootDir = $this->getComposerRootDir($rootDir);
         $options = $this->readComposer($rootDir);
 
-        $this->addRequirement(
-            version_compare($installedPhpVersion, self::REQUIRED_PHP_VERSION, '>='),
-            sprintf('PHP version must be at least %s (%s installed)', self::REQUIRED_PHP_VERSION, $installedPhpVersion),
-            sprintf('You are running PHP version "<strong>%s</strong>", but Symfony needs at least PHP "<strong>%s</strong>" to run.
-            Before using Symfony, upgrade your PHP installation, preferably to the latest version.',
-                $installedPhpVersion, self::REQUIRED_PHP_VERSION),
-            sprintf('Install PHP %s or newer (installed version is %s)', self::REQUIRED_PHP_VERSION, $installedPhpVersion)
-        );
+        $phpVersion = $symfonyVersion && version_compare($symfonyVersion, '4.0.0', '>=') ? self::REQUIRED_PHP_VERSION_4x : self::REQUIRED_PHP_VERSION_3x;
 
         $this->addRequirement(
-            version_compare($installedPhpVersion, '5.3.16', '!='),
-            'PHP version must not be 5.3.16 as Symfony won\'t work properly with it',
-            'Install PHP 5.3.17 or newer (or downgrade to an earlier PHP version)'
+            version_compare($installedPhpVersion, $phpVersion, '>='),
+            sprintf('PHP version must be at least %s (%s installed)', $phpVersion, $installedPhpVersion),
+            sprintf('You are running PHP version "<strong>%s</strong>", but Symfony needs at least PHP "<strong>%s</strong>" to run.
+            Before using Symfony, upgrade your PHP installation, preferably to the latest version.',
+                $installedPhpVersion, $phpVersion),
+            sprintf('Install PHP %s or newer (installed version is %s)', $phpVersion, $installedPhpVersion)
         );
 
         $this->addRequirement(
             is_dir($rootDir.'/vendor/composer'),
             'Vendor libraries must be installed',
             'Vendor libraries are missing. Install composer following instructions from <a href="http://getcomposer.org/">http://getcomposer.org/</a>. '.
-                'Then run "<strong>php composer.phar install</strong>" to install them.'
+            'Then run "<strong>php composer.phar install</strong>" to install them.'
         );
 
         if (is_dir($cacheDir = $rootDir.'/'.$options['var-dir'].'/cache')) {
@@ -61,11 +58,11 @@ class SymfonyRequirements extends RequirementCollection
             );
         }
 
-        if (is_dir($logsDir = $rootDir.'/'.$options['var-dir'].'/logs')) {
+        if (is_dir($logsDir = $rootDir.'/'.$options['var-dir'].'/log')) {
             $this->addRequirement(
                 is_writable($logsDir),
-                sprintf('%s/logs/ directory must be writable', $options['var-dir']),
-                sprintf('Change the permissions of "<strong>%s/logs/</strong>" directory so that the web server can write into it.', $options['var-dir'])
+                sprintf('%s/log/ directory must be writable', $options['var-dir']),
+                sprintf('Change the permissions of "<strong>%s/log/</strong>" directory so that the web server can write into it.', $options['var-dir'])
             );
         }
 
@@ -77,16 +74,9 @@ class SymfonyRequirements extends RequirementCollection
             );
         }
 
-        if (version_compare($installedPhpVersion, self::REQUIRED_PHP_VERSION, '>=')) {
-            $timezones = array();
-            foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
-                foreach ($abbreviations as $abbreviation) {
-                    $timezones[$abbreviation['timezone_id']] = true;
-                }
-            }
-
+        if (version_compare($installedPhpVersion, $phpVersion, '>=')) {
             $this->addRequirement(
-                isset($timezones[@date_default_timezone_get()]),
+                in_array(@date_default_timezone_get(), \DateTimeZone::listIdentifiers(), true),
                 sprintf('Configured default timezone "%s" must be supported by your installation of PHP', @date_default_timezone_get()),
                 'Your default timezone is not supported by PHP. Check for typos in your <strong>php.ini</strong> file and have a look at the list of deprecated timezones at <a href="http://php.net/manual/en/timezones.others.php">http://php.net/manual/en/timezones.others.php</a>.'
             );
@@ -193,38 +183,6 @@ class SymfonyRequirements extends RequirementCollection
         }
 
         /* optional recommendations follow */
-
-        $this->addRecommendation(
-            version_compare($installedPhpVersion, '5.3.4', '>='),
-            'You should use at least PHP 5.3.4 due to PHP bug #52083 in earlier versions',
-            'Your project might malfunction randomly due to PHP bug #52083 ("Notice: Trying to get property of non-object"). Install PHP 5.3.4 or newer.'
-        );
-
-        $this->addRecommendation(
-            version_compare($installedPhpVersion, '5.3.8', '>='),
-            'When using annotations you should have at least PHP 5.3.8 due to PHP bug #55156',
-            'Install PHP 5.3.8 or newer if your project uses annotations.'
-        );
-
-        $this->addRecommendation(
-            version_compare($installedPhpVersion, '5.4.0', '!='),
-            'You should not use PHP 5.4.0 due to the PHP bug #61453',
-            'Your project might not work properly due to the PHP bug #61453 ("Cannot dump definitions which have method calls"). Install PHP 5.4.1 or newer.'
-        );
-
-        $this->addRecommendation(
-            version_compare($installedPhpVersion, '5.4.11', '>='),
-            'When using the logout handler from the Symfony Security Component, you should have at least PHP 5.4.11 due to PHP bug #63379 (as a workaround, you can also set invalidate_session to false in the security logout handler configuration)',
-            'Install PHP 5.4.11 or newer if your project uses the logout handler from the Symfony Security Component.'
-        );
-
-        $this->addRecommendation(
-            (version_compare($installedPhpVersion, '5.3.18', '>=') && version_compare($installedPhpVersion, '5.4.0', '<'))
-            ||
-            version_compare($installedPhpVersion, '5.4.8', '>='),
-            'You should use PHP 5.3.18+ or PHP 5.4.8+ to always get nice error messages for fatal errors in the development environment due to PHP bug #61767/#60909',
-            'Install PHP 5.3.18+ or PHP 5.4.8+ if you want nice error messages for all fatal errors in the development environment.'
-        );
 
         if (null !== $pcreVersion) {
             $this->addRecommendation(
@@ -360,6 +318,30 @@ class SymfonyRequirements extends RequirementCollection
 
         $this->addPhpConfigRecommendation('session.auto_start', false);
 
+        $this->addPhpConfigRecommendation(
+            'xdebug.max_nesting_level',
+            function ($cfgValue) { return $cfgValue > 100; },
+            true,
+            'xdebug.max_nesting_level should be above 100 in php.ini',
+            'Set "<strong>xdebug.max_nesting_level</strong>" to e.g. "<strong>250</strong>" in php.ini<a href="#phpini">*</a> to stop Xdebug\'s infinite recursion protection erroneously throwing a fatal error in your project.'
+        );
+
+        $this->addPhpConfigRecommendation(
+            'post_max_size',
+            $this->getPostMaxSize() < $this->getMemoryLimit(),
+            true,
+            '"memory_limit" should be greater than "post_max_size".',
+            'Set "<strong>memory_limit</strong>" to be greater than "<strong>post_max_size</strong>".'
+        );
+
+        $this->addPhpConfigRecommendation(
+            'upload_max_filesize',
+            $this->getUploadMaxFilesize() < $this->getPostMaxSize(),
+            true,
+            '"post_max_size" should be greater than "upload_max_filesize".',
+            'Set "<strong>post_max_size</strong>" to be greater than "<strong>upload_max_filesize</strong>".'
+        );
+
         $this->addRecommendation(
             class_exists('PDO'),
             'PDO should be installed',
@@ -377,21 +359,33 @@ class SymfonyRequirements extends RequirementCollection
     }
 
     /**
-     * Loads realpath_cache_size from php.ini and converts it to int.
-     *
+     * Convert a given shorthand size in an integer
      * (e.g. 16k is converted to 16384 int)
      *
-     * @return int
+     * @param string $size - Shorthand size
+     *
+     * @see http://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
+     *
+     * @return int - Converted size
      */
-    private function getRealpathCacheSize()
+    private function convertShorthandSize($size)
     {
-        $size = ini_get('realpath_cache_size');
+        // Initialize
         $size = trim($size);
         $unit = '';
+
+        // Check unlimited alias
+        if ($size === '-1') {
+            return \INF;
+        }
+
+        // Check size
         if (!ctype_digit($size)) {
             $unit = strtolower(substr($size, -1, 1));
             $size = (int) substr($size, 0, -1);
         }
+
+        // Return converted size
         switch ($unit) {
             case 'g':
                 return $size * 1024 * 1024 * 1024;
@@ -402,6 +396,48 @@ class SymfonyRequirements extends RequirementCollection
             default:
                 return (int) $size;
         }
+    }
+
+    /**
+     * Loads realpath_cache_size from php.ini and converts it to int.
+     *
+     * (e.g. 16k is converted to 16384 int)
+     *
+     * @return int
+     */
+    private function getRealpathCacheSize()
+    {
+        return $this->convertShorthandSize(ini_get('realpath_cache_size'));
+    }
+
+    /**
+     * Loads post_max_size from php.ini and converts it to int.
+     *
+     * @return int
+     */
+    private function getPostMaxSize()
+    {
+        return $this->convertShorthandSize(ini_get('post_max_size'));
+    }
+
+    /**
+     * Loads memory_limit from php.ini and converts it to int.
+     *
+     * @return int
+     */
+    private function getMemoryLimit()
+    {
+        return $this->convertShorthandSize(ini_get('memory_limit'));
+    }
+
+    /**
+     * Loads upload_max_filesize from php.ini and converts it to int.
+     *
+     * @return int
+     */
+    private function getUploadMaxFilesize()
+    {
+        return $this->convertShorthandSize(ini_get('upload_max_filesize'));
     }
 
     private function getComposerRootDir($rootDir)
@@ -441,4 +477,4 @@ class SymfonyRequirements extends RequirementCollection
 
         return $options;
     }
- }
+}

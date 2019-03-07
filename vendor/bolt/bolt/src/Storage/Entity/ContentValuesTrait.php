@@ -3,7 +3,6 @@
 namespace Bolt\Storage\Entity;
 
 use Bolt\Common\Json;
-use Bolt\Helpers\Excerpt;
 use Bolt\Helpers\Input;
 use Bolt\Legacy;
 use Bolt\Library as Lib;
@@ -28,7 +27,7 @@ use Twig\Markup;
  */
 trait ContentValuesTrait
 {
-    /** @var boolean Whether this is a "real" ContentType or an embedded ones */
+    /** @var bool Whether this is a "real" ContentType or an embedded ones */
     protected $isRootType;
 
     /**
@@ -57,60 +56,10 @@ trait ContentValuesTrait
     }
 
     /**
-     * Alias for getExcerpt().
-     *
-     * @param integer      $length
-     * @param boolean      $includeTitle
-     * @param string|array $focus
-     *
-     * @return Markup
-     */
-    public function excerpt($length = 200, $includeTitle = false, $focus = null)
-    {
-        return $this->getExcerpt($length, $includeTitle, $focus);
-    }
-
-    /**
-     * Create an excerpt for the content.
-     *
-     * @param integer      $length
-     * @param boolean      $includeTitle
-     * @param string|array $focus
-     *
-     * @return Markup
-     */
-    public function getExcerpt($length = 200, $includeTitle = false, $focus = null)
-    {
-        $excerptParts = [];
-
-        if (!empty($this->contenttype['fields'])) {
-            foreach ($this->contenttype['fields'] as $key => $field) {
-                // Skip empty fields, and fields used as 'title'.
-                if (!isset($this->values[$key]) || in_array($key, $this->getTitleColumnName())) {
-                    continue;
-                }
-                // add 'text', 'html' and 'textarea' fields.
-                if (in_array($field['type'], ['text', 'html', 'textarea'])) {
-                    $excerptParts[] = $this->values[$key];
-                }
-                // add 'markdown' field
-                if ($field['type'] === 'markdown') {
-                    $excerptParts[] = $this->app['markdown']->text($this->values[$key]);
-                }
-            }
-        }
-
-        $excerpter = new Excerpt(implode(' ', $excerptParts), $this->getTitle());
-        $excerpt = $excerpter->getExcerpt($length, $includeTitle, $focus);
-
-        return new Markup($excerpt, 'UTF-8');
-    }
-
-    /**
      * Return a content objects values.
      *
-     * @param boolean $json     Set to TRUE to return JSON encoded values for arrays
-     * @param boolean $stripped Set to true to strip all of the base fields
+     * @param bool $json     Set to TRUE to return JSON encoded values for arrays
+     * @param bool $stripped Set to true to strip all of the base fields
      *
      * @return array
      */
@@ -198,6 +147,7 @@ trait ContentValuesTrait
                         $newvalue[$field] = round($this->values[$field]);
                         break;
 
+                    case 'embed':
                     case 'select':
                         if (is_array($this->values[$field])) {
                             $newvalue[$field] = Json::dump($this->values[$field]);
@@ -363,6 +313,7 @@ trait ContentValuesTrait
         }
 
         $serializedFieldTypes = [
+            'embed',
             'geolocation',
             'imagelist',
             'image',
@@ -622,7 +573,7 @@ trait ContentValuesTrait
         }
 
         // Sets the names of some 'common' names for the 'title' column.
-        $names = ['title', 'name', 'caption', 'subject'];
+        $names = ['title', 'name', 'caption', 'subject', 'heading'];
 
         // Some localised options as well
         $names = array_merge($names, ['titel', 'naam', 'onderwerp']); // NL
@@ -651,7 +602,7 @@ trait ContentValuesTrait
     /**
      * Check if a ContentType field has a template set.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasTemplateFields()
     {

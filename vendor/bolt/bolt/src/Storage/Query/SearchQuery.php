@@ -42,6 +42,8 @@ class SearchQuery extends SelectQuery
      * This method sets the search filter which then triggers the process method.
      *
      * @param string $search full search query
+     *
+     * @throws QueryParseException
      */
     public function setSearch($search)
     {
@@ -92,19 +94,26 @@ class SearchQuery extends SelectQuery
      * This overrides the SelectQuery default to do some extra preparation for a search query.
      * Firstly it builds separate filters for the search query and then it removes the filter
      * from the params and the others will then get processed normally by the parent.
+     *
+     * @throws QueryParseException
      */
     protected function processFilters()
     {
+        $params = $this->params;
+
         if (!$this->contentType) {
             throw new QueryParseException('You have attempted to run a search query without specifying a ContentType', 1);
+        }
+
+        if (isset($params['invisible']) && $params['invisible'] === true) {
+            $this->config->enableSearchInvisible(true);
         }
 
         if (!$config = $this->config->getConfig($this->contentType)) {
             throw new QueryParseException('You have attempted to run a search query on an unknown ContentType or one that is not searchable', 1);
         }
 
-        $params = $this->params;
-        unset($params['filter']);
+        unset($params['filter'], $params['invisible']);
 
         foreach ($config as $field => $options) {
             $params[$field] = $this->getSearchParameter();
@@ -127,12 +136,21 @@ class SearchQuery extends SelectQuery
             return null;
         }
 
-        $expr = $this->qb->expr()->orX();
+        $wrapExpr = $this->qb->expr()->andX();
+        $config = $this->config->getConfig($this->contentType);
+        $searchExpr = $this->qb->expr()->orX();
+        $searchKeys = array_keys($config);
+
         /** @var Filter $filter */
         foreach ($this->filters as $filter) {
-            $expr = $expr->add($filter->getExpression());
+            if (in_array($filter->getKey(), $searchKeys, true)) {
+                $searchExpr->add($filter->getExpression());
+            } else {
+                $wrapExpr->add($filter->getExpression());
+            }
         }
+        $wrapExpr->add($searchExpr);
 
-        return $expr;
+        return $wrapExpr;
     }
 }

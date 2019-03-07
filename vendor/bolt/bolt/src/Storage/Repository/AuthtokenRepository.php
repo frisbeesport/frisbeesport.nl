@@ -46,12 +46,12 @@ class AuthtokenRepository extends Repository
      * Fetches an existing token for the given user / ip.
      *
      * @param string      $token
-     * @param string      $ip
+     * @param string|null $ip
      * @param string|null $userAgent
      *
      * @return \Bolt\Storage\Entity\Authtoken|false
      */
-    public function getToken($token, $ip, $userAgent = null)
+    public function getToken($token, $ip = null, $userAgent = null)
     {
         $query = $this->getTokenQuery($token, $ip, $userAgent);
 
@@ -63,9 +63,12 @@ class AuthtokenRepository extends Repository
         $qb = $this->createQueryBuilder();
         $qb->select('*')
             ->where('token = :token')
-            ->andWhere('ip = :ip')
-            ->setParameter('token', $token)
-            ->setParameter('ip', $ip);
+            ->setParameter('token', $token);
+
+        if ($ip !== null) {
+            $qb->andWhere('ip = :ip')
+                ->setParameter('ip', $ip);
+        }
 
         if ($userAgent !== null) {
             $qb->andWhere('useragent = :useragent')
@@ -80,7 +83,7 @@ class AuthtokenRepository extends Repository
      *
      * @param int $userId
      *
-     * @return integer
+     * @return int
      */
     public function deleteTokens($userId)
     {
@@ -102,7 +105,7 @@ class AuthtokenRepository extends Repository
     /**
      * Deletes all expired tokens.
      *
-     * @return integer
+     * @return int
      */
     public function deleteExpiredTokens()
     {

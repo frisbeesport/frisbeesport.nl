@@ -5,16 +5,18 @@
     "license": "MIT",
     "require": {
         "php": "^5.5.9 || ^7.0",
-        "bolt/bolt": "^3.2",
-        "PasswordLib/PasswordLib": "^1.0@beta"
+        "bolt/bolt": "^3.6",
+        "passwordlib/passwordlib": "^1.0@beta",
+        "bolt/configuration-notices": "^1.0"
     },
     "minimum-stability": "beta",
-    "prefer-stable": true,
+    "prefer-stable": true,    
     "scripts": {
         "post-install-cmd": [
             "Bolt\\Composer\\ScriptHandler::installAssets"
         ],
         "post-update-cmd": [
+            "Bolt\\Composer\\ScriptHandler::updateProject",
             "Bolt\\Composer\\ScriptHandler::installAssets"
         ],
         "post-create-project-cmd": [
@@ -23,9 +25,9 @@
             "nut extensions:setup"
         ]
     },
-    "extra": {
-        "branch-alias": {
-            "dev-release/3.2" : "3.2.x-dev"
+    "autoload": {
+        "psr-4": {
+            "Bundle\\": "src/"
         }
     }
 }

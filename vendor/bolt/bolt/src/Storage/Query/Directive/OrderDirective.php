@@ -21,12 +21,18 @@ class OrderDirective
             return;
         }
 
+        // remove default order
+        $query->getQueryBuilder()->resetQueryPart('orderBy');
+
         $separatedOrders = $this->getOrderBys($order);
         foreach ($separatedOrders as $order) {
             $order = trim($order);
             if (strpos($order, '-') === 0) {
                 $direction = 'DESC';
                 $order = substr($order, 1);
+            } elseif (strpos($order, ' DESC') !== false) {
+                $direction = 'DESC';
+                $order = str_replace(' DESC', '', $order);
             } else {
                 $direction = null;
             }

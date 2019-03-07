@@ -6,3 +6,5 @@ paths:
     themebase: public_html/cms/theme
     files: public_html/cms/files
     view: public_html/cms/bolt-public/view
+
+    

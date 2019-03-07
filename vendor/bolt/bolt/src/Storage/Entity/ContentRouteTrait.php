@@ -29,13 +29,7 @@ trait ContentRouteTrait
      */
     public function editlink()
     {
-        $perm = 'contenttype:' . $this->contenttype['slug'] . ':edit:' . $this->id;
-
-        if ($this->app['users']->isAllowed($perm)) {
-            return $this->app['url_generator']->generate('editcontent', ['contenttypeslug' => $this->contenttype['slug'], 'id' => $this->id]);
-        }
-
-        return false;
+        return $this->app['twig.runtime.bolt_routing']->editlink($this);
     }
 
     /**
@@ -57,7 +51,7 @@ trait ContentRouteTrait
     /**
      * Checks if the current record is set as the homepage.
      *
-     * @return boolean
+     * @return bool
      */
     public function isHome()
     {
@@ -76,10 +70,6 @@ trait ContentRouteTrait
      */
     public function getRouteNameAndParams()
     {
-        if (empty($this->app)) {
-            $this->app = AppSingleton::get();
-        }
-
         if (empty($this->id)) {
             return null;
         }
@@ -195,7 +185,7 @@ trait ContentRouteTrait
      *
      * @param array $route
      *
-     * @return boolean
+     * @return bool
      */
     protected function isApplicableRoute(array $route)
     {

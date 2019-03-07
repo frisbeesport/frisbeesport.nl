@@ -69,7 +69,7 @@ class Edit
     }
 
     /**
-     * @internal DO NOT USE.
+     * @internal DO NOT USE
      *
      * @deprecated Temporary and to be removed circa 3.5.
      *
@@ -85,7 +85,7 @@ class Edit
      *
      * @param Content     $content     A content record
      * @param ContentType $contentType The ContentType data
-     * @param boolean     $duplicate   If TRUE create a duplicate record
+     * @param bool        $duplicate   If TRUE create a duplicate record
      *
      * @return array
      */
@@ -136,6 +136,10 @@ class Edit
                 continue;
             }
             $fromContentType = $relation->getFromContenttype();
+
+            if ($this->query) {
+                $this->em->setQueryService($this->query);
+            }
             $record = $this->em->getContent($fromContentType . '/' . $relation->getFromId());
 
             if ($record) {
@@ -404,11 +408,11 @@ class Edit
                         $fieldtypes[$rfield['type']] = true;
                     }
                 }
-            }
-            if ($field['type'] === 'block') {
-                foreach ($field['fields'] as $block) {
-                    foreach ($block['fields'] as $rfield) {
-                        $fieldtypes[$rfield['type']] = true;
+                if ($field['type'] === 'block') {
+                    foreach ($field['fields'] as $block) {
+                        foreach ($block['fields'] as $rfield) {
+                            $fieldtypes[$rfield['type']] = true;
+                        }
                     }
                 }
             }

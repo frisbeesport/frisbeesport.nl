@@ -101,6 +101,12 @@ class FileManager extends BackendBase
         if ($form->isSubmitted() && $form->isValid() && $form->get('save')->isClicked()) {
             return $this->handleEdit($form, $file);
         }
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->json([
+                'ok'  => false,
+                'msg' => Trans::__('page.file-management.message.save-failed-invalid-form', ['%s' => $file->getPath()]),
+            ]);
+        }
 
         $context = [
             'form'              => $form->createView(),
@@ -159,6 +165,9 @@ class FileManager extends BackendBase
 
                 return $this->redirectToRoute('files', ['path' => $path, 'namespace' => $namespace]);
             }
+            if ($form->isSubmitted() && !$form->isValid()) {
+                $this->flashes()->error(Trans::__('general.phrase.file-upload-failed'));
+            }
         }
 
         // Select the correct template to render this. If we've got 'CKEditor' in the title, it's a dialog
@@ -185,13 +194,6 @@ class FileManager extends BackendBase
      */
     private function handleEdit(FormInterface $form, FileInterface $file)
     {
-        if ($form->isSubmitted() && !$form->isValid()) {
-            return $this->json([
-                'ok'  => false,
-                'msg' => Trans::__('page.file-management.message.save-failed-invalid-form', ['%s' => $file->getPath()]),
-            ]);
-        }
-
         $data = $form->getData();
         $contents = Input::cleanPostedData($data['contents']) . "\n";
         // Remove ^M and \r characters from the file.
@@ -234,12 +236,6 @@ class FileManager extends BackendBase
      */
     private function handleUpload(FormInterface $form, DirectoryInterface $directory)
     {
-        if (!$form->isValid()) {
-            $this->flashes()->error(Trans::__('general.phrase.file-upload-failed'));
-
-            return;
-        }
-
         /** @var UploadedFile[] $files */
         $files = $form->get('select')->getData();
         $permissions = $this->app['filepermissions'];
@@ -251,7 +247,8 @@ class FileManager extends BackendBase
             ];
 
             $originalFilename = $fileToProcess['name'];
-            $filename = preg_replace('/[^a-zA-Z0-9_\\.]/', '_', basename($originalFilename));
+            $filename = basename($originalFilename);
+            $filename = $this->app['upload.sanitizer']->slugify($filename, $this->app['config']->get('general/upload/replacement', '-'));
 
             try {
                 $isAllowed = $permissions->allowedUpload($filename);

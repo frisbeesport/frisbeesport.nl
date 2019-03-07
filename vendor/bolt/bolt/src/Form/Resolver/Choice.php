@@ -4,7 +4,6 @@ namespace Bolt\Form\Resolver;
 
 use ArrayObject;
 use Bolt\Collection\Bag;
-use Bolt\Storage\Entity\Content;
 use Bolt\Storage\Mapping\ContentType;
 use Bolt\Storage\Query\Query;
 use Bolt\Storage\Query\QueryResultset;
@@ -18,6 +17,8 @@ use Bolt\Storage\Query\QueryResultset;
  */
 final class Choice
 {
+    const DEFAULT_LIMIT = 500;
+    
     /** @var Query */
     private $query;
 
@@ -42,7 +43,7 @@ final class Choice
         $select = new ArrayObject();
 
         $this->build($select, $contentType->getFields());
-        $this->build($select, $templateFields, true);
+        $this->build($select, $templateFields, 'templatefields');
 
         return iterator_to_array($select) ?: null;
     }
@@ -54,24 +55,37 @@ final class Choice
      * @param array       $fields
      * @param bool        $isTemplateFields
      */
-    private function build(ArrayObject $select, array $fields, $isTemplateFields = false)
+    private function build(ArrayObject $select, array $fields, $prefix = null)
     {
         foreach ($fields as $name => $field) {
             if ($field['type'] === 'repeater') {
-                $this->build($select, $field['fields']);
+                $subField = new ArrayObject();
+                $this->build($subField, $field['fields']);
+                if ($prefix) {
+                    $select[$prefix][$name] = iterator_to_array($subField);
+                } else {
+                    $select[$name] = iterator_to_array($subField);
+                }
+
             }
             if ($field['type'] === 'block') {
                 foreach ($field['fields'] as $blockName => $block) {
-                    $this->build($select, $block['fields']);
+                    $subField = new ArrayObject();
+                    $this->build($subField, $block['fields']);
+                    if ($prefix) {
+                        $select[$prefix][$name][$blockName] = iterator_to_array($subField);
+                    } else {
+                        $select[$name][$blockName] = iterator_to_array($subField);
+                    }
                 }
             }
             $values = $this->getValues($field);
             if ($values !== null) {
-                if ($isTemplateFields) {
-                    $select['templatefields'][$name] = $values;
-                    continue;
+                if ($prefix) {
+                    $select[$prefix][$name] = $values;
+                } else {
+                    $select[$name] = $values;
                 }
-                $select[$name] = $values;
             }
         }
     }
@@ -101,7 +115,7 @@ final class Choice
      */
     private function getYamlValues(Bag $field)
     {
-        $values = array_slice($field->get('values', []), 0, $field->get('limit'));
+        $values = array_slice($field->get('values', []), 0, $field->get('limit', self::DEFAULT_LIMIT), true);
         if ($field->get('sortable')) {
             asort($values, SORT_REGULAR);
         }
@@ -134,6 +148,7 @@ final class Choice
 
         $filter = $field->get('filter');
         $filter['order'] = $field->get('sort');
+        $filter['limit'] = $field->get('limit', self::DEFAULT_LIMIT);
         /** @var QueryResultset $entities */
         $entities = $this->query->getContent($contentType, $filter);
         if (!$entities) {
@@ -141,10 +156,14 @@ final class Choice
         }
 
         $values = [];
+        $ctCount = count($entities->getOriginalQueries());
         foreach ($entities as $entity) {
-            /** @var Content $entity */
             $id = $entity->get($field->get('keys', 'id'));
-            $values[$id] = $entity->get($queryFields[0]);
+            if ($ctCount > 1) {
+                $values[(string)$entity->getContenttype() . '/' . $id] = $entity->get($queryFields[0]);
+            } else {
+                $values[$id] = $entity->get($queryFields[0]);
+            }
             if (isset($queryFields[1])) {
                 $values[$id] .= ' / ' . $entity->get($queryFields[1]);
             }

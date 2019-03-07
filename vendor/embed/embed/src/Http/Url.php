@@ -540,10 +540,6 @@ class Url
         foreach ((array) $query as $key => $value) {
             $this->info['query'][hex2bin($key)] = $value;
         }
-
-        array_walk_recursive($this->info['query'], function (&$value) {
-            $value = urldecode($value);
-        });
     }
 
     /**
@@ -559,7 +555,7 @@ class Url
             return '';
         }
 
-        if (strpos($url, 'data:') === 0) {
+        if (preg_match('|^\w+:[^/]|', $url)) {
             return $url;
         }
 
@@ -624,9 +620,9 @@ class Url
     private static function getSuffixes()
     {
         if (self::$public_suffix_list === null) {
-            self::$public_suffix_list = include __DIR__.'/../resources/public_suffix_list.php';
+            self::$public_suffix_list = (@include __DIR__.'/../resources/public_suffix_list.php') ?: [];
         }
-
+      
         return self::$public_suffix_list;
     }
 
@@ -654,7 +650,7 @@ class Url
             throw new \InvalidArgumentException('Malformed URL: ' . $url);
         }
 
-        if (!empty($parts['scheme']) && !in_array($parts['scheme'], ['http', 'https'])) {
+        if (!empty($parts['scheme']) && !in_array($parts['scheme'], ['http', 'https', 'data'])) {
             throw new \InvalidArgumentException(sprintf('Invalid URL scheme: "%s"', $parts['scheme']));
         }
 

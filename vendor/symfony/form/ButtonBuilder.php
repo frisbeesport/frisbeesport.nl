@@ -12,8 +12,8 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * A builder for {@link Button} instances.
@@ -588,7 +588,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getVirtual()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\FormConfigBuilder::getInheritData method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\FormConfigBuilder::getInheritData method instead.', E_USER_DEPRECATED);
 
         return false;
     }

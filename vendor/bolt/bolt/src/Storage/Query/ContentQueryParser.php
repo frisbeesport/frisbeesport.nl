@@ -2,6 +2,8 @@
 
 namespace Bolt\Storage\Query;
 
+use Bolt\Events\QueryEvent;
+use Bolt\Events\QueryEvents;
 use Bolt\Storage\Entity\Content;
 use Bolt\Storage\EntityManager;
 use Bolt\Storage\Query\Directive\GetQueryDirective;
@@ -135,7 +137,7 @@ class ContentQueryParser
     }
 
     /**
-     * Parses the content area of the querystring.
+     * Parses the content area of the query string.
      */
     protected function parseContent()
     {
@@ -174,9 +176,11 @@ class ContentQueryParser
             return;
         }
 
-        if (in_array($queryParts[0], $this->operations)) {
+        if (in_array($queryParts[0], $this->operations, true)) {
             $operation = array_shift($queryParts);
-            $this->params['limit'] = array_shift($queryParts);
+            if (count($queryParts) && is_numeric($queryParts[0])) {
+                $this->params['limit'] = array_shift($queryParts);
+            }
             $this->identifier = implode(',', $queryParts);
         } else {
             $this->identifier = implode(',', $queryParts);
@@ -198,6 +202,8 @@ class ContentQueryParser
      */
     protected function parseDirectives()
     {
+        $this->directives = [];
+
         if (!$this->params) {
             return;
         }
@@ -219,7 +225,7 @@ class ContentQueryParser
     public function runDirectives(QueryInterface $query, array $skipDirective = [])
     {
         foreach ($this->directives as $key => $value) {
-            if (in_array($key, $skipDirective)) {
+            if (in_array($key, $skipDirective, true)) {
                 continue;
             }
             if (!$this->hasDirectiveHandler($key)) {
@@ -236,7 +242,7 @@ class ContentQueryParser
         $this->scope = $scope;
     }
 
-    public function runScopes(QueryInterface $query)
+    public function runScopes(ContentQueryInterface $query)
     {
         if ($this->scope !== null) {
             $this->scope->onQueryExecute($query);
@@ -302,8 +308,8 @@ class ContentQueryParser
     /**
      * Sets a directive for the named key.
      *
-     * @param string         $key
-     * @param string|boolean $value
+     * @param string      $key
+     * @param string|bool $value
      */
     public function setDirective($key, $value)
     {
@@ -436,8 +442,14 @@ class ContentQueryParser
     public function fetch()
     {
         $this->parse();
+        $parseEvent = new QueryEvent($this);
+        $this->getEntityManager()->getEventManager()->dispatch(QueryEvents::PARSE, $parseEvent);
 
-        return call_user_func($this->handlers[$this->getOperation()], $this);
+        $result = call_user_func($this->handlers[$this->getOperation()], $this);
+        $executeEvent = new QueryEvent($this, $result);
+        $this->getEntityManager()->getEventManager()->dispatch(QueryEvents::EXECUTE, $executeEvent);
+
+        return $result;
     }
 
     /**
@@ -457,7 +469,7 @@ class ContentQueryParser
      */
     public function addOperation($operation)
     {
-        if (!in_array($operation, $this->operations)) {
+        if (!in_array($operation, $this->operations, true)) {
             $this->operations[] = $operation;
         }
     }
@@ -469,8 +481,8 @@ class ContentQueryParser
      */
     public function removeOperation($operation)
     {
-        if (in_array($operation, $this->operations)) {
-            $key = array_search($operation, $this->operations);
+        if (in_array($operation, $this->operations, true)) {
+            $key = array_search($operation, $this->operations, true);
             unset($this->operations[$key]);
         }
     }

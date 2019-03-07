@@ -8,6 +8,8 @@ use Doctrine\DBAL\Schema\TableDiff;
 /**
  * Comparison handling for Sqlite platforms.
  *
+ * @internal
+ *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  */
 class Sqlite extends BaseComparator
@@ -20,11 +22,17 @@ class Sqlite extends BaseComparator
      */
     protected function setIgnoredChanges()
     {
-        if (DBAL\Version::compare('2.6.0') >= 0) {
+        if (DBAL\Version::compare('2.7.0') > 0) {
             /** @deprecated Drop when minimum PHP version is 7.1 or greater. */
             $this->ignoredChanges[] = new IgnoredChange('changedColumns', 'type', 'text', 'json');
             $this->ignoredChanges[] = new IgnoredChange('changedColumns', 'type', 'text', 'json_array');
             $this->ignoredChanges[] = new IgnoredChange('changedColumns', 'type', 'string', 'guid');
+            $this->ignoredChanges[] = new IgnoredChange('changedColumns', 'type', 'json', 'string');
+        }
+        // A proper fix for this won't land until DBAL 3.0
+        // https://github.com/doctrine/dbal/pull/3221
+        if (DBAL\Version::compare('3.0.0') > 0) {
+            $this->ignoredChanges[] = new IgnoredChange('changedColumns', 'default', 'json', 'json');
         }
     }
 

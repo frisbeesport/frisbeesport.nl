@@ -131,7 +131,7 @@ class ConfigurationNoticesListener implements EventSubscriberInterface
             return;
         }
 
-        $domainPartials = (array) $this->app['config']->get('general/configuration_notices/local_domains', []);
+        $domainPartials = (array) $this->app['config']->get('general/debug_local_domains', []);
 
         $domainPartials = array_unique(array_merge(
             (array) $domainPartials,
@@ -297,7 +297,7 @@ class ConfigurationNoticesListener implements EventSubscriberInterface
     protected function canonicalCheck(Request $request)
     {
         $hostname = strtok($request->getUri(), '?');
-        $canonical = $this->app['canonical']->getUrl();
+        $canonical = strtok($this->app['canonical']->getUrl());
 
         if (!empty($canonical) && ($hostname != $canonical)) {
             $notice = json_encode([

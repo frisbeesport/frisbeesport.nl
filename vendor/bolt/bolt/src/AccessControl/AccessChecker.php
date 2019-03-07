@@ -45,7 +45,7 @@ class AccessChecker
     protected $dispatcher;
     /** @var array */
     protected $cookieOptions;
-    /** @var boolean */
+    /** @var bool */
     protected $validSession;
 
     /**
@@ -109,7 +109,7 @@ class AccessChecker
      *
      * @throws AccessControlException
      *
-     * @return boolean
+     * @return bool
      */
     public function isValidSession($authCookie)
     {
@@ -146,7 +146,7 @@ class AccessChecker
     /**
      * Log out the currently logged in user.
      *
-     * @return boolean
+     * @return bool
      */
     public function revokeSession()
     {
@@ -174,7 +174,7 @@ class AccessChecker
         }
 
         $this->session->remove('authentication');
-        $this->session->migrate(true);
+        $this->session->migrate(true, 0);
 
         return false;
     }
@@ -186,7 +186,7 @@ class AccessChecker
      *
      * @param Token\Token $sessionAuth
      *
-     * @return boolean
+     * @return bool
      */
     protected function checkSessionStored(Token\Token $sessionAuth)
     {
@@ -203,14 +203,15 @@ class AccessChecker
      *
      * @param string $authCookie
      *
-     * @return boolean
+     * @return bool
      */
     protected function checkSessionDatabase($authCookie)
     {
+        $userIp = $this->cookieOptions['remoteaddr'] ? $this->getClientIp() : null;
         $userAgent = $this->cookieOptions['browseragent'] ? $this->getClientUserAgent() : null;
 
         try {
-            if (!$authTokenEntity = $this->getRepositoryAuthtoken()->getToken($authCookie, $this->getClientIp(), $userAgent)) {
+            if (!$authTokenEntity = $this->getRepositoryAuthtoken()->getToken($authCookie, $userIp, $userAgent)) {
                 return false;
             }
 
@@ -242,7 +243,7 @@ class AccessChecker
      *
      * @param Token\Token $sessionAuth
      *
-     * @return boolean
+     * @return bool
      */
     protected function checkSessionKeys(Token\Token $sessionAuth)
     {
@@ -295,7 +296,7 @@ class AccessChecker
      * @param string $userId
      * @param string $salt
      *
-     * @return string|boolean
+     * @return string|bool
      */
     protected function getAuthToken($userId, $salt)
     {

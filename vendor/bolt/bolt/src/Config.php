@@ -54,7 +54,7 @@ class Config
         'username',
     ];
 
-    /** @var integer */
+    /** @var int */
     protected $cachetimestamp;
 
     /**
@@ -65,7 +65,7 @@ class Config
      */
     public $fields;
 
-    /** @var boolean @deprecated Deprecated since 3.2, to be removed in 4.0 */
+    /** @var bool @deprecated Deprecated since 3.2, to be removed in 4.0 */
     public $notify_update;
 
     /** @var array */
@@ -177,7 +177,7 @@ class Config
      * @param string $path
      * @param mixed  $value
      *
-     * @return boolean
+     * @return bool
      */
     public function set($path, $value)
     {
@@ -192,8 +192,8 @@ class Config
      * For example:
      * $var = $config->get('general/wysiwyg/ck/contentsCss');
      *
-     * @param string               $path
-     * @param string|array|boolean $default
+     * @param string            $path
+     * @param string|array|bool $default
      *
      * @return mixed
      */
@@ -275,13 +275,13 @@ class Config
     {
         $config = [];
 
-        $config['general']      = $this->parseGeneral();
-        $config['taxonomy']     = $this->parseTaxonomy();
+        $config['general'] = $this->parseGeneral();
+        $config['taxonomy'] = $this->parseTaxonomy();
         $config['contenttypes'] = $this->parseContentTypes($config['general']);
-        $config['menu']         = $this->parseConfigYaml('menu.yml');
-        $config['routing']      = $this->parseConfigYaml('routing.yml');
-        $config['permissions']  = $this->parseConfigYaml('permissions.yml');
-        $config['extensions']   = $this->parseConfigYaml('extensions.yml');
+        $config['menu'] = $this->parseConfigYaml('menu.yml');
+        $config['routing'] = $this->parseConfigYaml('routing.yml');
+        $config['permissions'] = $this->parseConfigYaml('permissions.yml');
+        $config['extensions'] = $this->parseConfigYaml('extensions.yml');
 
         return $config;
     }
@@ -299,14 +299,28 @@ class Config
         $tempconfiglocal = $this->parseConfigYaml('config_local.yml');
         $general = Arr::replaceRecursive($tempconfig, $tempconfiglocal);
 
-        // Make sure old settings for 'accept_file_types' are not still picked up. Before 1.5.4 we used to store them
-        // as a regex-like string, and we switched to an array. If we find the old style, fall back to the defaults.
-        if (isset($general['accept_file_types']) && !is_array($general['accept_file_types'])) {
-            unset($general['accept_file_types']);
-        }
-
         // Merge the array with the defaults. Setting the required values that aren't already set.
         $general = Arr::replaceRecursive($this->defaultConfig, $general);
+
+        if (isset($general['accept_file_types']) === true) {
+            if (is_array($general['accept_file_types']) === false) {
+                // Make sure old settings for 'accept_file_types' are not still picked up. Before 1.5.4 we used to store them
+                // as a regex-like string, and we switched to an array. If we find the old style, fall back to the defaults.
+                unset($general['accept_file_types']);
+            }
+            // accept uppercase and lowercase file extensions
+            $general['accept_file_types'] = array_unique(
+                array_merge(
+                    $general['accept_file_types'],
+                    array_map(function ($extension) {
+                        return strtolower($extension);
+                    }, $general['accept_file_types']),
+                    array_map(function ($extension) {
+                        return strtoupper($extension);
+                    }, $general['accept_file_types'])
+                )
+            );
+        }
 
         // Make sure Bolt's mount point is OK:
         $general['branding']['path'] = '/' . Str::makeSafe($general['branding']['path']);
@@ -945,10 +959,31 @@ class Config
                     }
                 }
 
-                // Make sure that there are no hyphens in the field names, advise to change to underscores
+                // Check if all the used fields are existing field types.
+                // Note: Check is disabled for now, because of the load order. At this point
+                // in the execution, field types added by extensions are not yet initialised,
+                // giving "false positives". See https://github.com/bolt/bolt/pull/7260
+                /*
                 if (!isset($field['type']) || !$this->fields->has($field['type'])) {
                     $error = Trans::__(
                         'contenttypes.generic.no-proper-type',
+                        [
+                            '%contenttype%' => $key,
+                            '%field%'       => $fieldname,
+                            '%type%'        => $field['type'],
+                        ]
+                    );
+                    $this->app['logger.flash']->warning($error);
+
+                    unset($ct['fields'][$fieldname]);
+                    $this->passed = false;
+                }
+                */
+
+                // Make sure that there are no consecutive underscores in field names
+                if (strpos($fieldname, '__') !== false) {
+                    $error = Trans::__(
+                        'contenttypes.generic.consecutive-underscores',
                         [
                             '%contenttype%' => $key,
                             '%field%'       => $fieldname,

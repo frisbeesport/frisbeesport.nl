@@ -12,7 +12,7 @@ return array(
     'SecurityLib' => array($vendorDir . '/ircmaxell/security-lib/lib'),
     'RandomLib' => array($vendorDir . '/ircmaxell/random-lib/lib'),
     'Pimple' => array($vendorDir . '/pimple/pimple/lib'),
-    'PasswordLib' => array($vendorDir . '/passwordlib/passwordlib/lib'),
+    'PasswordLib' => array($vendorDir . '/bolt/passwordlib/lib'),
     'ParsedownExtra' => array($vendorDir . '/erusev/parsedown-extra'),
     'Parsedown' => array($vendorDir . '/erusev/parsedown'),
     'PHPExif' => array($vendorDir . '/miljar/php-exif/lib'),

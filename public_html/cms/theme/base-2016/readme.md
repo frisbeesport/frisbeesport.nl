@@ -126,7 +126,7 @@ For example, take a look at one of the simpler templates, `record.twig`:
 
         <h1>{{ record.title }}</h1>
 
-        {{ fields(template = 'partials/_sub_fields.twig') }}
+        {{ block('sub_fields', 'partials/_sub_fields.twig') }}
 
         {{ include('partials/_recordfooter.twig', { 'record': record }) }}
 
@@ -136,14 +136,47 @@ For example, take a look at one of the simpler templates, `record.twig`:
 You'll notice the first line that states that the template 'extends' the
 `_master.twig` partial. The rest of the template is the `{% block %}`, which
 overrides the 'main' block in the master template. Inside the block is just an
-`<h1>`-tag with the record's title, a `{{ fields() }}` tag that will output the
-fields that are defined for this contenttype, and it closes with an include of
-`_recordfooter.twig` to display some meta data, like the author, date and
-permalink.
+`<h1>` element with the record title, a `sub_fields` block (defined in
+`partials/_sub_fields.twig`) that will output the fields that are defined for
+this ContentType, and it closes with an include of `_recordfooter.twig` to
+display some meta data, like the author, date and permalink.
 
 As you can see, we can still use 'include' for small blocks of HTML, even though
 we're using template inheritance. This way we can keep our themes very
 structured and organized.
+
+### Showing all fields without defining them
+
+Because this is a general purpose theme, we try to make it work without problems
+for any defined ContentType. This means we'll need to render all available
+fields in the template without knowledge of which fields are defined exactly.
+To do this, we're using the `_sub_fields.twig` partial. Simply said, this
+partial goes over all fields in the ContentType, and outputs them in a generic
+way. It's used like this:
+
+```twig
+    {% with { 'record': record, 'common': true, 'extended': true, 'repeaters': true } %}
+        {{ block('sub_fields', 'partials/_sub_fields.twig') }}
+    {% endwith %}
+```
+
+The `with` tag is used to scope variables: This way they will be available
+within the block, but not outside. The partial has a few "options" you can set
+this way:
+
+| Option           | Description |
+|------------------|-------------|
+| `record`         | The Record to use in the display. Defaults to `record` |
+| `common`         | Whether or not to include common fields like 'text', 'html', 'textarea', 'image' and 'video' in the output. Defaults to `true` |
+| `extended`       | Whether or not to include all other regular fields (like 'date', 'select' and others) in the output. Defaults to `false` |
+| `repeaters`      | Whether or not to include repeater fields in the output. Defaults to `false` |
+| `exclude`        | field names to exclude, even though they might otherwise be included |
+| `skip_uses`      | By default the field that's used as the slug is skipped, under the assumption that it corresponds to the title of the page. To disable this, set `'skipuses': false` |
+
+Note: `templatefields` are included in `common` and `extended`, where applicable.
+
+Theme structure
+---------------
 
 In the diagram below, you'll see the wat most pages are structured. In this case,
 `index.twig`. In the HTML, you will see it extends `_master.twig`, which can be found in
@@ -258,32 +291,6 @@ edges of the browser on large screens:
 └───────┴─────────────────────────────────┴─┴────────────────────┴───────┘
 ```
 
-`boxed`: Adds a background and a border around the centered content.
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│ o o o      browser window                                              │
-├────────────────────────────────────────────────────────────────────────┤
-│░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│
-│░░░░░┌────────────────────────────────────────────┬───────────────┐░░░░░│
-│░░░░░│  Home link1 link2 link3                    │______ [Search]│░░░░░│
-│░░░░░├────────────────────────────────────────────┴───────────────┤░░░░░│
-│░░░░░│••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••│░░░░░│
-│░░░░░│•••••••••••••••••••••••(header image)•••••••••••••••••••••••│░░░░░│
-│░░░░░│•••••••••••••••••••••••(name of site)•••••••••••••••••••••••│░░░░░│
-│░░░░░│••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••│░░░░░│
-│░░░░░│ ┌──────────────────(main content)─┐ ┌────────────(aside)─┐ │░░░░░│
-│░░░░░│ │Lorem ipsum dolor sit amet       │ │Lorem ipsum dolor   │ │░░░░░│
-│░░░░░│ │                                 │ │sit amet. Consec-   │ │░░░░░│
-│░░░░░│ │Consectetur adipiscing elit. Nunc│ │tetur adipiscing.   │ │░░░░░│
-│░░░░░│ │omni virtuti vitium contrario    │ │                    │ │░░░░░│
-│░░░░░│ │nominehgpponitur. Non enim, si   │ │Latest X            │ │░░░░░│
-│░░░░░│ │malum est dolor, carere eo malo  │ │ - intellegetur     │ │░░░░░│
-│░░░░░│ └─────────────────────────────────┘ │ - Expectoque       │ │░░░░░│
-│░░░░░│ ┌─────────────────────────────────┐ │ - videantur        │ │░░░░░│
-│░░░░░│ │Lorem ipsum dolor sit amet       │ │                    │ │░░░░░│
-└─────┴─┴─────────────────────────────────┴─┴────────────────────┴─┴─────┘
-```
 
 The `theme.yml` file also defines the default images, that are used in the
 header of the website. Feel free to change these for other images. A lot of
@@ -311,19 +318,19 @@ Working with the `.twig` files
 
 You are free to do what you want, when it comes to the .twig files. Out-of-the-
 box, this theme comes with a handful of templates, that correspond to
-the default contenttypes when you have a fresh install of Bolt.
+the default ContentTypes when you have a fresh install of Bolt.
 
 Most of the templates will be pretty straightforward, especially if you're
 familiar with the concept of Template Inheritance. The main templates are:
 
  - `index.twig`: Used as the frontpage or homepage of the site.
  - `listing.twig`: This template is used for listing overviews of all kind, like
-   `/pages` for all records in the 'pages contenttype' or `category/movies` for
+   `/pages` for all records in the 'pages ContentType' or `category/movies` for
    all records that have the 'movies' category assigned to them. Note that
    'search' uses its own template, though.
  - `notfound.twig`: This template is used as the template that's shown when the
    visitor hits a non-existing page on the website.
- - `page.twig`: The detail page for a single record of the 'pages' contenttype.
+ - `page.twig`: The detail page for a single record of the 'pages' ContentType.
    Automatically picked up by Bolt, if the name matches.
  - `record.twig`: The "generic" detail page for a single record page. This is
    used as the fallback, if there's no specific template set for a single record
@@ -344,30 +351,24 @@ files. If you don't have Node and NPM yet, install them from [Nodejs.org](https:
 To install the themes dependencies, run the following in the source directory:
 
 ```
-npm install
+yarn install
 ```
 
-Now you can simply run `npm start` to compile the javascript and sass files.
-This will build the files, and it will continue to monitor changes to the
-`.scss` files. If you make a change, the compiled files will be updated
+Now you can simply run `yarn run start` to compile the javascript and sass
+files. This will build the files, and it will continue to monitor changes to
+the `.scss` files. If you make a change, the compiled files will be updated
 immediately. When you're ready to deploy, and put the site in production, be
 sure to build the files and minify them:
 
 ```
-npm run-script build
+yarn run build
 ```
 
 This will build the files that you can deploy, or put into your versioning
 system.
 
-The build process has been tested on NPM 3.10 and Node v7.2. If you do not
-have the correct versions you can use [n](https://www.npmjs.com/package/n) to
-manage your Node and NPM versions:
-
-```
-sudo npm install -g n;
-sudo n stable
-```
+The build process has been tested on Yarn 1.5.1. If you do not have Yarn
+installed, or need to update it, see: https://yarnpkg.com/lang/en/docs/install/
 
 And then go through the above steps again.
 

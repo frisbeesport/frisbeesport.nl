@@ -57,7 +57,7 @@ class Git
             // capture username/password from URL if there is one
             $this->process->execute('git remote -v', $output, $cwd);
             if (preg_match('{^(?:composer|origin)\s+https?://(.+):(.+)@([^/]+)}im', $output, $match)) {
-                $this->io->setAuthentication($match[3], urldecode($match[1]), urldecode($match[2]));
+                $this->io->setAuthentication($match[3], rawurldecode($match[1]), rawurldecode($match[2]));
             }
         }
 
@@ -153,6 +153,28 @@ class Git
                         return;
                     }
                 }
+            } elseif (preg_match('{^(https?)://' . self::getGitLabDomainsRegex($this->config) . '/(.*)}', $url, $match)) {
+                if (!$this->io->hasAuthentication($match[2])) {
+                    $gitLabUtil = new GitLab($this->io, $this->config, $this->process);
+                    $message = 'Cloning failed, enter your GitLab credentials to access private repos';
+
+                    if (!$gitLabUtil->authorizeOAuth($match[2]) && $this->io->isInteractive()) {
+                        $gitLabUtil->authorizeOAuthInteractively($match[1], $match[2], $message);
+                    }
+                }
+
+                if ($this->io->hasAuthentication($match[2])) {
+                    $auth = $this->io->getAuthentication($match[2]);
+                    if($auth['password'] === 'private-token' || $auth['password'] === 'oauth2') {
+                        $authUrl = $match[1] . '://' . rawurlencode($auth['password']) . ':' . rawurlencode($auth['username']) . '@' . $match[2] . '/' . $match[3]; // swap username and password
+                    } else {
+                        $authUrl = $match[1] . '://' . rawurlencode($auth['username']) . ':' . rawurlencode($auth['password']) . '@' . $match[2] . '/' . $match[3];
+                    }
+                    $command = call_user_func($commandCallable, $authUrl);
+                    if (0 === $this->process->execute($command, $ignoredOutput, $cwd)) {
+                        return;
+                    }
+                }
             } elseif ($this->isAuthenticationFailure($url, $match)) { // private non-github repo that failed to authenticate
                 if (strpos($match[2], '@')) {
                     list($authParts, $match[2]) = explode('@', $match[2], 2);
@@ -228,9 +250,24 @@ class Git
         return true;
     }
 
+    public function fetchRefOrSyncMirror($url, $dir, $ref)
+    {
+        if (is_dir($dir) && 0 === $this->process->execute('git rev-parse --git-dir', $output, $dir) && trim($output) === '.') {
+            $escapedRef = ProcessExecutor::escape($ref.'^{commit}');
+            $exitCode = $this->process->execute(sprintf('git rev-parse --quiet --verify %s', $escapedRef), $output, $dir);
+            if ($exitCode === 0) {
+                return true;
+            }
+        }
+
+        $this->syncMirror($url, $dir);
+
+        return false;
+    }
+
     private function isAuthenticationFailure($url, &$match)
     {
-        if (!preg_match('{(https?://)([^/]+)(.*)$}i', $url, $match)) {
+        if (!preg_match('{^(https?://)([^/]+)(.*)$}i', $url, $match)) {
             return false;
         }
 
@@ -239,10 +276,12 @@ class Git
             'remote error: Invalid username or password.',
             'error: 401 Unauthorized',
             'fatal: unable to access',
+            'fatal: could not read Username',
         );
 
+        $errorOutput = $this->process->getErrorOutput();
         foreach ($authFailures as $authFailure) {
-            if (strpos($this->process->getErrorOutput(), $authFailure) !== false) {
+            if (strpos($errorOutput, $authFailure) !== false) {
                 return true;
             }
         }
@@ -285,6 +324,11 @@ class Git
     public static function getGitHubDomainsRegex(Config $config)
     {
         return '(' . implode('|', array_map('preg_quote', $config->get('github-domains'))) . ')';
+    }
+
+    public static function getGitLabDomainsRegex(Config $config)
+    {
+        return '(' . implode('|', array_map('preg_quote', $config->get('gitlab-domains'))) . ')';
     }
 
     public static function sanitizeUrl($message)

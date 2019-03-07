@@ -8,11 +8,19 @@ use Bolt\Asset\Snippet\Snippet;
 use Bolt\Asset\Target;
 use Bolt\Helpers\Input;
 use Bolt\Response\TemplateResponse;
+use Bolt\Storage\Entity\Content;
+use Bolt\Storage\Entity\Relations;
+use Bolt\Storage\Entity\Taxonomy;
+use Bolt\Storage\EntityManager;
+use Bolt\Storage\Mapping\ContentType;
+use Bolt\Storage\Query\QueryResultset;
+use Bolt\Storage\Repository\TaxonomyRepository;
 use Bolt\Translation\Translator as Trans;
 use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Standard Frontend actions.
@@ -101,7 +109,7 @@ class Frontend extends ConfigurableBase
     public function homepage(Request $request)
     {
         $homepage = $this->getOption('theme/homepage') ?: $this->getOption('general/homepage');
-        $listingParameters = $this->getListingParameters($homepage);
+        $listingParameters = $this->getListingParameters($homepage, true);
         $content = $this->getContent($homepage, $listingParameters);
 
         $template = $this->templateChooser()->homepage($content);
@@ -150,7 +158,7 @@ class Frontend extends ConfigurableBase
         // First, try to get it by slug.
         $content = $this->getContent($contenttype['slug'], ['slug' => $slug, 'returnsingle' => true, 'log_not_found' => !is_numeric($slug)]);
 
-        if (is_numeric($slug) && (!$content || count($content) === 0)) {
+        if (is_numeric($slug) && !$content) {
             // And otherwise try getting it by ID
             $content = $this->getContent($contenttype['slug'], ['id' => $slug, 'returnsingle' => true]);
         }
@@ -185,20 +193,42 @@ class Frontend extends ConfigurableBase
      * @param Request $request         The Symfony Request
      * @param string  $contenttypeslug The content type slug
      *
+     * @throws \Exception
+     *
      * @return TemplateResponse
      */
     public function preview(Request $request, $contenttypeslug)
     {
-        $contenttype = $this->getContentType($contenttypeslug);
-
-        $id = $request->request->get('id');
-        if ($id) {
-            $content = $this->storage()->getContent($contenttype['slug'], ['id' => $id, 'returnsingle' => true, 'status' => '!undefined']);
-        } else {
-            $content = $this->storage()->getContentObject($contenttypeslug);
+        if (!$request->isMethod('POST')) {
+            throw new MethodNotAllowedHttpException(['POST'], 'This route only accepts POST requests.');
         }
 
-        $content->setFromPost($request->request->all(), $contenttype);
+        $contenttype = $this->getContentType($contenttypeslug);
+        $formValues = $request->request->all();
+
+        $storage = $this->storage();
+        if ($storage instanceof EntityManager) {
+            /** @var EntityManager $storage */
+            /** @var Content $content */
+            $content = $storage->create($contenttypeslug, $formValues);
+
+            /** @var Collection\Relations $related */
+            $related = $storage->createCollection(Relations::class);
+            $related->setFromPost($formValues, $content);
+            $content->setRelation($related);
+
+            /** @var Collection\Taxonomy $taxonomies */
+            $taxonomies = $storage->createCollection(Taxonomy::class);
+            $taxonomies->setFromPost($formValues, $content);
+            $content->setTaxonomy($taxonomies);
+
+        } else {
+            $content = $storage->getContentObject($contenttypeslug, [], false);
+            $content->setFromPost($formValues, $contenttype);
+        }
+
+        $this->fixBlockFieldsForPreview($content);
+        $this->fixHTMLFieldsForPreview($content);
 
         $liveEditor = $request->get('_live-editor-preview');
         if (!empty($liveEditor)) {
@@ -231,6 +261,95 @@ class Frontend extends ConfigurableBase
     }
 
     /**
+     * Helper function to prefill `block` fields with an additional `block` field per item.
+     *
+     * This is needed to make previewing content with block fields fully working.
+     */
+    private function fixBlockFieldsForPreview($record)
+    {
+        foreach ($record->contenttype['fields'] as $fieldSlug => $fieldSettings) {
+            if ($fieldSettings['type'] === 'block') {
+                $fieldValue = $this->getBlockFieldValue($record, $fieldSlug);
+                if ($fieldValue) {
+                    $newArray = [];
+                    foreach ($fieldValue as $item) {
+                        if (!empty($item)) {
+                            foreach ($item as $k => &$v) {
+                                $v['block'] = $k;
+                            }
+                            $newArray[] = $v;
+                        }
+                    }
+                    $this->setFieldValue($record, $fieldSlug, $newArray);
+                }
+            }
+        }
+
+        return $record;
+    }
+
+    /**
+     * Helper function to make sure HTML-like fields are Twig_Markup, and image fields are
+     * an image. Like they are in a "real" page.
+     *
+     * This is needed to make previewing content with block fields fully working.
+     * See: https://github.com/bolt/bolt/issues/7753
+     */
+    private function fixHTMLFieldsForPreview($record)
+    {
+        foreach ($record->contenttype['fields'] as $fieldSlug => $fieldSettings) {
+            if (in_array($fieldSettings['type'], ['html', 'text', 'textarea', 'markdown'])) {
+                $fieldValue = new \Twig_Markup($this->getFieldValue($record, $fieldSlug), "UTF-8");
+
+                $this->setFieldValue($record, $fieldSlug, $fieldValue);
+            }
+            if ($fieldSettings['type'] === 'image') {
+                $fieldValue = $this->getFieldValue($record, $fieldSlug);
+
+                if (is_array($fieldValue) && isset($fieldValue['file'])) {
+                    $this->setFieldValue($record, $fieldSlug, $fieldValue['file']);
+                }
+            }
+        }
+
+        return $record;
+    }
+
+    private function getBlockFieldValue($record, $field)
+    {
+        if ($record instanceof Content) {
+            $value = $record->get($field);
+            if (is_array($value)) {
+                return $value;
+            }
+        } elseif (isset($record->values[$field]) && is_array($record->values[$field])) {
+            return $record->values[$field];
+        }
+
+        return null;
+    }
+
+    private function getFieldValue($record, $field)
+    {
+        if ($record instanceof Content) {
+            return $record->get($field);
+        } elseif (isset($record->values[$field]) && is_array($record->values[$field])) {
+            return $record->values[$field];
+        }
+
+        return null;
+    }
+
+    private function setFieldValue($record, $field, $value)
+    {
+        if ($record instanceof Content) {
+            $record->set($field, $value);
+        } else {
+            $record->values[$field] = $value;
+        }
+    }
+
+    /**
      * The listing page controller.
      *
      * @param Request $request         The Symfony Request
@@ -240,8 +359,8 @@ class Frontend extends ConfigurableBase
      */
     public function listing(Request $request, $contenttypeslug)
     {
-        $listingparameters = $this->getListingParameters($contenttypeslug);
-        $content = $this->getContent($contenttypeslug, $listingparameters);
+        $listingParameters = $this->getListingParameters($contenttypeslug);
+        $content = $this->getContent($contenttypeslug, $listingParameters);
         $contenttype = $this->getContentType($contenttypeslug);
 
         $template = $this->templateChooser()->listing($contenttype);
@@ -264,11 +383,13 @@ class Frontend extends ConfigurableBase
      * @param string  $taxonomytype The taxonomy type slug
      * @param string  $slug         The taxonomy slug
      *
+     * @throws \Bolt\Exception\InvalidRepositoryException
+     *
      * @return TemplateResponse|false
      */
     public function taxonomy(Request $request, $taxonomytype, $slug)
     {
-        $taxonomy = $this->storage()->getTaxonomyType($taxonomytype);
+        $taxonomy = $this->app['config']->get('taxonomy/' . $taxonomytype);
         // No taxonomytype, no possible content.
         if (empty($taxonomy)) {
             return false;
@@ -287,7 +408,26 @@ class Frontend extends ConfigurableBase
         }
 
         $order = $this->getOption('theme/listing_sort', false) ?: $this->getOption('general/listing_sort');
-        $content = $this->storage()->getContentByTaxonomy($taxonomytype, $slug, ['limit' => $amount, 'order' => $order, 'page' => $page]);
+        $isLegacy = $this->getOption('general/compatibility/setcontent_legacy', true);
+        if ($isLegacy) {
+            $content = $this->storage()->getContentByTaxonomy($taxonomytype, $slug, ['limit' => $amount, 'order' => $order, 'page' => $page]);
+        } else {
+            $page = $this->app['pager']->getCurrentPage('taxonomy');
+            $appCt = array_keys($this->app['query.search_config']->getSearchableTypes());
+            /** @var TaxonomyRepository $repo */
+            $repo = $this->app['storage']->getRepository(Taxonomy::class);
+            $query = $repo->queryContentByTaxonomy($appCt, [$taxonomytype => $slug])
+                ->setFirstResult(($page - 1) * $amount)
+                ->setMaxResults($amount)
+            ;
+
+            $results = $repo->getContentByTaxonomy($query);
+            $set = new QueryResultset();
+            foreach ($results->getCollection() as $record) {
+                $set->add([$record]);
+            }
+            $content = $this->app['twig.records.view']->createView($set);
+        }
 
         if (!$this->isTaxonomyValid($content, $slug, $taxonomy)) {
             $this->abort(Response::HTTP_NOT_FOUND, "No slug '$slug' in taxonomy '$taxonomyslug'");
@@ -320,7 +460,7 @@ class Frontend extends ConfigurableBase
      * @param string      $slug
      * @param array       $taxonomy
      *
-     * @return boolean
+     * @return bool
      */
     protected function isTaxonomyValid($content, $slug, array $taxonomy)
     {
@@ -390,19 +530,39 @@ class Frontend extends ConfigurableBase
             $filters = null;
         }
 
-        $result = $this->storage()->searchContent($q, $contenttypes, $filters, $limit, $offset);
+        $isLegacy = $this->getOption('general/compatibility/setcontent_legacy', true);
+        if ($isLegacy) {
+            $result = $this->storage()->searchContent($q, $contenttypes, $filters, $limit, $offset);
 
-        /** @var \Bolt\Pager\PagerManager $manager */
-        $manager = $this->app['pager'];
-        $manager
-            ->createPager($context)
-            ->setCount($result['no_of_results'])
-            ->setTotalpages(ceil($result['no_of_results'] / $pageSize))
-            ->setCurrent($page)
-            ->setShowingFrom($offset + 1)
-            ->setShowingTo($offset + count($result['results']));
+            /** @var \Bolt\Pager\PagerManager $manager */
+            $manager = $this->app['pager'];
+            $manager
+                ->createPager($context)
+                ->setCount($result['no_of_results'])
+                ->setTotalpages(ceil($result['no_of_results'] / $pageSize))
+                ->setCurrent($page)
+                ->setShowingFrom($offset + 1)
+                ->setShowingTo($offset + ($result ? count($result['results']) : 0));
+            ;
 
-        $manager->setLink($this->generateUrl('search', ['q' => $q]) . '&page_search=');
+            $manager->setLink($this->generateUrl('search', ['q' => $q]) . '&page_search=');
+        } else {
+            $appCt = array_keys($this->app['query.search_config']->getSearchableTypes());
+            $textQuery = '(' . join(',', $appCt) . ')/search';
+            $params = [
+                'filter' => $q,
+                'page'   => $page,
+                'limit'  => $pageSize,
+            ];
+            $searchResult = $this->getContent($textQuery, $params);
+
+            $result = [
+                'results' => $searchResult->getSortedResults(),
+                'query'   => [
+                    'sanitized_q' => strip_tags($q),
+                ],
+            ];
+        }
 
         $globals = [
             'records'      => $result['results'],
@@ -437,10 +597,11 @@ class Frontend extends ConfigurableBase
      * Returns an array of the parameters used in getContent for listing pages.
      *
      * @param string $contentTypeSlug The content type slug
+     * @param bool   $allowViewless   Allow viewless contenttype
      *
      * @return array Parameters to use in getContent
      */
-    private function getListingParameters($contentTypeSlug)
+    private function getListingParameters($contentTypeSlug, $allowViewless = false)
     {
         $contentType = $this->getContentType(current(explode('/', $contentTypeSlug)));
 
@@ -450,13 +611,13 @@ class Frontend extends ConfigurableBase
         }
 
         // If the ContentType is 'viewless', don't show the listing / record page.
-        if ($contentType['viewless']) {
+        if ($contentType['viewless'] && !$allowViewless) {
             $this->abort(Response::HTTP_NOT_FOUND, 'Page ' . $contentType['slug'] . ' not found.');
         }
 
         // Build the pager
         $page = $this->app['pager']->getCurrentPage($contentType['slug']);
-        $order = $contentType['sort'] ?: $this->getListingOrder($contentType);
+        $order = isset($contentType['listing_sort']) ? $contentType['listing_sort'] : $this->getListingOrder($contentType);
 
         // CT value takes precedence over theme & config.yml
         if (!empty($contentType['listing_records'])) {
@@ -476,19 +637,20 @@ class Frontend extends ConfigurableBase
      *  - we let `getContent()` sort by itself
      *  - we explicitly set it to sort on the general/listing_sort setting
      *
-     * @param array $contentType
+     * @param ContentType|array $contentType
      *
      * @return null|string
      */
-    private function getListingOrder(array $contentType)
+    private function getListingOrder($contentType)
     {
         // An empty default isn't set in config yet, arrays got to hate them.
-        $contentType += ['taxonomy' => []];
-        $taxonomies = $this->getOption('taxonomy');
-        foreach ($contentType['taxonomy'] as $taxonomyName) {
-            if ($taxonomies[$taxonomyName]['has_sortorder']) {
-                // Let getContent() handle it
-                return null;
+        if (isset($contentType['taxonomy'])) {
+            $taxonomies = $this->getOption('taxonomy');
+            foreach ($contentType['taxonomy'] as $taxonomyName) {
+                if ($taxonomies[$taxonomyName]['has_sortorder']) {
+                    // Let getContent() handle it
+                    return null;
+                }
             }
         }
 

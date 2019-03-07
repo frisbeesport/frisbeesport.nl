@@ -5,7 +5,7 @@ namespace Bolt\Controller\Backend;
 use Bolt\AccessControl\Permissions;
 use Bolt\Events\AccessControlEvent;
 use Bolt\Form\FormType;
-use Bolt\Requirement\BoltRequirements;
+use Bolt\Helpers\ListMutator;
 use Bolt\Storage\Entity;
 use Bolt\Translation\Translator as Trans;
 use Silex\ControllerCollection;
@@ -14,6 +14,7 @@ use Swift_RfcComplianceException as RfcComplianceException;
 use Swift_TransportException as TransportException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Requirements\RequirementCollection;
 
 /**
  * Backend controller for user maintenance routes.
@@ -77,7 +78,7 @@ class Users extends BackendBase
      * User edit route.
      *
      * @param Request $request The Symfony Request
-     * @param integer $id      The user ID
+     * @param int     $id      The user ID
      *
      * @return \Bolt\Response\TemplateResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -88,15 +89,38 @@ class Users extends BackendBase
         if ($userEntity === false) {
             return $this->redirectToRoute('users');
         }
+        /** @var Permissions $permissions */
+        $permissions = $this->app['permissions'];
+        $availableRoles = array_flip(array_map(
+            function ($role) {
+                return $role['label'];
+            },
+            $permissions->getDefinedRoles()
+        ));
+        $mutableRoles = $permissions->getManipulatableRoles($currentUser->toArray());
+
+        $formOptions = [
+            'password' => [
+                'required' => !$userEntity->getId()
+            ],
+            'roles'    => [
+                'choices' => $availableRoles,
+                'mutable' => $mutableRoles,
+            ],
+        ];
 
         // Generate the form
-        $form = $this->createFormBuilder(FormType\UserEditType::class, $userEntity)
+        $form = $this->createFormBuilder(FormType\UserEditType::class, $userEntity, $formOptions)
             ->getForm()
             ->handleRequest($request)
         ;
 
-        if ($form->isValid()) {
-            $userEntity = $form->getData();
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var \Bolt\Form\FormType\UserData $data */
+            $data = $form->getData();
+            $roleMutator = new ListMutator($availableRoles, $mutableRoles);
+            $data->applyToEntity($userEntity, $roleMutator);
+
             $saved = $this->getRepository(Entity\Users::class)->save($userEntity);
             if ($saved) {
                 $this->flashes()->success(Trans::__('page.edit-users.message.user-saved', ['%user%' => $userEntity->getDisplayname()]));
@@ -168,8 +192,10 @@ class Users extends BackendBase
             ->handleRequest($request)
         ;
 
-        if ($form->isValid()) {
-            $userEntity = $form->getData();
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var \Bolt\Form\FormType\UserData $data */
+            $data = $form->getData();
+            $data->applyToEntity($userEntity);
             $saved = $this->getRepository(Entity\Users::class)->save($userEntity);
             if ($saved) {
                 $this->app['logger.system']->info(
@@ -198,7 +224,8 @@ class Users extends BackendBase
             }
         }
 
-        $requirements = new BoltRequirements($this->app['path_resolver']->resolve('%root%'));
+        /** @var RequirementCollection $requirements */
+        $requirements = $this->app['requirements'];
         $context = [
             'required'    => $requirements->getFailedRequirements() ?: null,
             'recommended' => $requirements->getFailedRecommendations() ?: null,
@@ -215,8 +242,8 @@ class Users extends BackendBase
     /**
      * Perform modification actions on users.
      *
-     * @param string  $action The action
-     * @param integer $id     The user ID
+     * @param string $action The action
+     * @param int    $id     The user ID
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -307,7 +334,10 @@ class Users extends BackendBase
         ;
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $userEntity = $form->getData();
+            /** @var \Bolt\Form\FormType\UserData $data */
+            $data = $form->getData();
+            $data->applyToEntity($userEntity);
+
             $this->app['logger.system']->info(Trans::__('page.edit-users.log.user-updated', ['%user%' => $userEntity->getDisplayname()]), ['event' => 'security']);
             if ($this->getRepository(Entity\Users::class)->save($userEntity)) {
                 $this->flashes()->success(Trans::__('page.edit-users.message.user-saved', ['%user%' => $userEntity->getDisplayname()]));
@@ -357,7 +387,7 @@ class Users extends BackendBase
     /**
      * Get the user we want to edit, or a new entity object if null.
      *
-     * @param integer $id
+     * @param int $id
      *
      * @return Entity\Users|false
      */
@@ -402,7 +432,8 @@ class Users extends BackendBase
         );
 
         $name = $this->getOption('general/mailoptions/senderName', $this->getOption('general/sitename'));
-        $from = ['bolt@' . $request->getHost() => $name];
+        $sendermail = $this->getOption('general/mailoptions/senderMail', 'bolt@' . $request->getHost());
+        $from = [$sendermail => $name];
         $email = $this->getOption('general/mailoptions/senderMail', $email);
         try {
             /** @var Message $message */
@@ -415,7 +446,6 @@ class Users extends BackendBase
                 ->setBody($mailHtml, 'text/html')
                 ->addPart(preg_replace('/^[\t ]+|[\t ]+$/m', '', strip_tags($mailHtml)), 'text/plain')
                 ->setPriority(Message::PRIORITY_HIGH);
-            ;
         } catch (RfcComplianceException $e) {
             // Sending message failed. What else can we do, send via snailmail?
             $logger->critical("The email address set in 'mailoptions/senderMail' is not a valid email address.", ['event' => 'exception', 'exception' => $e]);

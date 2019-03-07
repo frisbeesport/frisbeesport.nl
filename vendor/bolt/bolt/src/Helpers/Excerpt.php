@@ -7,6 +7,7 @@ use Bolt\Collection\MutableBag;
 use Bolt\Legacy\Content as LegacyContent;
 use Bolt\Storage\Entity\Content;
 use Parsedown;
+use Twig\Markup;
 
 class Excerpt
 {
@@ -73,8 +74,14 @@ class Excerpt
 
             $excerpt = '';
             array_walk($this->body, function ($value, $key) use (&$excerpt, $stripKeys) {
-                if (is_string($value) && !in_array($key, $stripKeys)) {
-                    $excerpt .= $value . ' ';
+                if (in_array($key, $stripKeys)) {
+                    return;
+                }
+                // We need non-empty strings that don't look like serialized JSON.
+                // Otherwise, Twig Markup is also OK.
+                if (is_string($value) && !empty($value) && !in_array($value[0], ['{', '[']) ||
+                    $value instanceof Markup) {
+                    $excerpt .= (string) $value . ' ';
                 }
             });
         } elseif (is_string($this->body) || (is_object($this->body) && method_exists($this->body, '__toString'))) {
@@ -169,8 +176,8 @@ class Excerpt
      * The only exception is where we have only two matches in which case we just take the
      * first as will be equally distant.
      *
-     * @param array   $locations
-     * @param integer $prevCount
+     * @param array $locations
+     * @param int   $prevCount
      *
      * @return int
      */
@@ -210,7 +217,7 @@ class Excerpt
      *
      * @param string|array $words
      * @param string       $fulltext
-     * @param integer      $relLength
+     * @param int          $relLength
      *
      * @return string
      */
@@ -232,7 +239,7 @@ class Excerpt
         }
 
         $locations = $this->extractLocations($words, $fulltext);
-        $startPos  = $this->determineSnipLocation($locations, $prevCount);
+        $startPos = $this->determineSnipLocation($locations, $prevCount);
 
         // if we are going to snip too much...
         if ($textlength - $startPos < $relLength) {
@@ -253,7 +260,9 @@ class Excerpt
 
         // Highlight the words, using the `<mark>` tag.
         foreach ($words as $word) {
-            $relText = preg_replace('/\b(' . $word . ')\b/i', '<mark>$1</mark>', $relText);
+            if ($word) {
+                $relText = preg_replace('/\b(' . preg_quote($word, '/') . ')\b/i', '<mark>$1</mark>', $relText);
+            }
         }
 
         return $relText;

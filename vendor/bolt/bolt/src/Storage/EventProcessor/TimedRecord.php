@@ -37,7 +37,7 @@ class TimedRecord
     protected $dispatcher;
     /** @var LoggerInterface */
     protected $systemLogger;
-    /** @var integer */
+    /** @var int */
     protected $interval;
 
     /**
@@ -48,7 +48,7 @@ class TimedRecord
      * @param CacheProvider            $cache
      * @param EventDispatcherInterface $dispatcher
      * @param LoggerInterface          $systemLogger
-     * @param integer                  $interval
+     * @param int                      $interval
      */
     public function __construct(
         array $contentTypeNames,
@@ -224,7 +224,7 @@ class TimedRecord
     private function getTimedPublishQuery(QueryBuilder $query)
     {
         $query
-            ->where('status = :status')
+            ->andWhere('status = :status')
             ->andWhere('datepublish < :currenttime')
             ->setParameter('status', 'timed')
         ;
@@ -238,7 +238,7 @@ class TimedRecord
     private function getHoldQuery(QueryBuilder $query)
     {
         $query
-            ->where('datedepublish <= :currenttime')
+            ->andWhere('datedepublish <= :currenttime')
             ->andWhere('datedepublish > :zeroday')
             ->andWhere('datechanged < datedepublish')
             ->setParameter('status', 'published')

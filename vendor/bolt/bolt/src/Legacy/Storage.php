@@ -56,12 +56,13 @@ class Storage
      *
      * @param array|string $contenttype
      * @param array        $values
+     * @param bool         $isRootType
      *
      * @throws \Exception
      *
      * @return \Bolt\Legacy\Content
      */
-    public function getContentObject($contenttype, $values = [])
+    public function getContentObject($contenttype, $values = [], $isRootType = true)
     {
         // Make sure $contenttype is an array, and not just the slug.
         if (!is_array($contenttype)) {
@@ -71,14 +72,14 @@ class Storage
         // If the contenttype has a 'class' specified, and the class exists,
         // Initialize the content as an object of that class.
         if (!empty($contenttype['class']) && class_exists($contenttype['class'])) {
-            $content = new $contenttype['class']($this->app, $contenttype, $values);
+            $content = new $contenttype['class']($this->app, $contenttype, $values, $isRootType);
 
             // Check if the class actually extends \Bolt\Legacy\Content.
             if (!($content instanceof Content)) {
                 throw new \Exception($contenttype['class'] . ' does not extend \\Bolt\\Legacy\\Content.');
             }
         } else {
-            $content = new Content($this->app, $contenttype, $values);
+            $content = new Content($this->app, $contenttype, $values, $isRootType);
         }
 
         return $content;
@@ -800,8 +801,8 @@ class Storage
             }
         }
 
-        $limit = !empty($parameters['limit']) ? $parameters['limit'] : 9999;
-        $page = !empty($parameters['page']) ? $parameters['page'] : 1;
+        $limit = isset($parameters['limit']) && $parameters['limit'] ? $parameters['limit'] : 9999;
+        $page = isset($parameters['page']) && $parameters['page'] ? $parameters['page'] : 1;
 
         // If we're allowed to use pagination, use the 'page' parameter.
         if (!empty($parameters['paging']) && $this->app['request_stack']->getCurrentRequest() !== null) {
@@ -888,8 +889,8 @@ class Storage
 
         $slug = $this->app['slugify']->slugify($name);
 
-        $limit = $parameters['limit'] ?: 9999;
-        $page = $parameters['page'] ?: 1;
+        $limit = isset($parameters['limit']) && $parameters['limit'] ? $parameters['limit'] : 9999;
+        $page = isset($parameters['page']) && $parameters['page'] ? $parameters['page'] : 1;
 
         $taxonomytype = $this->getTaxonomyType($taxonomyslug);
 

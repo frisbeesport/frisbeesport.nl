@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Core\Util;
 
 use Symfony\Component\Security\Acl\Util\ClassUtils as AclClassUtils;
 
-@trigger_error('The '.__NAMESPACE__.'\ClassUtils class is deprecated since version 2.8, to be removed in 3.0. Use Symfony\Component\Security\Acl\Util\ClassUtils instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\ClassUtils class is deprecated since Symfony 2.8, to be removed in 3.0. Use Symfony\Component\Security\Acl\Util\ClassUtils instead.', E_USER_DEPRECATED);
 
 /**
  * Class related functionality for objects that
@@ -57,7 +57,7 @@ class ClassUtils
         }
 
         // fallback in case security-acl is not installed
-        $class = is_object($object) ? get_class($object) : $object;
+        $class = \is_object($object) ? \get_class($object) : $object;
 
         if (false === $pos = strrpos($class, '\\'.self::MARKER.'\\')) {
             return $class;

@@ -11,9 +11,10 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
+use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\FormView;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\InitRuntimeInterface;
@@ -87,6 +88,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     {
         return array(
             new TwigFilter('humanize', array($this, 'humanize')),
+            new TwigFilter('form_encode_currency', array($this, 'encodeCurrency'), array('is_safe' => array('html'), 'needs_environment' => true)),
         );
     }
 
@@ -97,6 +99,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     {
         return array(
             new TwigTest('selectedchoice', array($this, 'isSelectedChoice')),
+            new TwigTest('rootform', array($this, 'isRootForm')),
         );
     }
 
@@ -149,11 +152,35 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function isSelectedChoice(ChoiceView $choice, $selectedValue)
     {
-        if (is_array($selectedValue)) {
-            return in_array($choice->value, $selectedValue, true);
+        if (\is_array($selectedValue)) {
+            return \in_array($choice->value, $selectedValue, true);
         }
 
         return $choice->value === $selectedValue;
+    }
+
+    /**
+     * @internal
+     */
+    public function isRootForm(FormView $formView)
+    {
+        return null === $formView->parent;
+    }
+
+    /**
+     * @internal
+     */
+    public function encodeCurrency(Environment $environment, $text, $widget = '')
+    {
+        if ('UTF-8' === $charset = $environment->getCharset()) {
+            $text = htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        } else {
+            $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+            $text = iconv('UTF-8', $charset, $text);
+            $widget = iconv('UTF-8', $charset, $widget);
+        }
+
+        return str_replace('{{ widget }}', $widget, $text);
     }
 
     /**

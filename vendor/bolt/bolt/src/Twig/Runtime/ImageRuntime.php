@@ -52,11 +52,11 @@ class ImageRuntime
     /**
      * Helper function to make a path to an image.
      *
-     * @param Environment    $env
-     * @param string|array   $fileName Target filename
-     * @param string|integer $width    Target width
-     * @param string|integer $height   Target height
-     * @param string         $crop     String identifier for cropped images
+     * @param Environment  $env
+     * @param string|array $fileName Target filename
+     * @param string|int   $width    Target width
+     * @param string|int   $height   Target height
+     * @param string       $crop     String identifier for cropped images
      *
      * @return string Image path
      */
@@ -73,9 +73,7 @@ class ImageRuntime
         }
 
         // After v1.5.1 we store image data as an array
-        if (is_array($fileName)) {
-            $fileName = isset($fileName['filename']) ? $fileName['filename'] : (isset($fileName['file']) ? $fileName['file'] : '');
-        }
+        $fileName = $this->normalizeFileName($fileName);
 
         // If _no_ filename is given, return nothing.
         if (!$fileName) {
@@ -126,8 +124,8 @@ class ImageRuntime
      * deprecated in favour of the Magnific Popup library.
      *
      * @param string|array $fileName Image file name
-     * @param integer      $width    Image width
-     * @param integer      $height   Image height
+     * @param int          $width    Image width
+     * @param int          $height   Image height
      * @param string       $crop     Crop image string identifier
      * @param string       $title    Display title for image
      *
@@ -177,10 +175,10 @@ class ImageRuntime
      * Example: {{ content.image|showimage(320, 240) }}
      * Example: {{ showimage(content.image, 320, 240) }}
      *
-     * @param string  $fileName Image filename
-     * @param integer $width    Image width
-     * @param integer $height   Image height
-     * @param string  $crop     Crop image string identifier
+     * @param string $fileName Image filename
+     * @param int    $width    Image width
+     * @param int    $height   Image height
+     * @param string $crop     Crop image string identifier
      *
      * @return string HTML output
      */
@@ -227,9 +225,9 @@ class ImageRuntime
      * @param string     $fileName Target filename
      * @param string|int $width    Target width
      * @param string|int $height   Target height
-     * @param string     $crop     Zooming and cropping: Set to 'f(it)', 'b(orders)', 'r(esize)' or 'c(rop)'
+     * @param string     $crop     zooming and cropping: Set to 'f(it)', 'b(orders)', 'r(esize)' or 'c(rop)'
      *                             Set width or height parameter to '0' for proportional scaling
-     *                             Setting them to '' uses default values.
+     *                             Setting them to '' uses default values
      *
      * @return string Relative URL of the thumbnail
      */
@@ -249,8 +247,8 @@ class ImageRuntime
      * Get a thumbnail object.
      *
      * @param string|array $fileName
-     * @param integer      $width
-     * @param integer      $height
+     * @param int          $width
+     * @param int          $height
      * @param string       $scale
      *
      * @return Thumbnail
@@ -312,9 +310,7 @@ class ImageRuntime
         }
 
         // If we're passing in an image as array, instead of a single filename.
-        if (is_array($fileName) && isset($fileName['file'])) {
-            $fileName = $fileName['file'];
-        }
+        $fileName = $this->normalizeFileName($fileName);
 
         return $this->urlGenerator->generate(
             'thumb_alias',
@@ -333,5 +329,25 @@ class ImageRuntime
     private function isAlias($alias)
     {
         return (bool) $this->config->get('theme/thumbnails/aliases/' . $alias, false);
+    }
+
+
+    /**
+     * If $fileName is an array with 'filename' or 'file' return that property,
+     * otherwise return passed value.
+     *
+     * @param array|string $fileName
+     *
+     * @return string
+     */
+    private function normalizeFileName($fileName)
+    {
+        if (!is_array($fileName)) {
+            return $fileName;
+        }
+
+        return isset($fileName['filename']) ? $fileName['filename']
+            : isset($fileName['file']) ? $fileName['file'] : ''
+        ;
     }
 }

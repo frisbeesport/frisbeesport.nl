@@ -53,7 +53,7 @@ final class ScriptHandler
         $syncer = DirectorySyncer::fromEvent($event);
 
         $syncer->sync('files', 'files');
-        $syncer->sync('%vendor%/bolt/themes', 'themes', true, ['base-2016', 'skeleton']);
+        $syncer->sync('%vendor%/bolt/themes', 'themes', true, ['base-2016', 'base-2018', 'skeleton']);
     }
 
     /**
@@ -89,7 +89,7 @@ final class ScriptHandler
      *
      * @param Event $event
      */
-    protected static function runUpdateProjectFromAssets(Event $event)
+    private static function runUpdateProjectFromAssets(Event $event)
     {
         if ($event->getName() !== ScriptEvents::POST_UPDATE_CMD) {
             return;

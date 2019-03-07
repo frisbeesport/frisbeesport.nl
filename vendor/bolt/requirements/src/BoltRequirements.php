@@ -2,18 +2,16 @@
 
 namespace Bolt\Requirement;
 
+use Bolt\Bootstrap;
+use Bolt\Common\Ini;
 use Bolt\Configuration\PathResolver;
-use Bolt\Exception\PathResolutionException;
 use Bolt\Version;
 use Collator;
 use Composer\CaBundle\CaBundle;
 use DateTimeZone;
 use PDO;
 use ReflectionExtension;
-use Silex\Application;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Requirements\RequirementCollection;
-use Webmozart\PathUtil\Path;
 
 /**
  * This class specifies all requirements and optional recommendations that
@@ -26,18 +24,23 @@ use Webmozart\PathUtil\Path;
 final class BoltRequirements extends RequirementCollection
 {
     const LEGACY_REQUIRED_PHP_VERSION = '5.5.9';
-    const REQUIRED_PHP_VERSION = '7.0.8';
+    const REQUIRED_PHP_VERSION = '7.1.3';
 
     /** @var string */
     private $boltVersion;
+    /** @var string */
+    private $rootPath;
+    /** @var PathResolver|null */
+    private $resolver;
 
     /**
      * Constructor.
      *
-     * @param string      $checkPath
-     * @param string|null $boltVersion
+     * @param string            $checkPath
+     * @param string|null       $boltVersion
+     * @param PathResolver|null $resolver
      */
-    public function __construct($checkPath = __DIR__, $boltVersion = null)
+    public function __construct($checkPath = __DIR__, $boltVersion = null, PathResolver $resolver = null)
     {
         if ($boltVersion === null) {
             if (!class_exists(Version::class, true)) {
@@ -49,59 +52,70 @@ final class BoltRequirements extends RequirementCollection
             }
             $this->boltVersion = Version::forComposer();
         }
+        $this->rootPath = $this->getRootDir($checkPath);
 
-        $paths = $this->determinePaths($checkPath);
-        if (file_exists($paths['site'] . '/vendor/composer')) {
-            require_once $paths['site'] . '/vendor/autoload.php';
+        // Load PathResolver from Bolt Application if it is installed
+        if (class_exists(Bootstrap::class)) {
+            try {
+                $app = Bootstrap::run($this->rootPath);
+                $app->boot();
+                $resolver = $app['path_resolver'];
+            } catch (\Exception $e) {
+                // Ignore path checks if we can't configure a PathResolver.
+            }
         }
 
-        $this->setRequirements($paths);
+        $this->resolver = $resolver;
+
+        $this->setRequirements();
         $this->setRecommendations();
     }
 
     /**
      * Mandatory requirements.
-     *
-     * @param array $paths
      */
-    protected function setRequirements(array $paths)
+    protected function setRequirements()
     {
         $installedPhpVersion = phpversion();
-        $requiredPhpVersion = $this->getPhpRequiredVersion($paths);
-
-        if (false !== $requiredPhpVersion) {
-            $this->addRequirement(
-                version_compare($installedPhpVersion, $requiredPhpVersion, '>='),
-                sprintf('PHP version must be at least %s (%s installed)', $requiredPhpVersion, $installedPhpVersion),
-                sprintf(
-                    'You are running PHP version "<strong>%s</strong>", but Bolt needs at least PHP "<strong>%s</strong>" to run.
-                Before using Bolt, upgrade your PHP installation, preferably to the latest version.',
-                    $installedPhpVersion,
-                    $requiredPhpVersion
-                ),
-                sprintf('Install PHP %s or newer (installed version is %s)', $requiredPhpVersion, $installedPhpVersion)
-            );
-        }
+        $requiredPhpVersion = $this->getPhpRequiredVersion();
 
         $this->addRequirement(
-            is_dir($paths['site'] . '/vendor/composer'),
+            version_compare($installedPhpVersion, $requiredPhpVersion, '>='),
+            sprintf('PHP version must be at least %s (%s installed)', $requiredPhpVersion, $installedPhpVersion),
+            sprintf(
+                'You are running PHP version "<strong>%s</strong>", but Bolt needs at least PHP "<strong>%s</strong>" to run.
+            Before using Bolt, upgrade your PHP installation, preferably to the latest version.',
+                $installedPhpVersion,
+                $requiredPhpVersion
+            ),
+            sprintf('Install PHP %s or newer (installed version is %s)', $requiredPhpVersion, $installedPhpVersion)
+        );
+
+        $this->addRequirement(
+            is_dir($this->rootPath . '/vendor/composer'),
             'Vendor libraries must be installed',
             'Vendor libraries are missing. Install composer following instructions from <a href="http://getcomposer.org/">http://getcomposer.org/</a>. ' .
             'Then run "<strong>php composer.phar install</strong>" to install them.'
         );
 
-        $this->addRequirement(
-            is_writable($paths['cache']),
-            sprintf('%s directory must be writable', $paths['cache']),
-            sprintf('Change the permissions of "<strong>%s</strong>" directory so that the web server can write into it.', $paths['cache'])
-        );
-/*
-        $this->addRequirement(
-            is_writable($paths['logs']),
-            'app/logs/ or var/logs/ directory must be writable',
-            'Change the permissions of either "<strong>app/logs/</strong>" or  "<strong>var/logs/</strong>" directory so that the web server can write into it.'
-        );
-*/
+        if ($this->resolver) {
+            $cachePath = $this->resolver->resolve('cache');
+            $this->addRequirement(
+                is_writable($cachePath),
+                sprintf('%s directory must be writable', $cachePath),
+                sprintf('Change the permissions of "<strong>%s</strong>" directory so that the web server can write into it.', $cachePath)
+            );
+
+            if ($this->resolver->raw('logs') !== null) {
+                $logsPath = $this->resolver->resolve('logs');
+                $this->addRequirement(
+                    is_writable($logsPath),
+                    sprintf('%s directory must be writable', $logsPath),
+                    sprintf('Change the permissions of "<strong>%s</strong>" directory so that the web server can write into it.', $logsPath)
+                );
+            }
+        }
+
         if (version_compare($installedPhpVersion, '7.0.0', '<')) {
             $this->addPhpConfigRequirement(
                 'date.timezone',
@@ -112,7 +126,7 @@ final class BoltRequirements extends RequirementCollection
             );
         }
 
-        if (false !== $requiredPhpVersion && version_compare($installedPhpVersion, $requiredPhpVersion, '>=')) {
+        if (version_compare($installedPhpVersion, $requiredPhpVersion, '>=')) {
             $timezones = [];
             foreach (DateTimeZone::listAbbreviations() as $abbreviations) {
                 foreach ($abbreviations as $abbreviation) {
@@ -130,56 +144,19 @@ final class BoltRequirements extends RequirementCollection
             );
         }
 
-        $this->addRequirement(
-            function_exists('iconv'),
-            'iconv() must be available',
-            'Install and enable the <strong>iconv</strong> extension.'
-        );
+        $this->addExtensionRequirement('iconv', 'iconv');
+        $this->addExtensionRequirement('JSON', 'json_encode');
+        $this->addExtensionRequirement('session', 'session_start');
+        $this->addExtensionRequirement('ctype', 'ctype_alpha');
+        $this->addExtensionRequirement('Tokenizer', 'token_get_all');
+        $this->addExtensionRequirement('SimpleXML', 'simplexml_import_dom');
 
-        $this->addRequirement(
-            function_exists('json_encode'),
-            'json_encode() must be available',
-            'Install and enable the <strong>JSON</strong> extension.'
-        );
-
-        $this->addRequirement(
-            function_exists('session_start'),
-            'session_start() must be available',
-            'Install and enable the <strong>session</strong> extension.'
-        );
-
-        $this->addRequirement(
-            function_exists('ctype_alpha'),
-            'ctype_alpha() must be available',
-            'Install and enable the <strong>ctype</strong> extension.'
-        );
-
-        $this->addRequirement(
-            function_exists('token_get_all'),
-            'token_get_all() must be available',
-            'Install and enable the <strong>Tokenizer</strong> extension.'
-        );
-
-        $this->addRequirement(
-            function_exists('simplexml_import_dom'),
-            'simplexml_import_dom() must be available',
-            'Install and enable the <strong>SimpleXML</strong> extension.'
-        );
-
-        if (function_exists('apc_store') && ini_get('apc.enabled')) {
-            if (version_compare($installedPhpVersion, '5.4.0', '>=')) {
-                $this->addRequirement(
-                    version_compare(phpversion('apc'), '3.1.13', '>='),
-                    'APC version must be at least 3.1.13 when using PHP 5.4',
-                    'Upgrade your <strong>APC</strong> extension (3.1.13+).'
-                );
-            } else {
-                $this->addRequirement(
-                    version_compare(phpversion('apc'), '3.0.17', '>='),
-                    'APC version must be at least 3.0.17',
-                    'Upgrade your <strong>APC</strong> extension (3.0.17+).'
-                );
-            }
+        if (function_exists('apc_store') && Ini::getBool('apc.enabled')) {
+            $this->addRequirement(
+                version_compare(phpversion('apc'), '3.1.13', '>='),
+                'APC version must be at least 3.1.13',
+                'Upgrade your <strong>APC</strong> extension (3.1.13+).'
+            );
         }
 
         $this->addPhpConfigRequirement('detect_unicode', false);
@@ -225,6 +202,15 @@ final class BoltRequirements extends RequirementCollection
                 'Set "<strong>mbstring.func_overload</strong>" to <strong>0</strong> in php.ini<a href="#phpini">*</a> to disable function overloading by the mbstring extension.'
             );
         }
+    }
+
+    protected function addExtensionRequirement($extension, $functionToCheck)
+    {
+        $this->addRequirement(
+            function_exists($functionToCheck),
+            sprintf('%s() must be available', $functionToCheck),
+            sprintf('Install and enable the <strong>%s</strong> extension.', $extension)
+        );
     }
 
     /**
@@ -331,17 +317,17 @@ final class BoltRequirements extends RequirementCollection
         }
 
         $accelerator =
-            (extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
+            (extension_loaded('eaccelerator') && Ini::getBool('eaccelerator.enable'))
             ||
-            (extension_loaded('apc') && ini_get('apc.enabled'))
+            (extension_loaded('apc') && Ini::getBool('apc.enabled'))
             ||
-            (extension_loaded('Zend Optimizer+') && ini_get('zend_optimizerplus.enable'))
+            (extension_loaded('Zend Optimizer+') && Ini::getBool('zend_optimizerplus.enable'))
             ||
-            (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
+            (extension_loaded('Zend OPcache') && Ini::getBool('opcache.enable'))
             ||
-            (extension_loaded('xcache') && ini_get('xcache.cacher'))
+            (extension_loaded('xcache') && Ini::getBool('xcache.cacher'))
             ||
-            (extension_loaded('wincache') && ini_get('wincache.ocenabled'))
+            (extension_loaded('wincache') && Ini::getBool('wincache.ocenabled'))
         ;
 
         $this->addRecommendation(
@@ -352,7 +338,7 @@ final class BoltRequirements extends RequirementCollection
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $this->addRecommendation(
-                $this->getRealpathCacheSize() >= 5 * 1024 * 1024,
+                Ini::getBytes('realpath_cache_size') >= 5 * 1024 * 1024,
                 'realpath_cache_size should be at least 5M in php.ini',
                 'Setting "<strong>realpath_cache_size</strong>" to e.g. "<strong>5242880</strong>" or "<strong>5M</strong>" in php.ini<a href="#phpini">*</a> may improve performance on Windows significantly in some cases.'
             );
@@ -361,8 +347,6 @@ final class BoltRequirements extends RequirementCollection
         $this->addPhpConfigRecommendation('short_open_tag', false);
 
         $this->addPhpConfigRecommendation('magic_quotes_gpc', false, true);
-
-        $this->addPhpConfigRecommendation('register_globals', false, true);
 
         $this->addPhpConfigRecommendation('session.auto_start', false);
 
@@ -383,116 +367,24 @@ final class BoltRequirements extends RequirementCollection
     }
 
     /**
-     * Loads realpath_cache_size from php.ini and converts it to int.
+     * Finds the PHP required version from Bolt version.
      *
-     * (e.g. 16k is converted to 16384 int)
-     *
-     * @return int
+     * @return string
      */
-    protected function getRealpathCacheSize()
+    protected function getPhpRequiredVersion()
     {
-        $size = ini_get('realpath_cache_size');
-        $size = trim($size);
-        $unit = '';
-        if (!ctype_digit($size)) {
-            $unit = strtolower(substr($size, -1, 1));
-            $size = (int) substr($size, 0, -1);
-        }
-        switch ($unit) {
-            case 'g':
-                return $size * 1024 * 1024 * 1024;
-            case 'm':
-                return $size * 1024 * 1024;
-            case 'k':
-                return $size * 1024;
-            default:
-                return (int) $size;
-        }
-    }
-
-    /**
-     * Defines PHP required version from Bolt version.
-     *
-     * @return string|false The PHP required version or false if it could not be guessed
-     */
-    protected function getPhpRequiredVersion(array $paths)
-    {
-        if (!file_exists($path = $paths['site'] . '/composer.lock')) {
-            return false;
+        if (!file_exists($path = $this->rootPath . '/composer.lock')) {
+            return self::LEGACY_REQUIRED_PHP_VERSION;
         }
 
         $composerLock = json_decode(file_get_contents($path), true);
         foreach ($composerLock['packages'] as $package) {
-            $name = $package['name'];
-            if ('bolt/bolt' === $name) {
+            if ($package['name'] === 'bolt/bolt') {
                 return (int) $package['version'][1] > 3 ? self::REQUIRED_PHP_VERSION : self::LEGACY_REQUIRED_PHP_VERSION;
             }
         }
 
-        return false;
-    }
-
-    /**
-     * @param string $checkPath
-     *
-     * @return array
-     */
-    private function determinePaths($checkPath)
-    {
-        $rootPath = $this->getRootDir($checkPath);
-
-        $cacheDir = version_compare($this->boltVersion, '3.99999', '>')
-            ? $rootPath . '/var/cache'
-            : $rootPath . '/app/cache'
-        ;
-        $paths = [
-            'site'              => $rootPath,
-            'app'               => $rootPath . '/app',
-            'cache'             => $cacheDir,
-            'config'            => $rootPath . '/app/config',
-            'database'          => $rootPath . '/app/database',
-            'extensions'        => $rootPath . '/extensions',
-            'extensions_config' => $rootPath . '/app/config/extensions',
-            'var'               => $rootPath . '/var',
-            'web'               => $rootPath . '/public',
-            'files'             => $rootPath . '/public/files',
-            'themes'            => $rootPath . '/public/theme',
-            'bolt_assets'       => $rootPath . '/public/bolt-public',
-        ];
-
-        // Doesn't seem to have Bolt installed
-        if (!class_exists(PathResolver::class) || !class_exists(Path::class)) {
-            return $paths;
-        }
-        $rootPath = Path::canonicalize($rootPath);
-        $config['paths'] = [];
-
-        // Read in .bolt.yml or .bolt.php
-        if (file_exists($rootPath . '/.bolt.yml')) {
-            $yaml = Yaml::parse(file_get_contents($rootPath . '/.bolt.yml')) ?: [];
-            $config = array_replace_recursive($config, $yaml);
-        } elseif (file_exists($rootPath . '/.bolt.php')) {
-            $php = include $rootPath . '/.bolt.php';
-        } else {
-            return $paths;
-        }
-        if (isset($php) && is_array($php)) {
-            $config = array_replace_recursive($config, $php);
-        } elseif (isset($php) && $php instanceof Application) {
-            return $paths;
-        }
-
-        // Resolve paths
-        $resolver = new PathResolver($rootPath, $config['paths']);
-        foreach (array_keys($paths) as $key) {
-            try {
-                $paths[$key] = $resolver->resolve("%$key%");
-            } catch (PathResolutionException $e) {
-                // Keep moving
-            }
-        }
-
-        return $paths;
+        return self::LEGACY_REQUIRED_PHP_VERSION;
     }
 
     /**

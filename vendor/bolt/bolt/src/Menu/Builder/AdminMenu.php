@@ -8,7 +8,7 @@ use Bolt\Translation\Translator as Trans;
 /**
  * Bolt admin (back-end) area menu builder.
  *
- * @internal Backwards compatibility not guaranteed on this class presently.
+ * @internal backwards compatibility not guaranteed on this class presently
  *
  * @author Gawain Lynch <gawain.lynch@gmail.com>
  * @author Carson Full <carsonfull@gmail.com>
@@ -26,7 +26,6 @@ final class AdminMenu
     {
         $this->addConfiguration($root);
         $this->addFileManagement($root);
-        $this->addTranslations($root);
         $this->addExtend($root);
 
         return $root;
@@ -145,6 +144,24 @@ final class AdminMenu
                 ->setIcon('fa:support')
                 ->setPermission('checks')
         );
+
+        // Translations: Messages
+        $configEntry->add(
+            MenuEntry::create('tr_messages')
+                ->setRoute('translation', ['domain' => 'messages'])
+                ->setLabel(Trans::__('general.phrase.translations') . ': ' . Trans::__('general.phrase.messages'))
+                ->setIcon('fa:flag')
+                ->setPermission('translation')
+        );
+
+        // Translations: Long messages
+        $configEntry->add(
+            MenuEntry::create('tr_long_messages')
+                ->setRoute('translation', ['domain' => 'infos'])
+                ->setLabel(Trans::__('general.phrase.translations') . ': ' . Trans::__('general.phrase.long-messages'))
+                ->setIcon('fa:flag')
+                ->setPermission('translation')
+        );
     }
 
     /**
@@ -177,38 +194,6 @@ final class AdminMenu
                 ->setLabel(Trans::__('general.phrase.view-edit-templates'))
                 ->setIcon('fa:desktop')
                 ->setPermission('files:theme')
-        );
-    }
-
-    /**
-     * Translations menus.
-     *
-     * @param MenuEntry $root
-     */
-    private function addTranslations(MenuEntry $root)
-    {
-        $translationEntry = $root->add(
-            MenuEntry::create('translations')
-                ->setLabel(Trans::__('general.phrase.translations'))
-                ->setPermission('translation')
-        );
-
-        // Messages
-        $translationEntry->add(
-            MenuEntry::create('tr_messages')
-                ->setRoute('translation', ['domain' => 'messages'])
-                ->setLabel(Trans::__('general.phrase.messages'))
-                ->setIcon('fa:flag')
-                ->setPermission('translation')
-        );
-
-        // Long messages
-        $translationEntry->add(
-            MenuEntry::create('tr_long_messages')
-                ->setRoute('translation', ['domain' => 'infos'])
-                ->setLabel(Trans::__('general.phrase.long-messages'))
-                ->setIcon('fa:flag')
-                ->setPermission('translation')
         );
     }
 

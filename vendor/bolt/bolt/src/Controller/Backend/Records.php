@@ -9,6 +9,7 @@ use Bolt\Translation\Translator as Trans;
 use Silex\ControllerCollection;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -40,7 +41,7 @@ class Records extends BackendBase
      *
      * @param Request $request         The Symfony Request
      * @param string  $contenttypeslug The content type slug
-     * @param integer $id              The content ID
+     * @param int     $id              The content ID
      *
      * @return \Bolt\Response\TemplateResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -89,6 +90,15 @@ class Records extends BackendBase
             }
         }
 
+        // If the form is not valid, we normally show it again to the user.
+        // In case of an Ajaxy Request we can't, so we return a JSON error
+        // response.
+        if ($form->isSubmitted() && !$form->isValid() && $request->isXmlHttpRequest()) {
+                $response = ['error' => ['message' => (string) $form->getErrors()]];
+
+                return new JsonResponse($response, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
         try {
             // Get the record
             $repo = $this->getRepository($contentTypeKey);
@@ -132,7 +142,7 @@ class Records extends BackendBase
     /**
      * Calculate the parameter used to determine response.
      *
-     * @internal To be removed when forms cut-over is complete.
+     * @internal to be removed when forms cut-over is complete
      *
      * @param Request $request
      * @param Button  $button
@@ -182,6 +192,7 @@ class Records extends BackendBase
             ->setOrder($request->query->get('order'))
             ->setPage($request->query->get('page_' . $contenttypeslug))
             ->setFilter($request->query->get('filter'))
+            ->setStatus($request->query->get('status'))
             ->setTaxonomies($taxonomy)
             ->setGroupSort(true)
         ;
@@ -199,8 +210,8 @@ class Records extends BackendBase
     /**
      * Check that the user is allowed to edit the record.
      *
-     * @param string  $contenttypeslug
-     * @param integer $id
+     * @param string $contenttypeslug
+     * @param int    $id
      *
      * @return bool|\Symfony\Component\HttpFoundation\RedirectResponse
      */

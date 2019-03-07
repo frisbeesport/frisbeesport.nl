@@ -3,11 +3,14 @@
 namespace Bolt\Storage\Database\Prefill;
 
 use Bolt\Collection\ImmutableBag;
+use Bolt\Filesystem\Exception\IOException;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Storage\Collection;
 use Bolt\Storage\Entity;
+use Bolt\Storage\Mapping\ContentType;
 use Bolt\Storage\Repository\ContentRepository;
 use Cocur\Slugify\Slugify;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Create a generated set of pre-filled records for a ContentType.
@@ -18,6 +21,8 @@ class RecordContentGenerator
 {
     /** @var ApiClient */
     private $apiClient;
+    /** @var ImageClient */
+    private $imageClient;
     /** @var string */
     private $contentTypeName;
     /** @var ContentRepository */
@@ -33,6 +38,7 @@ class RecordContentGenerator
     private $defaultTitles;
     /** @var array */
     private $createSummary;
+
     /**
      * Constructor.
      *
@@ -46,6 +52,7 @@ class RecordContentGenerator
     public function __construct(
         $contentTypeName,
         ApiClient $apiClient,
+        ImageClient $imageClient,
         ContentRepository $repository,
         FilesystemInterface $filesystem,
         array $taxConfig,
@@ -53,6 +60,7 @@ class RecordContentGenerator
     ) {
         $this->contentTypeName = $contentTypeName;
         $this->apiClient = $apiClient;
+        $this->imageClient = $imageClient;
         $this->repository = $repository;
         $this->filesystem = $filesystem;
         $this->taxConfig = $taxConfig;
@@ -85,6 +93,7 @@ class RecordContentGenerator
         'geolocation'    => 'addJson',
         'image'          => 'addJson',
         'imagelist'      => 'addJson',
+        'oembed'         => 'addJson',
         'selectmultiple' => 'addJson',
         'templatefields' => 'addJson',
         'video'          => 'addJson',
@@ -171,12 +180,12 @@ class RecordContentGenerator
     }
 
     /**
-     * @param Entity\Content $contentEntity
-     * @param array          $contentType
-     * @param string         $fieldName
-     * @param array          $values
+     * @param Entity\Content    $contentEntity
+     * @param array|Contenttype $contentType
+     * @param string            $fieldName
+     * @param array             $values
      */
-    private function setFieldValue(Entity\Content $contentEntity, array $contentType, $fieldName, array $values)
+    private function setFieldValue(Entity\Content $contentEntity, $contentType, $fieldName, array $values)
     {
         $type = $values['type'];
         if (!array_key_exists($type, $this->fieldMap)) {
@@ -228,12 +237,12 @@ class RecordContentGenerator
     }
 
     /**
-     * @param Entity\Content $contentEntity
-     * @param string         $fieldName
-     * @param string         $type
-     * @param array          $contentType
+     * @param Entity\Content    $contentEntity
+     * @param string            $fieldName
+     * @param string            $type
+     * @param array|ContentType $contentType
      */
-    private function addText(Entity\Content $contentEntity, $fieldName, $type, array $contentType)
+    private function addText(Entity\Content $contentEntity, $fieldName, $type, $contentType)
     {
         if ($type === 'text') {
             if ($fieldName === 'title' && $this->defaultTitles->has($contentType['slug'])) {
@@ -250,7 +259,7 @@ class RecordContentGenerator
             $contentEntity->set($fieldName, $value);
 
             return;
-        } elseif ($type === 'file' || $type === 'select') {
+        } elseif (in_array($type, ['file', 'select', 'templateselect'])) {
             $contentEntity->set($fieldName, null);
 
             return;
@@ -277,12 +286,14 @@ class RecordContentGenerator
      */
     private function addJson(Entity\Content $contentEntity, $fieldName, $type)
     {
+        $contentType = $this->repository->getEntityManager()->getContentType($contentEntity->getContenttype());
+        $placeholder = isset($contentType['fields'][$fieldName]['placeholder']) ? $contentType['fields'][$fieldName]['placeholder'] : null;
         $value = null;
         if ($type === 'image') {
-            $value = $this->getRandomImage($type);
+            $value = $this->getRandomImage($type, $placeholder);
         } elseif ($type === 'imagelist') {
             for ($i = 1; $i <= 3; $i++) {
-                $value[] = $this->getRandomImage($type);
+                $value[] = $this->getRandomImage($type, $placeholder);
             }
         } elseif ($type === 'filelist' || $type === 'templatefields') {
             $value = [];
@@ -294,10 +305,10 @@ class RecordContentGenerator
     /**
      * Add some random taxonomy entries on the record.
      *
-     * @param Entity\Content $contentEntity
-     * @param array          $contentType
+     * @param Entity\Content    $contentEntity
+     * @param array|ContentType $contentType
      */
-    private function setTaxonomyCollection(Entity\Content $contentEntity, array $contentType)
+    private function setTaxonomyCollection(Entity\Content $contentEntity, $contentType)
     {
         if (empty($contentType['taxonomy'])) {
             return;
@@ -416,7 +427,7 @@ class RecordContentGenerator
     /**
      * Get an array of random tags
      *
-     * @param integer $count
+     * @param int $count
      *
      * @return string[]
      */
@@ -448,13 +459,19 @@ class RecordContentGenerator
     /**
      * Get a random image.
      *
-     * @param string $type
+     * @param string      $type
+     * @param string|null $placeholder
      *
      * @return array|null
      */
-    private function getRandomImage($type)
+    private function getRandomImage($type, $placeholder)
     {
         $pathKey = $type === 'image' ? 'file' : 'filename';
+
+        if ($placeholder && ($filename = $this->fetchPlaceholder($placeholder))) {
+            return [$pathKey => $filename, 'title' => 'placeholder', 'alt' => 'placeholder'];
+        }
+
         $images = $this->getImageFiles();
         if (empty($images)) {
             return null;
@@ -465,5 +482,33 @@ class RecordContentGenerator
         $title = ucwords(str_replace('-', ' ', $title));
 
         return [$pathKey => $image->getPath(), 'title' => $title, 'alt' => $title];
+    }
+
+    /**
+     * Attempt to fetch a placeholder image from a remote URL.
+     *
+     * @param string $placeholder
+     *
+     * @return array|bool
+     */
+    private function fetchPlaceholder($placeholder)
+    {
+        try {
+            $image = $this->imageClient->get($placeholder);
+        } catch (RequestException $e) {
+            // We couldn't fetch the file, fall back to default behaviour
+            return false;
+        }
+
+        $filename = sprintf('placeholder_%s.jpg', substr(md5(microtime()), 0, 12));
+
+        try {
+            $this->filesystem->put('files://' . $filename, $image);
+        } catch (IOException $e) {
+            // We couldn't save the file, fall back to default behaviour
+            return false;
+        }
+
+        return $filename;
     }
 }

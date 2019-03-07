@@ -3,7 +3,7 @@
 namespace Bolt\Filesystem\Tests\Adapter;
 
 use Bolt\Filesystem\Adapter\Local;
-use Bolt\Filesystem\Exception\DirectoryCreationException;
+use Bolt\Filesystem\Exception\FileNotFoundException;
 use Bolt\Filesystem\Filesystem;
 use Bolt\Filesystem\FilesystemInterface;
 use Bolt\Filesystem\Tests\FilesystemTestCase;
@@ -28,6 +28,10 @@ class LocalTest extends FilesystemTestCase
         $this->filesystem = new Filesystem(new Local($this->rootDir . '/tests'));
     }
 
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\DirectoryCreationException
+     * @expectedExceptionMessage Failed to create directory
+     */
     public function testConstruct()
     {
         if (posix_getuid() === 0) {
@@ -37,7 +41,6 @@ class LocalTest extends FilesystemTestCase
         $local = new Local($this->tempDir);
         $this->assertInstanceOf(Local::class, $local);
 
-        $this->setExpectedException(DirectoryCreationException::class, 'Failed to create directory');
         new Local('/bad');
     }
 
@@ -56,6 +59,9 @@ class LocalTest extends FilesystemTestCase
         $this->assertFalse($update);
     }
 
+    /**
+     * @expectedException \Bolt\Filesystem\Exception\FileNotFoundException
+     */
     public function testDelete()
     {
         $this->filesystem->get('fixtures/base.css')->copy('temp/koala.css');
@@ -63,8 +69,7 @@ class LocalTest extends FilesystemTestCase
         $delete = $local->delete('koala.css');
         $this->assertTrue($delete);
 
-        $delete = $local->delete('koala.css.typo');
-        $this->assertFalse($delete);
+        $local->delete('koala.css.typo');
     }
 
     public function testCreateDir()

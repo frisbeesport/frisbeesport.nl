@@ -11,6 +11,8 @@ use Bolt\Legacy;
 use Bolt\Pager\PagerManager;
 use Bolt\Storage\Collection\Taxonomy;
 use Bolt\Storage\Entity;
+use Bolt\Storage\Mapping\ContentType;
+use Bolt\Storage\Query\Query;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,6 +36,8 @@ class RecordRuntime
     private $themeTemplateSelect;
     /** @var bool */
     private $useTwigGlobals;
+    /** @var Query  */
+    private $query;
 
     /**
      * Constructor.
@@ -43,19 +47,22 @@ class RecordRuntime
      * @param DirectoryInterface $templatesDir
      * @param array              $themeTemplateSelect
      * @param mixed              $useTwigGlobals
+     * @param Query              $query
      */
     public function __construct(
         RequestStack $requestStack,
         PagerManager $pagerManager,
         DirectoryInterface $templatesDir,
         array $themeTemplateSelect,
-        $useTwigGlobals
+        $useTwigGlobals,
+        Query $query
     ) {
         $this->requestStack = $requestStack;
         $this->pagerManager = $pagerManager;
         $this->templatesDir = $templatesDir;
         $this->themeTemplateSelect = $themeTemplateSelect;
         $this->useTwigGlobals = $useTwigGlobals;
+        $this->query = $query;
     }
 
     /**
@@ -66,7 +73,7 @@ class RecordRuntime
      *
      * @param \Bolt\Legacy\Content|array $content
      *
-     * @return boolean True if the given content is on the curent page.
+     * @return bool true if the given content is on the curent page
      */
     public function current($content)
     {
@@ -121,7 +128,7 @@ class RecordRuntime
      * Create an excerpt for the given content.
      *
      * @param \Bolt\Legacy\Content|array|string $content
-     * @param integer                           $length  Defaults to 200 characters
+     * @param int                               $length  Defaults to 200 characters
      * @param array|string|null                 $focus
      *
      * @return string Resulting excerpt
@@ -132,6 +139,40 @@ class RecordRuntime
         $excerpt = $excerpter->getExcerpt($length, false, $focus);
 
         return $excerpt;
+    }
+
+    /**
+     * Gets the first image from the given content record.
+     *
+     * This method is deprecated. In Bolt 3.5 it'll be replaced / removed to
+     * fall in line with the work done for #6985
+     *
+     * @param \Bolt\Storage\Entity\Content $content
+     *
+     * @return array|null image
+     */
+    public function getFirstImage($content)
+    {
+        Deprecated::method('3.4');
+
+        $contentType = $content->getContenttype();
+        if (!$contentType instanceof ContentType) {
+            return null;
+        }
+        $fields = $contentType->getFields();
+        if (!is_array($fields)) {
+            return null;
+        }
+
+        // Grab the first field of type 'image', and return that.
+        foreach ($fields as $key => $field) {
+            if ($field['type'] === 'image' && is_array($content->get($key))) {
+                return $content->get($key);
+            }
+        }
+
+        // otherwise, no image.
+        return null;
     }
 
     /**
@@ -149,7 +190,7 @@ class RecordRuntime
      * @param string|array         $exclude
      * @param bool                 $skip_uses
      *
-     * @return string
+     * @return string|null
      */
     public function fields(
         Environment $env,
@@ -232,11 +273,75 @@ class RecordRuntime
     }
 
     /**
+     * @param Entity\Content $entity
+     * @param string         $field
+     * @param array          $where
+     *
+     * @return Entity\Content|null
+     */
+    public function next($entity, $field = 'datepublish', $where = [])
+    {
+        if ($field[0] === '-') {
+            $operator = '<';
+            $field = substr($field, 1);
+            $order = '-' . $field;
+        } elseif ($field[0] === '+') {
+            $operator = '>';
+            $field = substr($field, 1);
+            $order = $field;
+        } else {
+            $operator = '>';
+            $order = $field;
+        }
+        $params = [
+            $field         => $operator . $entity->get($field),
+            'limit'        => 1,
+            'order'        => $order,
+            'returnsingle' => true,
+        ];
+        $params = array_merge($params, $where);
+
+        return $this->query->getContent((string) $entity->getContenttype(), $params);
+    }
+
+    /**
+     * @param Entity\Content $entity
+     * @param string         $field
+     * @param array          $where
+     *
+     * @return Entity\Content|null
+     */
+    public function previous($entity, $field = 'datepublish', array $where = [])
+    {
+        if ($field[0] === '-') {
+            $operator = '>';
+            $field = substr($field, 1);
+            $order = '-' . $field;
+        } elseif ($field[0] === '+') {
+            $operator = '<';
+            $field = substr($field, 1);
+            $order = $field;
+        } else {
+            $operator = '<';
+            $order = $field;
+        }
+        $params = [
+            $field         => $operator . $entity->get($field),
+            'limit'        => 1,
+            'order'        => $order,
+            'returnsingle' => true,
+        ];
+        $params = array_merge($params, $where);
+
+        return $this->query->getContent((string) $entity->getContenttype(), $params);
+    }
+
+    /**
      * Output a simple pager, for paginated listing pages.
      *
      * @param Environment $env
      * @param string      $pagerName
-     * @param integer     $surr
+     * @param int         $surr
      * @param string      $template  The template to apply
      * @param string      $class
      *
@@ -271,7 +376,7 @@ class RecordRuntime
      *
      * @param array        $content     A Bolt record array
      * @param array|string $fieldName   Name of a field, or array of field names to return from each record
-     * @param boolean      $startempty  Whether or not the array should start with an empty element
+     * @param bool         $startempty  Whether or not the array should start with an empty element
      * @param string       $keyName     Name of the key in the array
      * @param string|null  $contentType ContentType string used by the select field
      *

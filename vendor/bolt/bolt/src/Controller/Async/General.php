@@ -3,6 +3,8 @@
 namespace Bolt\Controller\Async;
 
 use Bolt;
+use Bolt\Common\Exception\ParseException;
+use Bolt\Common\Json;
 use Bolt\Extension\ExtensionInterface;
 use Bolt\Filesystem;
 use Bolt\Storage\Entity;
@@ -97,8 +99,8 @@ class General extends AsyncBase
     /**
      * Generate the change log box for a single record in edit.
      *
-     * @param string  $contenttype
-     * @param integer $contentid
+     * @param string $contenttype
+     * @param int    $contentid
      *
      * @return \Bolt\Response\TemplateResponse
      */
@@ -151,8 +153,8 @@ class General extends AsyncBase
     /**
      * Latest {contenttype} to show a small listing in the sidebars.
      *
-     * @param string       $contenttypeslug
-     * @param integer|null $contentid
+     * @param string   $contenttypeslug
+     * @param int|null $contentid
      *
      * @return \Bolt\Response\TemplateResponse
      */
@@ -207,14 +209,21 @@ class General extends AsyncBase
      */
     public function makeUri(Request $request)
     {
-        return $this->storage()->getUri(
-            $request->query->get('title'),
-            $request->query->get('id'),
+        $content = $this->storage()->create(
             $request->query->get('contenttypeslug'),
+            $request->query->all()
+        );
+
+        // Spoof the title, for contenttypes that have a different `uses:`
+        $content->set('title', $request->query->get('title'));
+
+        $uri = $content->getUri(
+            $request->query->get('id'),
             $request->query->getBoolean('fulluri'),
-            true,
             $request->query->get('slugfield') //for multipleslug support
         );
+
+        return $uri;
     }
 
     /**
@@ -393,17 +402,19 @@ class General extends AsyncBase
             ];
         }
 
-        $fetchedNewsItems = json_decode($fetchedNewsData);
-        if ($newsVariable = $this->getOption('general/branding/news_variable')) {
-            $fetchedNewsItems = $fetchedNewsItems->$newsVariable;
+        try {
+            $fetchedNewsItems = Json::parse($fetchedNewsData);
+        } catch (ParseException $e) {
+            // Just move on, a user-friendly notice is returned below.
+            $fetchedNewsItems = [];
+        }
+
+        $newsVariable = $this->getOption('general/branding/news_variable');
+        if ($newsVariable && array_key_exists($newsVariable, $fetchedNewsItems)) {
+            $fetchedNewsItems = $fetchedNewsItems[$newsVariable];
         }
 
         $news = [];
-        if (!$fetchedNewsItems) {
-            $this->app['logger.system']->error('Invalid JSON feed returned', ['event' => 'news']);
-
-            return $news;
-        }
 
         // Iterate over the items, pick the first news-item that
         // applies and the first alert we need to show
@@ -416,7 +427,18 @@ class General extends AsyncBase
             }
         }
 
-        return $news;
+        if ($news) {
+            return $news;
+        }
+        $this->app['logger.system']->error('Invalid JSON feed returned', ['event' => 'news']);
+
+        return [
+            'error' => [
+                'type'   => 'error',
+                'title'  => 'Unable to fetch news!',
+                'teaser' => "<p>Invalid JSON feed returned by $source</p>",
+            ],
+        ];
     }
 
     /**
@@ -442,12 +464,16 @@ class General extends AsyncBase
         ];
 
         if ($this->getOption('general/httpProxy')) {
-            $options['proxy'] = sprintf(
-                '%s:%s@%s',
-                $this->getOption('general/httpProxy/user'),
-                $this->getOption('general/httpProxy/password'),
-                $this->getOption('general/httpProxy/host')
-            );
+            if ($this->getOption('general/httpProxy/user')) {
+                $options['proxy'] = sprintf(
+                    '%s:%s@%s',
+                    $this->getOption('general/httpProxy/user'),
+                    $this->getOption('general/httpProxy/password'),
+                    $this->getOption('general/httpProxy/host')
+                );
+            } else {
+                $options['proxy'] = $this->getOption('general/httpProxy/host');
+            }
         }
 
         return $options;
@@ -456,8 +482,8 @@ class General extends AsyncBase
     /**
      * Get last modified records from the content log.
      *
-     * @param string  $contenttypeslug
-     * @param integer $contentid
+     * @param string $contenttypeslug
+     * @param int    $contentid
      *
      * @return \Bolt\Response\TemplateResponse
      */
