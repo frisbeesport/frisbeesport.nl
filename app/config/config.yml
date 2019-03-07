@@ -182,7 +182,7 @@ accept_file_types: [ twig, html, js, css, scss, gif, jpg, jpeg, png, ico, zip, t
 # production environment.
 debug: true
 developer_notices: false
-debug_show_loggedoff: true
+debug_show_loggedoff: false
 debug_permission_audit_mode: false
 debug_error_level: 6135 # equivalent to E_ALL &~ E_NOTICE &~ E_DEPRECATED &~ E_USER_DEPRECATED
 #debug_error_level: 30719 # equivalent to E_ALL
