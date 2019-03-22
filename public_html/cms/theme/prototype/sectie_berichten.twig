@@ -22,14 +22,13 @@ section--cards--small section--nieuws
     <div class="container">
         <div class="section__content">
             <div class="section__header">
-            <div class="section__title section__title--centered"><h2>Berichten en verslagen</h2></div>
+            <div class="section__title section__title--centered"><h2>Nieuws</h2></div>
         </div>
         
         <div class="smallcards">
             {% for record in records %}       
                 {% include 'nieuwsbericht_card.twig' with { 'nieuwsbericht': record, 'afdelingkleur': true } %} 
             {% endfor %}
-        </div>
         </div>
     </div>
      

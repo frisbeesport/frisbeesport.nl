@@ -25,13 +25,7 @@
             <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ path('organisatie') }}">Organisatie</a></li>
             {% else %}
             <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ path('organisatie') }}">Organisatie</a></li>
-            {% endif %}
-            
-            {% if afdeling == 'spelers' %}
-            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--active" href="{{ path('spelers') }}">Spelersinfo</a></li>
-            {% else %}
-            <li><a class="navigatie-afdelingen__tab navigatie-afdelingen__tab--inactive" href="{{ path('spelers') }}">Spelersinfo</a></li>
-            {% endif %}          
+            {% endif %}      
         </ul>
     </div>
 </div>
