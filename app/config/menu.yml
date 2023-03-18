@@ -27,8 +27,9 @@ homepage_mobile:
   - label: Organisatie
     path: paginas/organisatie
     top: true
-  - label: Spelersinfo
-    path: paginas/spelers
+  - label: Veilig sporten
+    title: Veilig sporten
+    path: paginaset/veilig-sporten
     top: true
   - label: Pers
     path: paginas/organisatie-pers
@@ -50,7 +51,7 @@ ultimate:
   - label: Nationale teams
     path: pagina/ultimate-nationale-teams
     top: true
-  - label: Wedstrijden
+  - label: Competitie
     path: paginas/ultimate-competitie
     top: true    
   - label: Competitieuitslagen
@@ -63,13 +64,21 @@ ultimate:
   - label: Verenigingen
     path: pagina/ultimate-verenigingen
     top: true
+  - label: Veilig sporten
+    title: Veilig sporten
+    path: paginaset/veilig-sporten
+    top: true    
   - label: Contact
     title: Contact
     path: pagina/ultimate-contact
     top: true        
   - label: Nieuws
     path: pagina/ultimate-nieuws
-      
+  - label: Agenda
+    title: Agenda
+    path: pagina/ultimate-agenda
+    top: true
+    
 discgolf:
   - label: Disc Golf
     title: Disc Golf
@@ -80,21 +89,34 @@ discgolf:
   - label: Courses
     path: pagina/discgolf-courses
     top: true
-  - label: Competitieuitslagen
+  - label: Competitie
+    title: Competitie
     path: pagina/discgolf-competitie
+    top: true  
+  - label: Competitieuitslagen
+    path: pagina/discgolf-competitie-uitslagen
     top: true    
-  - label: Competitieagenda
-    path: pagina/spelers-discgolf-competitie
-    top: true
   - label: Verenigingen
     path: pagina/discgolf-verenigingen
     top: true
+  - label: Veilig sporten
+    title: Veilig sporten
+    path: paginaset/veilig-sporten
+    top: true    
   - label: Contact
     title: Contact
     path: pagina/discgolf-contact
     top: true    
   - label: Nieuws
     path: pagina/discgolf-nieuws    
+  - label: Agenda
+    title: Agenda
+    path: pagina/discgolf-agenda
+    top: true
+  - label: Documenten
+    title: Documenten
+    path: pagina/discgolf-documenten
+    top: true
     
 organisatie:
   - label: Organisatie
@@ -148,3 +170,7 @@ organisatie:
     title: Agenda
     path: pagina/agenda
     top: true
+  - label: Privacyverklaring
+    title: Privacyverklaring
+    path: pagina/57
+    top: false
